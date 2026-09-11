@@ -1,0 +1,19 @@
+# normaliza los finales de linea: LF en el repositorio, nativo al trabajar
+* text=auto eol=lf
+
+# archivos que siempre deben conservar LF
+*.sh text eol=lf
+*.sql text eol=lf
+*.yml text eol=lf
+*.yaml text eol=lf
+
+# archivos binarios
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.pdf binary
+*.ico binary
+*.ttf binary
+*.woff binary
+*.woff2 binary
