@@ -1,0 +1,147 @@
+openapi: 3.1.0
+
+info:
+  title: API Panamericana
+  version: 0.1.0
+  description: |
+    Contrato de la API del sistema de gestión Panamericana.
+    Este archivo es la fuente de verdad: el endpoint se escribe aquí ANTES de implementarlo.
+    Los nombres de los campos son idénticos a los de la base de datos (regla R2).
+
+servers:
+  - url: http://localhost:3000
+    description: desarrollo local
+  - url: http://localhost:4010
+    description: mock del contrato (prism)
+
+tags:
+  - name: buses
+    description: gestión de la flota
+
+security:
+  - tokenPortador: []
+
+paths:
+  /v1/buses:
+    get:
+      tags: [buses]
+      summary: Listar buses
+      operationId: listarBuses
+      responses:
+        '200':
+          description: lista de buses
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Bus'
+        '401':
+          $ref: '#/components/responses/NoAutorizado'
+
+    post:
+      tags: [buses]
+      summary: Registrar un bus
+      operationId: registrarBus
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RegistrarBusEntrada'
+      responses:
+        '201':
+          description: bus registrado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Bus'
+        '400':
+          $ref: '#/components/responses/SolicitudInvalida'
+        '401':
+          $ref: '#/components/responses/NoAutorizado'
+        '409':
+          $ref: '#/components/responses/Conflicto'
+
+components:
+  securitySchemes:
+    tokenPortador:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  schemas:
+    Bus:
+      type: object
+      required: [id, placa, marca, modelo, numero_pisos, estado]
+      properties:
+        id:
+          type: string
+          format: uuid
+        placa:
+          type: string
+          example: ABC-123
+        marca:
+          type: string
+          example: Volvo
+        modelo:
+          type: string
+          example: B450R
+        anio_fabricacion:
+          type: [integer, 'null']
+          example: 2021
+        numero_pisos:
+          type: integer
+          enum: [1, 2]
+        estado:
+          type: string
+          enum: [activo, mantenimiento, inactivo]
+
+    RegistrarBusEntrada:
+      type: object
+      required: [placa, marca, modelo, numero_pisos]
+      properties:
+        placa:
+          type: string
+        marca:
+          type: string
+        modelo:
+          type: string
+        anio_fabricacion:
+          type: [integer, 'null']
+        numero_pisos:
+          type: integer
+          enum: [1, 2]
+
+    Error:
+      type: object
+      required: [codigo, mensaje]
+      properties:
+        codigo:
+          type: string
+          example: placa_duplicada
+        mensaje:
+          type: string
+          example: Ya existe un bus con la placa ABC-123
+        detalles:
+          type: object
+
+  responses:
+    SolicitudInvalida:
+      description: los datos enviados no tienen el formato correcto
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    NoAutorizado:
+      description: falta el token o no es válido
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    Conflicto:
+      description: la operación choca con una regla del negocio
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'

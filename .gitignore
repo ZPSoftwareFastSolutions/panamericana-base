@@ -1,0 +1,40 @@
+# dependencias
+node_modules/
+.pnp
+.pnp.js
+
+# compilados
+dist/
+build/
+.next/
+out/
+.expo/
+*.tsbuildinfo
+
+# variables de entorno (NUNCA se suben)
+.env
+.env.*
+!.env.example
+
+# pruebas y cobertura
+coverage/
+.vitest/
+
+# supabase local
+supabase/.branches/
+supabase/.temp/
+.supabase/
+
+# herramientas locales
+.claude/settings.local.json
+.vscode/
+.idea/
+
+# sistema operativo
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# logs
+*.log
+npm-debug.log*
