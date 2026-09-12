@@ -163,11 +163,18 @@ Los dos repositorios usan **el mismo proyecto**, así que el equipo de 5 y nosot
 
 **Lo que NO se comparte por el repositorio:** la contraseña de la base de datos y la cadena de conexión. Cada integrante las copia del panel de Supabase:
 
+**Cadena de conexión verificada** (solo falta la contraseña):
+
+```
+postgresql://postgres.tvyhpwpyxmbdfxogopnl:CONTRASENA@aws-0-us-east-1.pooler.supabase.com:5432/postgres
+```
+
 | Dato | Dónde está |
 |---|---|
-| Cadena de conexión | Supabase → **Connect** → *Session pooler* (o *Direct connection*) |
-| Contraseña de la base | Supabase → Project Settings → Database → *Database password* (se puede resetear) |
+| Contraseña de la base | La comparte Ángel por canal privado (o Supabase → Project Settings → Database → *Reset password*) |
 | Claves de la API | Supabase → Project Settings → API |
+
+> 🔌 **No usar la conexión directa** (`db.tvyhpwpyxmbdfxogopnl.supabase.co`): es solo IPv6 y falla con `getaddrinfo ENOTFOUND`. El *Session pooler* es IPv4 y sí funciona. Ojo que el usuario lleva la referencia del proyecto: `postgres.tvyhpwpyxmbdfxogopnl`.
 
 > ⚠️ Como es una base compartida, el Repositorio 1 **no hace cargas masivas de datos**. El espacio es del equipo de 5 para sus pruebas de CRUD.
 

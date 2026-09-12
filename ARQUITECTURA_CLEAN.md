@@ -57,7 +57,7 @@ Luego completa `backend/.env` con los datos de Supabase:
 |---|---|---|
 | `PORT` | fijo | `4000` |
 | `ALLOWED_ORIGINS` | dónde corre la web | `http://localhost:3000` |
-| `DATABASE_URL` | Supabase → **Connect** → *Session pooler* o *Direct connection*. La contraseña está en Project Settings → Database | `postgresql://postgres:...@db.tvyhpwpyxmbdfxogopnl.supabase.co:5432/postgres` |
+| `DATABASE_URL` | **Session pooler** (ver aviso abajo). La contraseña la comparte Ángel por canal privado | `postgresql://postgres.tvyhpwpyxmbdfxogopnl:CONTRASENA@aws-0-us-east-1.pooler.supabase.com:5432/postgres` |
 | `SUPABASE_URL` | Ya viene en el `.env.example` | `https://tvyhpwpyxmbdfxogopnl.supabase.co` |
 | `SUPABASE_JWT_SECRET` | Supabase → Project Settings → API → JWT | (se usa en la épica de login) |
 | `MINUTOS_RESERVA_ASIENTO` | acuerdo del equipo | `10` |
@@ -69,6 +69,8 @@ NEXT_PUBLIC_API_URL=http://localhost:4000
 ```
 
 > ⚠️ Los archivos `.env` y `.env.local` **nunca** se suben al repositorio. Solo se suben los `.example`.
+
+> 🔌 **Usa siempre el Session pooler.** La conexión directa (`db.<ref>.supabase.co`) es solo IPv6 y falla en casi cualquier red doméstica con `getaddrinfo ENOTFOUND`. El pooler (`aws-0-us-east-1.pooler.supabase.com`, puerto 5432) es IPv4 y funciona; fíjate que el usuario incluye la referencia del proyecto: `postgres.tvyhpwpyxmbdfxogopnl`.
 
 ### 2.4 Levantar el proyecto (dos terminales)
 
