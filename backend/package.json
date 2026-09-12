@@ -13,7 +13,8 @@
     "test": "vitest run --passWithNoTests",
     "test:watch": "vitest",
     "lint": "eslint src --no-error-on-unmatched-pattern",
-    "format": "prettier --write \"src/**/*.ts\""
+    "format": "prettier --write \"src/**/*.ts\"",
+    "db:verificar": "tsx src/infraestructura/verificarConexion.ts"
   },
   "dependencies": {
     "@panamericana/shared": "*",

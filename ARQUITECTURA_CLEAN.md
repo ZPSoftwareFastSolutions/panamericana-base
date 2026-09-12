@@ -57,8 +57,8 @@ Luego completa `backend/.env` con los datos de Supabase:
 |---|---|---|
 | `PORT` | fijo | `4000` |
 | `ALLOWED_ORIGINS` | dónde corre la web | `http://localhost:3000` |
-| `DATABASE_URL` | Supabase → Project Settings → Database → Connection string → **Session mode** | `postgresql://postgres:...@...:5432/postgres` |
-| `SUPABASE_URL` | Supabase → Project Settings → API | `https://xxxx.supabase.co` |
+| `DATABASE_URL` | Supabase → **Connect** → *Session pooler* o *Direct connection*. La contraseña está en Project Settings → Database | `postgresql://postgres:...@db.tvyhpwpyxmbdfxogopnl.supabase.co:5432/postgres` |
+| `SUPABASE_URL` | Ya viene en el `.env.example` | `https://tvyhpwpyxmbdfxogopnl.supabase.co` |
 | `SUPABASE_JWT_SECRET` | Supabase → Project Settings → API → JWT | (se usa en la épica de login) |
 | `MINUTOS_RESERVA_ASIENTO` | acuerdo del equipo | `10` |
 
@@ -82,6 +82,7 @@ npm run dev:web
 
 | Para ver | Abre |
 |---|---|
+| ¿La base conecta? | `npm run db:verificar` en una terminal |
 | ¿La API responde? | http://localhost:4000/salud → `{"estado":"ok"}` |
 | La web | http://localhost:3000 |
 | El panel administrativo | http://localhost:3000/admin/buses |
@@ -96,6 +97,7 @@ npm run dev:web
 | `npm run lint` | Revisa el estilo del código |
 | `npm run build` | Compila todo, igual que en el servidor |
 | `npm run build:shared` | Recompila el contrato compartido (se ejecuta solo al usar `dev:*`) |
+| `npm run db:verificar` | Comprueba que el backend se conecta a la base y lista las tablas |
 
 ---
 

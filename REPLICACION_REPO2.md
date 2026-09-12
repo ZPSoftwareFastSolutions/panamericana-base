@@ -36,7 +36,7 @@ flowchart LR
 | **A2** | El Repositorio 2 **nunca** se abre como directorio de trabajo de Claude Code ni de otro asistente | Es el requisito principal |
 | **A3** | El Repositorio 1 **no** tiene al Repositorio 2 como remoto (`git remote -v` solo muestra su propio `origin`) | Evita un `push` accidental |
 | **A4** | El Repositorio 2 **no** copia: `.claude/`, `CLAUDE.md`, `AGENTS.md`, `.mcp.json`, `REPLICACION_REPO2.md`, `.git/` | Evita filtrar configuración y contexto del Repositorio 1 |
-| **A5** | Cada repositorio tiene su **propio proyecto de Supabase** y sus propias claves. Los archivos `.env` nunca se copian | Una clave filtrada afecta a los dos |
+| **A5** | Los dos repositorios comparten el proyecto de Supabase `panamericana`, pero **los archivos `.env` nunca se copian**: cada persona pone sus credenciales a mano | Compartir datos es intencional; compartir archivos con claves, no |
 | **A6** | La transferencia es por **copia de archivos**, nunca por historial de Git | El Repositorio 2 tiene su propio historial, hecho por el equipo |
 | **A7** | Antes de copiar, se revisa que ningún archivo tenga claves ni rutas locales | Ver checklist de la sección 6 |
 
@@ -149,16 +149,27 @@ git push -u origin main
 
 ## 5. Configuración de entorno del Repositorio 2
 
-### 5.1 Supabase del equipo
+### 5.1 Supabase compartido
 
-Ángel crea **dos proyectos nuevos**, distintos de los del Repositorio 1:
+Los dos repositorios usan **el mismo proyecto**, así que el equipo de 5 y nosotros vemos los mismos datos.
 
-| Proyecto | Uso |
+| Dato | Valor |
 |---|---|
-| `panamericana-equipo-staging` | Desarrollo diario de los 5 |
-| `panamericana-equipo-prod` | Entrega final |
+| Proyecto | `panamericana` |
+| Referencia | `tvyhpwpyxmbdfxogopnl` |
+| URL | `https://tvyhpwpyxmbdfxogopnl.supabase.co` |
+| Región | `us-east-1` |
+| Estado | 16 tablas creadas, con datos de prueba |
 
-Las claves se comparten por un canal privado, **nunca** dentro del repositorio.
+**Lo que NO se comparte por el repositorio:** la contraseña de la base de datos y la cadena de conexión. Cada integrante las copia del panel de Supabase:
+
+| Dato | Dónde está |
+|---|---|
+| Cadena de conexión | Supabase → **Connect** → *Session pooler* (o *Direct connection*) |
+| Contraseña de la base | Supabase → Project Settings → Database → *Database password* (se puede resetear) |
+| Claves de la API | Supabase → Project Settings → API |
+
+> ⚠️ Como es una base compartida, el Repositorio 1 **no hace cargas masivas de datos**. El espacio es del equipo de 5 para sus pruebas de CRUD.
 
 ### 5.2 Pasos para cada integrante
 
@@ -169,14 +180,15 @@ Las claves se comparten por un canal privado, **nunca** dentro del repositorio.
 | 3 | Instalar (en la raíz) | `npm install` |
 | 4 | Variables del backend | `cp backend/.env.example backend/.env` |
 | 5 | Variables de la web | `cp web/.env.local.example web/.env.local` |
-| 6 | Completar `backend/.env` | Datos del Supabase del equipo |
+| 6 | Completar `backend/.env` | `DATABASE_URL` del panel de Supabase (sección 5.1) |
 | 7 | Levantar | `npm run dev:backend` y `npm run dev:web` |
-| 8 | Verificar | http://localhost:4000/salud y http://localhost:3000/admin/buses |
+| 8 | Verificar la base | `npm run db:verificar` |
+| 9 | Verificar en el navegador | http://localhost:4000/salud y http://localhost:3000/admin/buses |
 
 ### 5.3 Migraciones
 
 ```bash
-npx supabase link --project-ref <ref-del-proyecto-del-equipo>
+npx supabase link --project-ref tvyhpwpyxmbdfxogopnl
 ```
 
 ```bash

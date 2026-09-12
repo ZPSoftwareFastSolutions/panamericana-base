@@ -1,8 +1,26 @@
 # Propuesta de Base de Datos — Panamericana
 
-> **Versión:** 0.9 — candidata a v1.0 · **Estado:** 🟡 Última ronda de comentarios
-> **Fecha límite para comentarios:** ____ / ____ / 2026
+> **Versión:** 1.0 · **Estado:** ✅ Creada en Supabase · nombres congelados
+> **Fecha:** 2026-09-12
 > Incorpora las observaciones de la revisión del modelo v0.1.
+
+## 0. Estado actual
+
+| Dato | Valor |
+|---|---|
+| Proyecto Supabase | `panamericana` (ref `tvyhpwpyxmbdfxogopnl`) |
+| Tablas creadas | **16**, todas con RLS activado y sin políticas públicas |
+| Datos de prueba | `supabase/seed.sql`: 2 buses, 4 asientos, 3 terminales, 1 ruta con 3 paradas, 1 viaje, 1 venta y 1 pasaje |
+| Migraciones | `supabase/migrations/` (5 archivos, aplicados) |
+
+**Protección de asientos verificada en la base real:**
+
+| Prueba | Resultado |
+|---|---|
+| Vender el asiento 1 del tramo 1→3 cuando ya está vendido el 1→2 | ❌ Rechazado (`23P01`, restricción `pasajes_asiento_sin_traslape`) |
+| Vender el asiento 1 del tramo 2→3 con el 1→2 ya vendido | ✅ Aceptado |
+
+> ⚠️ **Los nombres de tablas y campos están congelados** (reglas R2 y R3). Cualquier cambio a partir de aquí se hace con una migración nueva, nunca editando las existentes. Las preguntas de la sección 6 que sigan abiertas se resuelven así.
 
 ---
 
@@ -363,16 +381,24 @@ Traducido: *"para el mismo viaje y el mismo asiento, no pueden existir dos pasaj
 
 ## 8. Próximos pasos
 
-```
-v0.9 (este documento) → Comentarios → v1.0 → Aprobación → Nombres congelados → Migraciones en Supabase
-```
-
-| Paso | Resultado |
+| Paso | Estado |
 |---|---|
-| 1. Recoger comentarios y responder P5–P18 | Lista de cambios finales |
-| 2. Publicar v1.0 | Modelo definitivo |
-| 3. Aprobación del equipo | Nombres congelados (reglas R2 y R3) |
-| 4. Escribir las migraciones `.sql` | Una migración por área |
-| 5. Aplicar en el proyecto de pruebas y luego en producción | Base de datos lista |
+| 1. Incorporar la revisión (tripulación, tramos, tarifas, ventas) | ✅ Hecho |
+| 2. Escribir las migraciones `.sql` | ✅ 5 migraciones |
+| 3. Crear la base en Supabase | ✅ 16 tablas |
+| 4. Cargar datos de prueba y verificar la protección de asientos | ✅ Verificado |
+| 5. Congelar nombres | ✅ Reglas R2 y R3 activas |
+| 6. Responder P5–P18 | ⏳ Cada respuesta será una migración nueva |
+| 7. Crear el proyecto de producción antes de la entrega | ⏳ Pendiente |
 
-> La tabla `buses` ya está creada en `supabase/migrations/0001_buses.sql` porque es el módulo de referencia del repositorio y no cambia con estas observaciones.
+### Migraciones aplicadas
+
+| Archivo | Contenido |
+|---|---|
+| `20260912051634_buses.sql` | `buses` |
+| `20260912051645_funciones_y_personas.sql` | función de auditoría, `usuarios`, `clientes` |
+| `20260912051709_flota_y_rutas.sql` | `asientos`, `choferes`, `terminales`, `rutas`, `rutas_paradas`, `viajes`, `viajes_choferes`, `tarifas` |
+| `20260912051726_ventas_pasajes_pagos.sql` | `ventas`, `pasajes` (con la restricción por tramos), `pagos` |
+| `20260912051740_encomiendas.sql` | `encomiendas`, `historial_encomiendas` |
+
+Todas las tablas tienen `creado_en` y `actualizado_en`; un *trigger* mantiene `actualizado_en` al día automáticamente.

@@ -64,6 +64,7 @@ El módulo **`buses`** está implementado de punta a punta (base de datos → AP
 | `npm test` | Pruebas del backend |
 | `npm run lint` | Revisa el estilo del código |
 | `npm run build` | Compila todo, igual que el servidor de integración |
+| `npm run db:verificar` | Comprueba la conexión con la base de datos |
 
 ---
 
@@ -73,7 +74,7 @@ El módulo **`buses`** está implementado de punta a punta (base de datos → AP
 |---|---|
 | [ARQUITECTURA_CLEAN.md](ARQUITECTURA_CLEAN.md) | Guía de trabajo: puesta en marcha, capas, flujo completo y recetas |
 | [PLANIFICACION.md](PLANIFICACION.md) | Roles, sprints, reglas y roadmap |
-| [PROPUESTA_BD.md](PROPUESTA_BD.md) | Modelo de datos (v0.9, en última revisión) |
+| [PROPUESTA_BD.md](PROPUESTA_BD.md) | Modelo de datos v1.0, ya creado en Supabase (16 tablas) |
 | [REPLICACION_REPO2.md](REPLICACION_REPO2.md) | Cómo se crea y sincroniza el repositorio del equipo |
 | `docs/api/openapi.yaml` | Contrato de la API |
 | `docs/adr/` | Decisiones de arquitectura |
