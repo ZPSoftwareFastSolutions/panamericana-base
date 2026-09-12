@@ -7,12 +7,9 @@ on:
     branches: [main]
 
 jobs:
-  backend:
-    name: Backend (lint, tests, build)
+  proyecto:
+    name: Lint, pruebas y build
     runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: backend
 
     steps:
       - uses: actions/checkout@v4
@@ -21,10 +18,13 @@ jobs:
         with:
           node-version: 24
           cache: npm
-          cache-dependency-path: backend/package-lock.json
+          cache-dependency-path: package-lock.json
 
       - name: Instalar dependencias
         run: npm ci
+
+      - name: Compilar contrato compartido
+        run: npm run build:shared
 
       - name: Lint
         run: npm run lint
@@ -32,5 +32,5 @@ jobs:
       - name: Pruebas
         run: npm test
 
-      - name: Compilar
+      - name: Build
         run: npm run build

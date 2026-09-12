@@ -1,9 +1,69 @@
 # Panamericana — Sistema de Gestión
 
-Sistema web y móvil para venta de pasajes, gestión de flota, rutas y encomiendas de la empresa de transporte **Panamericana**.
+Sistema web para venta de pasajes, gestión de flota, rutas y encomiendas de la empresa de transporte **Panamericana**.
 
 > **Repositorio privado de trabajo (Repositorio 1).** Acceso: John Zabaleta y Ángel Paredes.
 > El repositorio del equipo completo es el **Repositorio 2** (ver [REPLICACION_REPO2.md](REPLICACION_REPO2.md)).
+
+---
+
+## Arranque rápido
+
+```bash
+npm install
+```
+
+```bash
+cp backend/.env.example backend/.env
+```
+
+```bash
+cp web/.env.local.example web/.env.local
+```
+
+Completa `backend/.env` con los datos de Supabase y levanta el proyecto en dos terminales:
+
+```bash
+npm run dev:backend
+```
+
+```bash
+npm run dev:web
+```
+
+| Dirección | Qué es |
+|---|---|
+| http://localhost:4000/salud | La API responde |
+| http://localhost:3000 | La web |
+| http://localhost:3000/admin/buses | Panel administrativo (módulo de ejemplo) |
+
+**La guía completa del flujo de trabajo está en [ARQUITECTURA_CLEAN.md](ARQUITECTURA_CLEAN.md).** Léela antes de escribir código.
+
+---
+
+## Estructura
+
+```
+shared/      contrato compartido: direcciones de la API y tipos de datos
+backend/     API REST — Node.js + TypeScript + Express (Clean Architecture)
+web/         Next.js 16 — portal público + backoffice
+supabase/    migraciones .sql y datos de prueba
+docs/        contrato OpenAPI, decisiones (ADR) y guías por sprint
+```
+
+El módulo **`buses`** está implementado de punta a punta (base de datos → API → pantalla) y sirve de plantilla para los demás.
+
+---
+
+## Comandos
+
+| Comando | Qué hace |
+|---|---|
+| `npm run dev:backend` | Levanta la API en el puerto 4000 |
+| `npm run dev:web` | Levanta la web en el puerto 3000 |
+| `npm test` | Pruebas del backend |
+| `npm run lint` | Revisa el estilo del código |
+| `npm run build` | Compila todo, igual que el servidor de integración |
 
 ---
 
@@ -11,68 +71,20 @@ Sistema web y móvil para venta de pasajes, gestión de flota, rutas y encomiend
 
 | Documento | Contenido |
 |---|---|
-| [PLANIFICACION.md](PLANIFICACION.md) | Roles, stack, reglas del proyecto, sprints y roadmap |
-| [ARQUITECTURA_CLEAN.md](ARQUITECTURA_CLEAN.md) | Guía práctica de Clean Architecture y convenciones de código |
-| [PROPUESTA_BD.md](PROPUESTA_BD.md) | Modelo de datos (borrador v0.1, en revisión) |
-| [REPLICACION_REPO2.md](REPLICACION_REPO2.md) | Cómo se crea y se sincroniza el repositorio del equipo |
-| `docs/api/openapi.yaml` | Contrato de la API (se escribe antes del código) |
+| [ARQUITECTURA_CLEAN.md](ARQUITECTURA_CLEAN.md) | Guía de trabajo: puesta en marcha, capas, flujo completo y recetas |
+| [PLANIFICACION.md](PLANIFICACION.md) | Roles, sprints, reglas y roadmap |
+| [PROPUESTA_BD.md](PROPUESTA_BD.md) | Modelo de datos (v0.9, en última revisión) |
+| [REPLICACION_REPO2.md](REPLICACION_REPO2.md) | Cómo se crea y sincroniza el repositorio del equipo |
+| `docs/api/openapi.yaml` | Contrato de la API |
 | `docs/adr/` | Decisiones de arquitectura |
-| `docs/guias-sprint/` | Guías de replicación por sprint |
 
 ---
 
-## Estructura
+## Reglas del proyecto
 
-```
-backend/     API REST — Node.js + TypeScript + Express (Clean Architecture)
-web/         Next.js — portal público + backoffice
-mobile/      Expo React Native — app de compra
-supabase/    migraciones .sql y datos de prueba
-docs/        contrato de API, decisiones y guías
-```
-
----
-
-## Requisitos
-
-| Herramienta | Versión |
-|---|---|
-| Node.js | 24 LTS (ver `.nvmrc`) |
-| npm | 10+ |
-| Supabase CLI | última estable |
-| Git | 2.40+ |
-
----
-
-## Puesta en marcha
-
-### 1. Backend
-
-```bash
-cd backend && npm install && cp .env.example .env && npm run dev
-```
-
-Completa `.env` con los datos del proyecto de Supabase de **staging**. El archivo `.env` nunca se sube al repositorio.
-
-### 2. Contrato de la API (mock)
-
-Levanta un servidor falso que responde según el contrato, para que el frontend avance sin esperar al backend:
-
-```bash
-npx @stoplight/prism-cli mock docs/api/openapi.yaml --port 4010
-```
-
-### 3. Web y móvil
-
-Aún no están generados. Las instrucciones están en `web/README.md` y `mobile/README.md`.
-
----
-
-## Reglas del proyecto (resumen)
-
-1. **Clean Architecture:** las dependencias apuntan hacia adentro. Ver [ARQUITECTURA_CLEAN.md](ARQUITECTURA_CLEAN.md).
-2. **API-First:** primero el endpoint en `docs/api/openapi.yaml`, después el código.
-3. **SQL en minúsculas** y nombres de campos idénticos al modelo aprobado (reglas R1–R6 de [PLANIFICACION.md](PLANIFICACION.md)).
-4. **Un solo nombre por dato:** el mismo en la base de datos, en las entidades y en el JSON de la API.
+1. **Clean Architecture:** las dependencias apuntan hacia adentro.
+2. **Un solo lugar para cada dirección de la API:** `shared/src/endpoints.ts`.
+3. **SQL en minúsculas** y nombres de campos idénticos al modelo aprobado (R1–R6).
+4. **Un dato se llama igual** en la base, en el backend y en la web (`numero_pisos`).
 5. **Cambios de esquema solo por migraciones**, nunca desde el panel de Supabase.
 6. **Nunca subir claves ni archivos `.env`.**

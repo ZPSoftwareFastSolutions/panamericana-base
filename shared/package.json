@@ -1,0 +1,14 @@
+{
+  "name": "@panamericana/shared",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Contrato compartido entre el backend y la web: nombres de endpoints y tipos de datos",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsc --build"
+  },
+  "devDependencies": {
+    "typescript": "^5.9.0"
+  }
+}

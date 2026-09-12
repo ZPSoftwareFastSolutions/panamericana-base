@@ -1,6 +1,6 @@
 # PLANIFICACIÓN — Sistema de Gestión "Panamericana"
 
-> **Versión:** 0.2 · **Fecha:** 2026-09-11 · **Estado:** Roles validados · Stack simplificado
+> **Versión:** 0.3 · **Fecha:** 2026-09-12 · **Estado:** Base del repositorio construida
 > **Entorno:** Proyecto aislado (cuarentena), sin dependencias ni contexto heredado.
 
 ### Historial de cambios
@@ -9,14 +9,15 @@
 |---|---|
 | 0.1 | Propuesta inicial de roles, stack y arquitectura. |
 | 0.2 | Ángel pasa a **Scrum Master + Backend**; Grisel pasa a **Backend + Frontend**. Stack simplificado para aprendizaje. Base de datos en **Supabase**. Flujo de aprobación de BD. Fechas de Sprint 0 y 1 confirmadas. |
+| 0.3 | Repositorio construido: workspaces (`shared`, `backend`, `web`), módulo de ejemplo `buses` de punta a punta, Next.js 16. Móvil aplazado para priorizar la web. Modelo de datos v0.9 con tripulación, tramos, tarifas y ventas. |
 
 ### Documentos del proyecto
 
 | Documento | Propósito |
 |---|---|
 | `PLANIFICACION.md` | Este documento: roles, stack, reglas y roadmap. |
-| `ARQUITECTURA_CLEAN.md` | Guía práctica de Clean Architecture, sencilla, para aprender y consultar mientras se programa. |
-| `PROPUESTA_BD.md` | Borrador v0.1 del modelo de datos para revisión y comentarios del equipo. |
+| `ARQUITECTURA_CLEAN.md` | Guía de trabajo: puesta en marcha, mapa del repositorio, flujo completo y recetas paso a paso. |
+| `PROPUESTA_BD.md` | Modelo de datos v0.9 (candidata a v1.0), en última ronda de comentarios. |
 | `TRELLO_SETUP.md` | *(Siguiente iteración)* Backlog y Sprint 1 en Trello. |
 
 ---
@@ -95,8 +96,8 @@ Grisel (API encomiendas) ⇄  Grisel  (pantallas encomiendas) → integra en lay
 - Escribir pruebas unitarias de dominio y casos de uso.
 
 **Frontend — Brisa, Karime, Grisel (50 %)**
-- Consumir la API solo desde la carpeta `api/` de cada módulo, nunca desde componentes.
-- Trabajar contra el *mock* del contrato mientras la API real no esté lista.
+- Consumir la API solo desde la carpeta `servicios/` de cada módulo, nunca desde los componentes.
+- Usar las direcciones de `shared/src/endpoints.ts`; nunca escribir una URL a mano.
 - Manejar los estados de carga, error y conflicto (p. ej., "asiento ya tomado").
 
 ### 2.6 Reglas anti-sobrecarga
@@ -119,15 +120,15 @@ Grisel (API encomiendas) ⇄  Grisel  (pantallas encomiendas) → integra en lay
 
 | Capa | Tecnología | Por qué |
 |---|---|---|
-| **Repositorio** | Un solo repo con carpetas `backend/`, `web/`, `mobile/`, `supabase/`, `docs/` | Sin herramientas de monorepo que aprender |
-| **Contrato API** | OpenAPI 3.1 en `docs/api/openapi.yaml` · Prism (mock) | API-First: el frontend avanza en paralelo |
-| **Backend** | Node.js 24 LTS · TypeScript (`strict`) · Express 5 · Zod | Framework mínimo; la inyección de dependencias se hace a mano y se entiende |
+| **Repositorio** | Un repo con workspaces de npm: `shared/`, `backend/`, `web/`, más `supabase/` y `docs/` | Un solo `npm install` en la raíz; sin herramientas extra de monorepo |
+| **Contrato API** | `shared/src/endpoints.ts` (direcciones y tipos) + `docs/api/openapi.yaml` | Backend y web leen la misma dirección; imposible desincronizarse |
+| **Backend** | Node.js 24 LTS · TypeScript (`strict`) · Express 5 · Zod · puerto 4000 | Framework mínimo; la inyección de dependencias se hace a mano y se entiende |
 | **Acceso a datos** | `pg` (node-postgres) con SQL escrito a mano | Control total del SQL en minúsculas y de los nombres de campos |
 | **Base de datos** | **Supabase** (PostgreSQL gestionado) | Postgres real con transacciones, más panel, backups y autenticación |
 | **Migraciones** | Supabase CLI → `supabase/migrations/*.sql` | Archivos SQL versionados en Git |
 | **Autenticación** | Supabase Auth · la API valida el JWT | No se implementan contraseñas ni tokens a mano |
-| **Web** | Next.js (App Router) · TanStack Query · Tailwind CSS | Estándar actual de React |
-| **Móvil** | React Native con Expo (Expo Router) · TanStack Query | Mismo patrón que la web |
+| **Web** | Next.js 16 (App Router) · TanStack Query · Tailwind CSS · puerto 3000 | Estándar actual de React |
+| **Móvil** | Aplazado: no está en el repositorio todavía | La prioridad es la web; entra en una épica posterior |
 | **Pruebas** | Vitest | Una sola herramienta para dominio y casos de uso |
 | **CI** | GitHub Actions: lint + tests + build | Un pipeline sencillo |
 | **Despliegue** | *A definir (ADR-002) antes del Sprint 2* | — |
@@ -180,7 +181,7 @@ La guía completa, con ejemplos, está en **`ARQUITECTURA_CLEAN.md`**. Resumen:
 ### 6.1 Flujo de aprobación del modelo de datos
 
 ```
-1. Borrador v0.1 (PROPUESTA_BD.md)
+1. Modelo v0.9 (PROPUESTA_BD.md)
 2. Se comparte con todo el equipo  →  comentarios hasta la fecha límite
 3. Se consolidan los cambios  →  versión v1.0
 4. Aprobación en reunión de equipo
@@ -276,7 +277,7 @@ La guía completa, con ejemplos, está en **`ARQUITECTURA_CLEAN.md`**. Resumen:
 | **E5** | Venta de pasajes web (concurrencia) | John | Karime | 3–4 |
 | **E6** | Encomiendas | Grisel | Grisel | 3–4 |
 | **E7** | Taquilla (venta presencial) | John | Brisa | 4 |
-| **E8** | App móvil de compra | John | Karime | 4–5 |
+| **E8** | App móvil de compra *(aplazada: entra cuando la web esté estable)* | John | Karime | — |
 | **E9** | Reportes | Grisel | Grisel | 5–6 |
 | **E10** | Endurecimiento para producción | Todos | Todos | 6 |
 
