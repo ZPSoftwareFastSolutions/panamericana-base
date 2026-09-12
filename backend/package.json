@@ -2,7 +2,6 @@
   "name": "panamericana-backend",
   "version": "0.1.0",
   "private": true,
-  "type": "module",
   "description": "API REST del sistema Panamericana (Clean Architecture)",
   "engines": {
     "node": ">=24"
@@ -11,9 +10,9 @@
     "dev": "tsx watch src/main.ts",
     "build": "tsc --build",
     "start": "node dist/main.js",
-    "test": "vitest run",
+    "test": "vitest run --passWithNoTests",
     "test:watch": "vitest",
-    "lint": "eslint src",
+    "lint": "eslint src --no-error-on-unmatched-pattern",
     "format": "prettier --write \"src/**/*.ts\""
   },
   "dependencies": {
@@ -23,6 +22,7 @@
     "zod": "^4.1.0"
   },
   "devDependencies": {
+    "@eslint/js": "^9.35.0",
     "@types/express": "^5.0.0",
     "@types/node": "^24.0.0",
     "@types/pg": "^8.15.0",

@@ -23,9 +23,8 @@ jobs:
           cache: npm
           cache-dependency-path: backend/package-lock.json
 
-      # cuando package-lock.json este en el repositorio, cambiar por: npm ci
       - name: Instalar dependencias
-        run: npm install --no-audit --no-fund
+        run: npm ci
 
       - name: Lint
         run: npm run lint
