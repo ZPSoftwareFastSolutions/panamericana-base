@@ -58,17 +58,19 @@
 - Plan v0.5 y `PRODUCT_BACKLOG.md` validados; sin rupturas de arquitectura.
 - **Repositorio 2 montado por Ángel (15/09)** y `docs/repo2/CORRECCIONES_01.md` **aplicadas**: autoría corregida a AngelParedesH20 y 6 archivos ajustados para Bolivia.
 - Tablero de Trello con el Sprint 1 (PAN-01 a PAN-08).
+- **Guía de desarrollo del equipo** (`docs/equipo/GUIA_DESARROLLO.md`, 15/09): cómo crear y llamar endpoints, `shared`, servicios, hooks, componentes `.tsx`, páginas, reglas, git y uso de asistentes de IA. Su ejemplo, el módulo `choferes`, se **extrajo, compiló (lint, 8 pruebas, build) y probó contra la base real** y luego se retiró del stack. La copia con el `.env` completo está en `compartir/GUIA_DESARROLLO_PANAMERICANA.md`, ignorada por git.
 
 **En curso:** Sprint 1 (08/09 → 19/09).
 
 **Próximos pasos (en orden)**
 1. **Invitar al equipo al tablero de Trello:** hoy el único miembro es la cuenta conectada "Oya Oya". La integración no envía invitaciones: se hace desde la interfaz de Trello con los correos del §2 (falta el de Ángel).
-2. **PAN-02 (Ángel):** colaboradores en GitHub, protección de `main` y ramas `dev/*`.
-3. **Review del Sprint 1 (sábado 19/09):** marcar ✅ en el backlog, recalibrar la capacidad con la velocidad real y pasar lo no terminado al inicio del Sprint 2 (backlog §7.3).
-4. **Solo si el usuario lo pide:** escribir `docs/guias-sprint/GUIA_SPRINT_02.md` y cargar en Trello las tarjetas PAN-10 a PAN-23 antes del Planning del martes 22/09. Hasta entonces, **en Trello solo existe el Sprint 1**.
-5. En la Review del Sprint 2 (03/10): **agendar la fase final de despliegue** (PAN-09 y PAN-24).
-6. PAN-10 (Sprint 2): login con validación por JWKS. Después, desactivar las claves *legacy* y recién entonces revocar la clave HS256 (§8).
-7. Confirmar con el docente si existe el Sprint 3 (si no, aplicar la contingencia del backlog §7.1).
+2. **Compartir la guía con el equipo:** enviar `compartir/GUIA_DESARROLLO_PANAMERICANA.md` por un canal privado. **No** se sube al repositorio 2 (regla: sin `.md`).
+3. **PAN-02 (Ángel):** colaboradores en GitHub, protección de `main` y ramas `dev/*`.
+4. **Review del Sprint 1 (sábado 19/09):** marcar ✅ en el backlog, recalibrar la capacidad con la velocidad real y pasar lo no terminado al inicio del Sprint 2 (backlog §7.3).
+5. **Solo si el usuario lo pide:** escribir `docs/guias-sprint/GUIA_SPRINT_02.md` y cargar en Trello las tarjetas PAN-10 a PAN-23 antes del Planning del martes 22/09. Hasta entonces, **en Trello solo existe el Sprint 1**.
+6. En la Review del Sprint 2 (03/10): **agendar la fase final de despliegue** (PAN-09 y PAN-24).
+7. PAN-10 (Sprint 2): login con validación por JWKS. Después, desactivar las claves *legacy* y recién entonces revocar la clave HS256 (§8).
+8. Confirmar con el docente si existe el Sprint 3 (si no, aplicar la contingencia del backlog §7.1).
 
 ---
 
@@ -175,6 +177,11 @@ npm run db:verificar   # prueba la conexión y lista las tablas
   - Los *heredoc* muy largos (más de ~5 KB) fallan en la herramienta Bash: usar la herramienta de escritura de archivos.
   - Para parches con barras invertidas, escribir un script de Python con cadenas *raw* en el scratchpad.
 - **Mantener al día los documentos** según la tabla del §12 cada vez que cambie algo.
+- **Guía del equipo:** si cambia algo del stack que la guía enseña (estructura, `shared`, `clienteHttp`, convenciones, `.env`), actualizar `docs/equipo/GUIA_DESARROLLO.md`, volver a verificar su código y regenerar la copia de `compartir/`.
+  - Verificación: extraer los bloques que empiezan con `// archivo:` y aplicar los fragmentos `// en:`; correr lint, pruebas y build; probar la API; **retirar el ejemplo** y borrar los datos de prueba.
+  - La copia se genera reemplazando `<CONTRASEÑA_DE_LA_BASE>` con la `DATABASE_URL` de `backend/.env`. La versión versionada nunca lleva la contraseña.
+  - Contenido limpio: sin repositorio base, Z&P, documentos internos ni códigos `HU-`. Solo puede mencionar asistentes de IA de forma genérica, como apoyo del integrante.
+  - El ejemplo `choferes` **no** está en el stack a propósito. Si alguien implementa HU-013 (choferes), revisar que la guía no contradiga ese código.
 
 ---
 
@@ -191,6 +198,8 @@ npm run db:verificar   # prueba la conexión y lista las tablas
 | `docs/adr/` | ADR-001 concurrencia · ADR-002 despliegue · ADR-003 Supabase | Se toma o cambia una decisión técnica |
 | `docs/guias-sprint/` | `GUIA_SPRINT_01.md` y la plantilla (se convierten en tarjetas, no se copian) | Se planifica un sprint |
 | `docs/repo2/` | `README.md` básico del repositorio 2 · `CORRECCIONES_NN.md` | Hay cambios para el equipo |
+| `docs/equipo/GUIA_DESARROLLO.md` | Guía para los 5 integrantes con el ejemplo `choferes` y el `.env` (con marcador en lugar de la contraseña) | Cambia el stack, una convención o el `.env` |
+| `compartir/` *(ignorada por git)* | Copia de la guía con el `.env` completo, lista para enviar al equipo | Se regenera cada vez que cambia la guía |
 
 ---
 

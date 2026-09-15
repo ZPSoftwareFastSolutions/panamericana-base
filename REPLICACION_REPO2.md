@@ -103,6 +103,7 @@ git remote add origin https://AngelParedesH20@github.com/AngelParedesH20/panamer
 | `docs/repo2/README.md` | ✅ Se copia **como `README.md` en la raíz** |
 | Cualquier otro `.md`: `README.md` de este repositorio, `CLAUDE.md`, `PLANIFICACION.md`, `ARQUITECTURA_CLEAN.md`, `PROPUESTA_BD.md`, este documento, `.github/pull_request_template.md` | ❌ Nunca |
 | `docs/` completa: ADR, guías de sprint, `openapi.yaml`, plantillas | ❌ Nunca |
+| `docs/equipo/GUIA_DESARROLLO.md` | ❌ No va al repositorio | Se **comparte por fuera** (canal privado). La copia con el `.env` completo está en `compartir/` |
 | `.claude/`, `.mcp.json`, `AGENTS.md` | ❌ Nunca |
 | `.env`, `.env.local` | ❌ Nunca |
 | `node_modules/`, `dist/`, `.next/`, `.git/` | ❌ Se regeneran |

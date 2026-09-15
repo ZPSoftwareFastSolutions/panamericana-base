@@ -28,6 +28,7 @@
 | `docs/guias-sprint/GUIA_SPRINT_NN.md` | Detalle técnico de las tarjetas de cada sprint. |
 | `REPLICACION_REPO2.md` | Reglas de aislamiento y cómo se transfiere la base al repositorio del equipo. |
 | `docs/repo2/` | README básico del repositorio del equipo y `CORRECCIONES_NN.md` (cambios puntuales que copia Ángel). |
+| `docs/equipo/GUIA_DESARROLLO.md` | Guía de desarrollo para los 5 integrantes (se comparte por fuera del repositorio). |
 
 ---
 
