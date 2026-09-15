@@ -59,7 +59,6 @@ Luego completa `backend/.env` con los datos de Supabase:
 | `ALLOWED_ORIGINS` | dónde corre la web | `http://localhost:3000` |
 | `DATABASE_URL` | **Session pooler** (ver aviso abajo). La contraseña la comparte Ángel por canal privado | `postgresql://postgres.tvyhpwpyxmbdfxogopnl:CONTRASENA@aws-0-us-east-1.pooler.supabase.com:5432/postgres` |
 | `SUPABASE_URL` | Ya viene en el `.env.example` | `https://tvyhpwpyxmbdfxogopnl.supabase.co` |
-| `SUPABASE_JWT_SECRET` | Supabase → Project Settings → API → JWT | (se usa en la épica de login) |
 | `MINUTOS_RESERVA_ASIENTO` | acuerdo del equipo | `10` |
 
 `web/.env.local` solo necesita:

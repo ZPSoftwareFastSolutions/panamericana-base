@@ -1,7 +1,7 @@
 # ADR-002 — Despliegue en la nube (Vercel + Supabase)
 
 - **Fecha:** 2026-09-15
-- **Estado:** Propuesta · se valida con el spike **PAN-09** (Sprint 1) y se acepta antes del **22/09/2026** (inicio del Sprint 2)
+- **Estado:** Propuesta · **se ejecuta en la fase final** del proyecto (fecha a definir, decisión del 15/09). Hasta entonces cada integrante trabaja en local contra la base compartida
 - **Responsable:** John Zabaleta
 
 ## Contexto
@@ -26,7 +26,7 @@ Se cargan en el panel de Vercel, por entorno, y **nunca** en el repositorio:
 
 | Proyecto | Variables |
 |---|---|
-| API | `DATABASE_URL`, `SUPABASE_URL`, `SUPABASE_JWT_SECRET`, `ALLOWED_ORIGINS` (dominio de la web en Vercel), `MINUTOS_RESERVA_ASIENTO` |
+| API | `DATABASE_URL`, `SUPABASE_URL`, `ALLOWED_ORIGINS` (dominio de la web en Vercel), `MINUTOS_RESERVA_ASIENTO`, `DB_POOL_MAX` |
 | Web | `NEXT_PUBLIC_API_URL` (URL de la API en Vercel) |
 
 ### Conexión a la base desde funciones *serverless*

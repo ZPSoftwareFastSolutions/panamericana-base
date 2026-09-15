@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import type { Bus } from '../dominio/Bus';
 import type { BusRepositorio } from '../dominio/BusRepositorio';
-import { NumeroPisosInvalidoError, PlacaDuplicadaError } from '../dominio/errores';
+import { NumeroPisosInvalidoError, PlacaDuplicadaError, PlacaInvalidaError } from '../dominio/errores';
 import { RegistrarBus } from './RegistrarBus';
 
 /** repositorio falso: guarda en memoria, sin base de datos */
@@ -22,7 +22,7 @@ class BusRepositorioEnMemoria implements BusRepositorio {
 }
 
 describe('RegistrarBus', () => {
-  const datosValidos = { placa: 'ABC-123', marca: 'Volvo', modelo: 'B450R', numero_pisos: 2 };
+  const datosValidos = { placa: '2045KLP', marca: 'Volvo', modelo: 'B450R', numero_pisos: 2 };
 
   it('registra un bus y lo deja en estado activo', async () => {
     const repositorio = new BusRepositorioEnMemoria();
@@ -30,7 +30,7 @@ describe('RegistrarBus', () => {
 
     const bus = await registrarBus.ejecutar(datosValidos);
 
-    expect(bus.placa).toBe('ABC-123');
+    expect(bus.placa).toBe('2045KLP');
     expect(bus.estado).toBe('activo');
     expect(repositorio.buses).toHaveLength(1);
   });
@@ -39,8 +39,16 @@ describe('RegistrarBus', () => {
     const registrarBus = new RegistrarBus(new BusRepositorioEnMemoria());
     await registrarBus.ejecutar(datosValidos);
 
-    await expect(registrarBus.ejecutar({ ...datosValidos, placa: 'abc-123' })).rejects.toThrow(
+    await expect(registrarBus.ejecutar({ ...datosValidos, placa: '2045 klp' })).rejects.toThrow(
       PlacaDuplicadaError,
+    );
+  });
+
+  it('rechaza una placa que no tiene el formato boliviano', async () => {
+    const registrarBus = new RegistrarBus(new BusRepositorioEnMemoria());
+
+    await expect(registrarBus.ejecutar({ ...datosValidos, placa: 'ABC-123' })).rejects.toThrow(
+      PlacaInvalidaError,
     );
   });
 

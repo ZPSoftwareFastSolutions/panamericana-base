@@ -39,6 +39,7 @@ flowchart LR
 | **A5** | Los dos repositorios comparten el proyecto de Supabase `panamericana`, pero **los archivos `.env` nunca se copian**: cada persona pone sus credenciales a mano | Compartir datos es intencional; compartir archivos con claves, no |
 | **A6** | La transferencia es por **copia de archivos**, nunca por historial de Git | El Repositorio 2 tiene su propio historial, hecho por el equipo |
 | **A7** | Antes de copiar, se revisa que ningún archivo tenga claves ni rutas locales | Ver checklist de la sección 6 |
+| **A8** | El Repositorio 2 lo administra **AngelParedesH20**. En esa carpeta, git usa la identidad y las credenciales de Ángel, **nunca** las de Z&P (la identidad global de la computadora es la de Z&P) | Ni commits ni colaboradores de Z&P en el proyecto del equipo |
 
 ---
 
@@ -61,7 +62,15 @@ cd "F:\Universidad\6to\Proyecto III\panamericana" && git init -b main
 En GitHub: **New repository** → nombre `panamericana` → **Private** → sin README ni .gitignore → Create.
 
 ```bash
-git remote add origin https://github.com/<usuario-de-angel>/panamericana.git
+git config user.name "Ángel Fabricio Paredes Campos"
+```
+
+```bash
+git config user.email "<correo verificado o noreply de AngelParedesH20>"
+```
+
+```bash
+git remote add origin https://AngelParedesH20@github.com/AngelParedesH20/panamericana.git
 ```
 
 ### 3.3 Invitar al equipo

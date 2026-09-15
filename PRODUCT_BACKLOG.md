@@ -26,8 +26,8 @@
 
 | Sprint | Fechas | Estado | Objetivo (incremento) | Puntos comprometidos |
 |---|---|---|---|---|
-| **Sprint 1** | 08/09/2026 → 19/09/2026 | 🔄 En curso · confirmado | **Base operativa:** el equipo trabaja sobre la misma base, primeros catálogos (terminales, usuarios, clientes), maqueta del portal y primer despliegue en la nube | 34 |
-| **Sprint 2** | 22/09/2026 → 03/10/2026 | ✅ Confirmado | **MVP 1 — Venta web con control de concurrencia en la nube:** el administrador programa rutas y viajes; el cliente busca, elige asiento por tramo, reserva y compra; es imposible vender dos veces el mismo asiento | 46 |
+| **Sprint 1** | 08/09/2026 → 19/09/2026 | 🔄 En curso · confirmado | **Base operativa:** el equipo trabaja en local sobre la misma base, primeros catálogos (terminales, usuarios, clientes) y maqueta del portal | 31 |
+| **Sprint 2** | 22/09/2026 → 03/10/2026 | ✅ Confirmado | **MVP 1 — Venta web con control de concurrencia (en local):** el administrador programa rutas y viajes; el cliente busca, elige asiento por tramo, reserva y compra; es imposible vender dos veces el mismo asiento | 45 |
 | **Sprint 3** | *06/10/2026 → 17/10/2026 (tentativo)* | ⚠️ **Sin confirmar por el docente** | **MVP 2 — Multicanal, control e IA:** taquilla, anulación, encomiendas, boleto con QR, panel de indicadores con predicción de demanda (machine learning) y PWA | 47 |
 
 > **Regla de diseño del plan:** cada sprint termina con un incremento **demostrable por sí solo**. Si el Sprint 3 no se confirma o se acorta, el **MVP 1 del Sprint 2** es un producto completo que se puede presentar. Ver el plan de contingencia (sección 7).
@@ -45,7 +45,7 @@ Se compromete como máximo el **80 %** de la capacidad (regla 2.6 de `PLANIFICAC
 | Ángel | 40 % SM · 60 % BE | 6 |
 | **Total** | | **46** |
 
-El Sprint 1 compromete menos (34) porque ya estaba en curso cuando se cambió el calendario y es un sprint de aprendizaje.
+El Sprint 1 compromete menos (31) porque ya estaba en curso cuando se cambió el calendario y es un sprint de aprendizaje.
 
 ---
 
@@ -60,11 +60,13 @@ Estas decisiones responden de forma **provisional** las preguntas abiertas de `P
 | P8 | Métodos de pago | **Pago simulado**: web registra `tarjeta` y taquilla `efectivo`, ambos con estado `aprobado`. `referencia_externa` = `SIMULADO-<codigo>` | Una pasarela real (HU-032) no cabe en 3 sprints |
 | P10 | ¿Se anulan pasajes? | **Sí, hasta 2 horas antes de la salida**, solo desde taquilla. El pago pasa a `reembolsado` como registro; la devolución de dinero es manual | Cubre el caso sin un flujo de devoluciones |
 | P15 | ¿Tarifas por viaje o por ruta? | **Por viaje**, como está en el modelo | Sin cambios en la base |
+| P12 | Documentos de identidad | **Bolivia: `ci` (carnet de identidad), `ce` (cédula de extranjero) y `pasaporte`.** El CI se valida en el dominio: 5 a 10 dígitos con complemento opcional (`4827351-1A`). Migración `documentos_bolivia` aplicada el 15/09 | Contexto confirmado: La Paz, Bolivia |
+| — | Despliegue en la nube | **Fase final** (fecha a definir). Hasta entonces cada integrante trabaja **en local** contra la base compartida | Decisión del equipo (15/09) |
 | P17 | ¿Precio de un tramo? | **Proporcional al tiempo**: precio completo × (minutos del tramo ÷ duración total), redondeado a 0,50 | Se calcula con `rutas_paradas.minutos_desde_origen` |
 | — | Canal móvil | **PWA** (portal web instalable). La app nativa queda fuera del MVP (HU-027) | Cumple "web y móvil" del título sin duplicar el frontend |
 | — | Liberar reservas vencidas | **Al consultar o reservar**, no con una tarea programada | No depende de un cron (ver ADR-002) |
 
-> ⚠️ **Pendiente de decisión (P12):** el modelo acepta `dni`, `ce` y `pasaporte`, con la regla "DNI de 8 dígitos". Esos son documentos de Perú; en Bolivia el documento es la **cédula de identidad (CI)**. Si el Product Owner confirma que el caso es La Paz, hace falta una migración que agregue `ci` a la lista permitida, antes de que Grisel cierre PAN-06 o como primera tarea del Sprint 2.
+> ✅ **P12 resuelta (15/09):** contexto Bolivia. La base acepta `ci`, `ce` y `pasaporte`; los datos de prueba usan CI, placas bolivianas, celulares de 8 dígitos y la ruta La Paz → Oruro → Cochabamba.
 
 ---
 
@@ -121,15 +123,16 @@ Estas decisiones responden de forma **provisional** las preguntas abiertas de `P
 - ADR-002 aceptada con el resultado del spike (Vercel para web y API, Supabase para datos).
 - La web y la API responden en URLs de staging; `/salud` devuelve `{"estado":"ok"}`.
 - Las claves solo están en las variables de entorno del proveedor, nunca en el repositorio.
-- Desde el Sprint 2, cada fusión a `main` despliega sola.
+- Desde la fase final, cada fusión a `main` despliega sola.
 
-**Must · 4 pts · Sprints 1–2 · PAN-09 (S1), PAN-24 (S2) · 🔄**
+**Must · 4 pts · Fase final (fecha a definir) · PAN-09, PAN-24 · ⏳** — hasta entonces todo corre en local.
 
 ### E1 — Identidad y acceso
 
 #### HU-005 · Inicio de sesión y control por rol en el backoffice
 **Como** usuario interno (administrador, vendedor o encargado de encomiendas) **quiero** iniciar sesión **para** acceder solo a las funciones de mi rol.
-- La web inicia sesión con Supabase Auth y envía el token a la API.
+- La web inicia sesión con Supabase Auth (clave publicable `sb_publishable_...`) y envía el token a la API.
+- La API valida el token con el JWKS de Supabase (firma **ECC P-256 / ES256**); no usa `SUPABASE_JWT_SECRET`.
 - La API rechaza sin token (401) y con rol no permitido (403).
 - `/admin/*` redirige al login si no hay sesión; el menú muestra solo las opciones del rol.
 - Las rutas públicas de búsqueda y compra no piden sesión.
@@ -372,7 +375,7 @@ Estas decisiones responden de forma **provisional** las preguntas abiertas de `P
 
 Detalle de cada tarjeta: `docs/guias-sprint/GUIA_SPRINT_01.md`.
 
-**Tablero de Trello (creado el 15/09):** https://trello.com/b/ida3R2kt/panamericana — listas `To Do → In Progress → Review → Done`, 9 tarjetas con fecha límite 19/09 y checklist de criterios de aceptación. PAN-01 y PAN-02 en *In Progress*. Las tarjetas no mencionan documentos internos.
+**Tablero de Trello (creado el 15/09):** https://trello.com/b/ida3R2kt/panamericana — listas `To Do → In Progress → Review → Done`, 8 tarjetas activas con fecha límite 19/09 (PAN-09 archivada: el despliegue pasa a la fase final) y checklist de criterios de aceptación. PAN-01 y PAN-02 en *In Progress*. Las tarjetas no mencionan documentos internos.
 
 | Tarjeta | Responsable | Trabajo | HU | Pts |
 |---|---|---|---|---|
@@ -384,7 +387,6 @@ Detalle de cada tarjeta: `docs/guias-sprint/GUIA_SPRINT_01.md`.
 | PAN-06 | Grisel | Módulo `clientes` de punta a punta | HU-009 | 5 |
 | PAN-07 | Brisa | Pantalla de terminales y menú lateral | HU-010 | 5 |
 | PAN-08 | Karime | Portal público y maqueta del buscador | HU-017 | 5 |
-| PAN-09 | John | Spike de despliegue: ADR-002 y primer despliegue en Vercel | HU-004 | 3 |
 
 ### 5.2 Sprint 2 — 22/09 → 03/10 · MVP 1
 
@@ -404,14 +406,24 @@ Detalle de cada tarjeta: `docs/guias-sprint/GUIA_SPRINT_01.md`.
 | PAN-21 | John | Reservar asiento con retención y control de concurrencia (API) | HU-020 | 5 | PAN-19 |
 | PAN-22 | John | Confirmar compra con pago simulado y emitir pasajes (API) | HU-021 | 3 | PAN-21 |
 | PAN-23 | Karime | Checkout: datos del pasajero, pago simulado, confirmación y manejo del 409 | HU-021 | 3 | PAN-21, PAN-22 (contrato) |
-| PAN-24 | Ángel | Despliegue automático de staging desde `main` | HU-004 | 1 | PAN-09 |
 
 **Orden sugerido para no bloquear al frontend:**
 1. **Días 1–2:** cada backend declara sus endpoints y tipos en `shared/src/` y abre ese PR primero (en el repositorio del equipo no existe `docs/`). El frontend trabaja contra el contrato (estado de error sin romperse, como en PAN-07).
 2. **Días 3–7:** implementación del backend en paralelo, siguiendo la cadena PAN-13 → PAN-15 → PAN-19 → PAN-21 → PAN-22.
-3. **Días 8–10:** integración web + API en staging y prueba de dos reservas simultáneas (criterio de HU-020).
+3. **Días 8–10:** integración web + API en local y prueba de dos reservas simultáneas (criterio de HU-020).
 
-### 5.3 Sprint 3 — 06/10 → 17/10 (tentativo) · MVP 2
+### 5.3 Fase final — despliegue en la nube (fecha a definir)
+
+Decisión del 15/09: hasta esta fase **todo corre en local**. Es obligatoria porque sostiene la tecnología emergente *cloud computing*.
+
+| Tarjeta | Responsable | Trabajo | HU | Pts |
+|---|---|---|---|---|
+| PAN-09 | John | Primer despliegue de web y API en Vercel (comandos de build, `DB_POOL_MAX`, cuenta de Ángel; ver ADR-002) | HU-004 | 3 |
+| PAN-24 | Ángel | Despliegue automático desde `main` | HU-004 | 1 |
+
+> Se agenda en la Review del Sprint 2. Si entra en el Sprint 3, hay que liberar 4 puntos de tarjetas *Should* de John y Ángel.
+
+### 5.4 Sprint 3 — 06/10 → 17/10 (tentativo) · MVP 2
 
 | Tarjeta | Responsable | Trabajo | HU | Pts | Depende de |
 |---|---|---|---|---|---|
@@ -438,12 +450,12 @@ Detalle de cada tarjeta: `docs/guias-sprint/GUIA_SPRINT_01.md`.
 
 | Integrante | Capacidad | Sprint 1 | Sprint 2 | Sprint 3 |
 |---|---|---|---|---|
-| John | 10 | 9 | 11 | 11 |
+| John | 10 | 6 | 11 | 11 |
 | Grisel | 10 | 6 | 10 (solo BE) | 10 |
 | Brisa | 10 | 6 | 9 | 10 |
 | Karime | 10 | 6 | 10 | 10 |
-| Ángel | 6 | 7 | 6 | 6 |
-| **Total** | **46** | **34** | **46** | **47** |
+| Ángel | 6 | 7 | 5 | 6 |
+| **Total** | **46** | **31** | **45** | **47** |
 
 **Ajustes respecto al *ownership* de `PLANIFICACION.md` (2.1):**
 - **Grisel apoya Operaciones en el Sprint 2** (croquis, viajes, búsqueda y disponibilidad), porque sus módulos propios (encomiendas y reportes) son del Sprint 3 y Ángel tiene solo 6 puntos. En el Sprint 2 hace solo backend; lo compensa en el Sprint 3.
@@ -456,7 +468,8 @@ Detalle de cada tarjeta: `docs/guias-sprint/GUIA_SPRINT_01.md`.
 
 ### 7.1 Si el Sprint 3 no se confirma
 
-- El entregable es el **MVP 1** (Sprint 2): venta web por tramos con control de concurrencia, backoffice con login y despliegue en la nube. **Cumple el requisito de tecnología emergente con cloud computing.**
+- El entregable es el **MVP 1** (Sprint 2): venta web por tramos con control de concurrencia y backoffice con login.
+- El **despliegue (PAN-09 y PAN-24) se ejecuta igual como tarea de cierre**: sin él no se cumple la tecnología emergente *cloud computing*.
 - La predicción de demanda es parte del **título**: si no hay Sprint 3, PAN-26 y PAN-27 se ejecutan igual como tarea de cierre (6 puntos), para sostener el título y el componente de machine learning.
 - En el documento del proyecto, taquilla, encomiendas y reportes pasan a **1.6.2 Límites** como trabajo futuro.
 
@@ -472,11 +485,12 @@ Se ejecuta en este orden y se corta donde se acabe el tiempo:
 | 4 | PAN-38 | Boleto con QR: cierra la experiencia de compra |
 | 5 | PAN-33, PAN-34 | Encomiendas |
 | 6 | PAN-29, PAN-35, PAN-36, PAN-37, PAN-39 | Mejoras |
+| Siempre | PAN-09, PAN-24 | Despliegue: sostiene *cloud computing* |
 | Siempre | PAN-40 | Sin pruebas de humo no hay demo |
 
 ### 7.3 Si una tarjeta del Sprint 1 no se termina
 
-Pasa **al inicio** del Sprint 2 con prioridad máxima, y se retira del Sprint 2 una tarjeta del mismo responsable de igual tamaño, empezando por las que no bloquean a nadie (por ejemplo, PAN-24 o PAN-16).
+Pasa **al inicio** del Sprint 2 con prioridad máxima, y se retira del Sprint 2 una tarjeta del mismo responsable de igual tamaño, empezando por las que no bloquean a nadie (por ejemplo, PAN-16).
 
 ---
 

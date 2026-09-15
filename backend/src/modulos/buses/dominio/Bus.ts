@@ -27,9 +27,10 @@ export class Bus {
 
   /** crea un bus nuevo aplicando las reglas del negocio */
   static crear(datos: DatosNuevoBus): Bus {
-    const placa = datos.placa.trim().toUpperCase();
+    // placa boliviana: 3 o 4 digitos seguidos de 3 letras (ej. 2045KLP); se ignoran espacios y guiones
+    const placa = datos.placa.replace(/[\s-]/g, '').toUpperCase();
 
-    if (placa.length < 6) {
+    if (!/^\d{3,4}[A-Z]{3}$/.test(placa)) {
       throw new PlacaInvalidaError(datos.placa);
     }
     if (datos.numero_pisos !== 1 && datos.numero_pisos !== 2) {

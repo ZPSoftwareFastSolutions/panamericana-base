@@ -35,7 +35,9 @@ Supabase ofrece PostgreSQL gestionado, autenticación y una API automática sobr
 ## Consecuencias
 
 - El backend valida el token de Supabase Auth en cada petición (`compartido/adaptadores/http/autenticacion.ts`).
-- **Validación del token (PAN-10):** revisar en Supabase → Project Settings → JWT Keys qué tipo de firma usa el proyecto. Si usa claves asimétricas (lo habitual en proyectos nuevos), la API valida con el JWKS público (`https://tvyhpwpyxmbdfxogopnl.supabase.co/auth/v1/.well-known/jwks.json`) y `SUPABASE_JWT_SECRET` deja de ser necesario.
+- **Validación del token (PAN-10), confirmado el 15/09:** el proyecto firma los tokens con **ECC (P-256)**, clave actual `4190b38b-8119-4025-8677-2161cefc2518`. La clave anterior (*Legacy HS256*, rotada el 12/09) solo sirve para verificar tokens viejos. La API valida con el JWKS público `https://tvyhpwpyxmbdfxogopnl.supabase.co/auth/v1/.well-known/jwks.json` (algoritmo `ES256`, emisor `https://tvyhpwpyxmbdfxogopnl.supabase.co/auth/v1`, audiencia `authenticated`, por ejemplo con `jose`). `SUPABASE_JWT_SECRET` **no se usa** y se quitó de `.env.example`.
+- La web usará la **clave publicable** (`sb_publishable_...`), no la `anon` *legacy*.
+- **No revocar todavía la clave HS256 anterior:** las claves *legacy* `anon` y `service_role` siguen activas y están firmadas con ese secreto. Primero se desactivan las claves *legacy* (cuando la web ya use la publicable) y después se revoca.
 - Si más adelante se quiere usar Realtime para el croquis de asientos, hará falta un nuevo ADR, porque rompe la regla de "datos solo por la API".
 - Las claves y la contrasena de la base nunca viajan por el repositorio: cada persona las copia del panel de Supabase.
 - Cuando se cree el proyecto de produccion, solo cambia `DATABASE_URL`; el codigo no se toca.

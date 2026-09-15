@@ -22,7 +22,7 @@ export function FormularioBus() {
 
       <input
         className="rounded border border-slate-300 px-3 py-2"
-        placeholder="Placa"
+        placeholder="Placa (ej. 2045KLP)"
         value={valores.placa}
         onChange={(e) => setValores({ ...valores, placa: e.target.value })}
         required

@@ -2,9 +2,9 @@
 
 > **Sprint:** 1 · **Fechas:** 08/09/2026 → 19/09/2026 (fijadas por el docente)
 > **Para:** Ángel (montaje del repositorio) y todo el equipo (tareas)
-> **Objetivo:** que los 5 integrantes tengan el proyecto corriendo en su computadora, conectado a la base de datos real, que cada uno entregue su primer módulo siguiendo la arquitectura y que exista un primer despliegue en la nube.
+> **Objetivo:** que los 5 integrantes tengan el proyecto corriendo en su computadora, conectado a la base de datos real, que cada uno entregue su primer módulo siguiendo la arquitectura.
 >
-> 🔁 **Antes era la "Guía del Sprint 0" (14/09 → 25/09).** Con el calendario de 3 sprints (`PLANIFICACION.md` v0.4) su contenido pasa al Sprint 1, que ya estaba en curso. Se agrega la tarjeta **PAN-09** (spike de despliegue). Las historias de usuario de cada tarjeta están en `PRODUCT_BACKLOG.md`, sección 5.1.
+> 🔁 **Antes era la "Guía del Sprint 0" (14/09 → 25/09).** Con el calendario de 3 sprints (`PLANIFICACION.md` v0.4) su contenido pasa al Sprint 1, que ya estaba en curso. Se había agregado la tarjeta **PAN-09** (spike de despliegue); **el 15/09 se archivó**: el despliegue pasa a la fase final y todo el Sprint 1 corre en local. Las historias de usuario de cada tarjeta están en `PRODUCT_BACKLOG.md`, sección 5.1.
 >
 > 🗂️ **Tablero de Trello:** https://trello.com/b/ida3R2kt/panamericana (creado el 15/09 con PAN-01 a PAN-09).
 >
@@ -277,9 +277,8 @@ git checkout main
 | **PAN-06** | Grisel | Módulo `clientes` de punta a punta: API + pantalla del backoffice | HU-009 | 5 |
 | **PAN-07** | Brisa | Pantalla de terminales en el backoffice + opciones del menú lateral | HU-010 | 5 |
 | **PAN-08** | Karime | Estructura `app/(publico)/` + maqueta del buscador de viajes | HU-017 | 5 |
-| **PAN-09** | John | Spike de despliegue: primer despliegue de web y API en Vercel y ADR-002 aceptada | HU-004 | 3 |
 
-**Carga:** John 9 · Ángel 7 · Grisel 6 · Brisa 6 · Karime 6 (incluye PAN-01). Si una tarjeta no se termina el 19/09, pasa **al inicio** del Sprint 2 (`PRODUCT_BACKLOG.md`, sección 7.3).
+**Carga:** John 6 · Ángel 7 · Grisel 6 · Brisa 6 · Karime 6 (incluye PAN-01). Si una tarjeta no se termina el 19/09, pasa **al inicio** del Sprint 2 (`PRODUCT_BACKLOG.md`, sección 7.3).
 
 ### B2. Detalle de cada tarjeta
 
@@ -315,7 +314,7 @@ Mismos 6 pasos que PAN-03, con módulo `usuarios`.
 Campos de `clientes`: `id`, `tipo_documento`, `numero_documento`, `nombres`, `apellidos`, `telefono`, `correo`, `fecha_nacimiento`.
 
 **Backend:** los mismos 6 pasos de PAN-03, con módulo `clientes`.
-**Reglas:** `tipo_documento` solo `dni`, `ce` o `pasaporte`; si es `dni`, `numero_documento` debe tener 8 dígitos; no se repite la pareja tipo + número (409).
+**Reglas (Bolivia):** `tipo_documento` solo `ci`, `ce` o `pasaporte` (la base ya lo exige); si es `ci`, `numero_documento` tiene de 5 a 10 dígitos con complemento opcional de 2 caracteres (`4827351` o `4827351-1A`); celular de 8 dígitos; no se repite la pareja tipo + número (409).
 
 **Frontend:**
 
@@ -355,7 +354,9 @@ Campos de `clientes`: `id`, `tipo_documento`, `numero_documento`, `nombres`, `ap
 
 > ⚠️ **Choque de rutas en Next.js:** hoy existe `web/src/app/page.tsx`. Los grupos entre paréntesis no cambian la URL, así que `app/(publico)/page.tsx` y `app/page.tsx` resuelven los dos a `/` y `npm run build` falla. Hay que **eliminar** `app/page.tsx` y llevar la portada a `app/(publico)/page.tsx`.
 
-#### PAN-09 · Spike de despliegue en la nube — John
+#### PAN-09 · Spike de despliegue en la nube — John · ⏸️ Archivada el 15/09, pasa a la fase final
+
+> No forma parte del Sprint 1. Se conserva el detalle para cuando se agende la fase final.
 
 Objetivo: comprobar que la propuesta de ADR-002 funciona **antes** del Sprint 2 y dejarla aceptada.
 
@@ -414,8 +415,7 @@ En GitHub: **Compare & pull request** hacia `main`, pide revisión al compañero
 - [ ] `shared/src/endpoints.ts` incluye todos los endpoints nuevos
 - [ ] Ningún `.env` subido al repositorio
 - [ ] El repositorio 2 sigue sin ningún `.md` aparte del `README.md`
-- [ ] Web y API desplegadas en Vercel y ADR-002 aceptada (PAN-09)
-- [ ] Tablero de Trello con las tarjetas del Sprint 2 (PAN-10 a PAN-24) listas para el Planning del 22/09
+- [ ] Tablero de Trello con las tarjetas del Sprint 2 (PAN-10 a PAN-23) listas para el Planning del 22/09
 
 ---
 

@@ -10,8 +10,9 @@
 |---|---|
 | Proyecto Supabase | `panamericana` (ref `tvyhpwpyxmbdfxogopnl`) |
 | Tablas creadas | **16**, todas con RLS activado y sin políticas públicas |
-| Datos de prueba | `supabase/seed.sql`: 2 buses, 4 asientos, 3 terminales, 1 ruta con 3 paradas, 1 viaje, 1 venta y 1 pasaje |
-| Migraciones | `supabase/migrations/` (5 archivos, aplicados) |
+| Datos de prueba | `supabase/seed.sql`: 2 buses, 4 asientos, 3 terminales, 1 ruta La Paz → Oruro → Cochabamba, 1 viaje, 1 venta y 1 pasaje |
+| Migraciones | `supabase/migrations/` (6 archivos, aplicados) |
+| Contexto | **Bolivia (La Paz):** documentos `ci`, `ce` y `pasaporte`; placas `1234ABC`; montos en bolivianos (Bs); fechas en hora de La Paz (UTC−4) |
 
 **Protección de asientos verificada en la base real:**
 
@@ -51,6 +52,9 @@
 | Montos | `numeric(10,2)` | `precio`, `total` |
 | Estados | Texto con lista de valores permitidos | `'activo'` |
 | Palabras SQL | Siempre en minúsculas | `create table`, `not null` |
+| Moneda | Bolivianos (Bs) | `precio_base` 80.00 = Bs 80 |
+| Documentos de identidad | `ci` (carnet de identidad), `ce` (cédula de extranjero), `pasaporte` | `ci` `4827351` o `4827351-1A` |
+| Placas | 3 o 4 dígitos y 3 letras, sin guion | `2045KLP` |
 
 ---
 
@@ -117,7 +121,7 @@ Pasajeros, remitentes y destinatarios. No necesitan cuenta.
 |---|---|---|---|
 | `id` | uuid | Sí | |
 | `usuario_id` | uuid | No | → `usuarios.id`. Único. Solo si tiene cuenta |
-| `tipo_documento` | text | Sí | `'dni'`, `'ce'`, `'pasaporte'` |
+| `tipo_documento` | text | Sí | `'ci'` (carnet de identidad), `'ce'` (cédula de extranjero), `'pasaporte'` |
 | `numero_documento` | text | Sí | |
 | `nombres` · `apellidos` | text | Sí | |
 | `telefono` · `correo` | text | No | |
@@ -157,7 +161,7 @@ Pasajeros, remitentes y destinatarios. No necesitan cuenta.
 | Campo | Tipo | Obligatorio | Descripción |
 |---|---|---|---|
 | `id` | uuid | Sí | |
-| `tipo_documento` · `numero_documento` | text | Sí | Únicos en conjunto |
+| `tipo_documento` · `numero_documento` | text | Sí | `'ci'`, `'ce'` o `'pasaporte'`; únicos en conjunto |
 | `nombres` · `apellidos` | text | Sí | |
 | `numero_licencia` | text | Sí | Único |
 | `categoria_licencia` | text | Sí | Categoría habilitante |
@@ -182,7 +186,7 @@ Ya no guarda origen y destino: ahora son la primera y la última parada.
 | Campo | Tipo | Obligatorio | Descripción |
 |---|---|---|---|
 | `id` | uuid | Sí | |
-| `nombre` | text | Sí | Ej.: "Ciudad A – Ciudad C" |
+| `nombre` | text | Sí | Ej.: "La Paz – Cochabamba" |
 | `distancia_km` | numeric(7,2) | No | |
 | `duracion_estimada_min` | integer | Sí | Total del recorrido |
 | `activo` | boolean | Sí | Por defecto `true` |
@@ -359,7 +363,7 @@ Traducido: *"para el mismo viaje y el mismo asiento, no pueden existir dos pasaj
 | **P9** | ¿Qué roles internos existen? (¿supervisor?, ¿contador?) | Valores de `usuarios.rol` |
 | **P10** | ¿Se pueden anular pasajes? ¿Hay devolución y con cuánta anticipación? | Estados de `pasajes` y `pagos` |
 | **P11** | ¿Guardamos historial de cambios de los pasajes, como en encomiendas? | Nueva tabla `historial_pasajes` |
-| **P12** | ¿Qué documentos de identidad se aceptan? | Valores de `clientes.tipo_documento` |
+| ~~P12~~ | ✅ **Resuelta (15/09):** Bolivia → `ci`, `ce` y `pasaporte` | Migración `documentos_bolivia` |
 | **P15** | ¿Las tarifas se definen viaje por viaje, o conviene una plantilla por ruta que se copie al programar? | Tabla `tarifas` por viaje o por ruta |
 | **P16** | ¿La tripulación rota a mitad del recorrido en viajes largos? | `viajes_choferes` necesitaría tramo asignado |
 | **P17** | ¿El precio de un tramo se calcula por proporción de la distancia, o se define manualmente? | Posible tabla `tarifas_tramos` |
@@ -400,5 +404,6 @@ Traducido: *"para el mismo viaje y el mismo asiento, no pueden existir dos pasaj
 | `20260912051709_flota_y_rutas.sql` | `asientos`, `choferes`, `terminales`, `rutas`, `rutas_paradas`, `viajes`, `viajes_choferes`, `tarifas` |
 | `20260912051726_ventas_pasajes_pagos.sql` | `ventas`, `pasajes` (con la restricción por tramos), `pagos` |
 | `20260912051740_encomiendas.sql` | `encomiendas`, `historial_encomiendas` |
+| `20260915052138_documentos_bolivia.sql` | `clientes` y `choferes` aceptan `ci`, `ce` y `pasaporte` (antes `dni`) |
 
 Todas las tablas tienen `creado_en` y `actualizado_en`; un *trigger* mantiene `actualizado_en` al día automáticamente.

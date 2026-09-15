@@ -12,6 +12,7 @@
 | 0.1 | Propuesta inicial de roles, stack y arquitectura. |
 | 0.2 | Ángel pasa a **Scrum Master + Backend**; Grisel pasa a **Backend + Frontend**. Stack simplificado para aprendizaje. Base de datos en **Supabase**. Flujo de aprobación de BD. Fechas de Sprint 0 y 1 confirmadas. |
 | 0.3 | Repositorio construido: workspaces (`shared`, `backend`, `web`), módulo de ejemplo `buses` de punta a punta, Next.js 16. Móvil aplazado para priorizar la web. Modelo de datos v0.9 con tripulación, tramos, tarifas y ventas. |
+| 0.5 | **Contexto Bolivia** (documentos `ci`/`ce`/`pasaporte`, placas, Bs). **Despliegue en la nube movido a la fase final**: todo corre en local hasta entonces. Tokens de Supabase firmados con **ECC P-256** (validación por JWKS). El repositorio del equipo lo administra **AngelParedesH20**. |
 | 0.4 | **Calendario comprimido a 3 sprints** (el docente fijó Sprint 1 del 08/09 al 19/09 y Sprint 2 del 22/09 al 03/10; el Sprint 3 está sin confirmar). Desaparece el Sprint 0: su guía pasa a ser la del Sprint 1. **Product Backlog del MVP** con épicas E0–E11 e historias de usuario. Despliegue en **Vercel + Supabase** (ADR-002, propuesta). Canal móvil como **PWA**. Nueva sección de **tecnologías emergentes**. |
 
 ### Documentos del proyecto
@@ -143,13 +144,13 @@ Es una hipótesis inicial: se recalibra en la Review del Sprint 1 con la velocid
 | **Acceso a datos** | `pg` (node-postgres) con SQL escrito a mano | Control total del SQL en minúsculas y de los nombres de campos |
 | **Base de datos** | **Supabase** (PostgreSQL gestionado) | Postgres real con transacciones, más panel, backups y autenticación |
 | **Migraciones** | Supabase CLI → `supabase/migrations/*.sql` | Archivos SQL versionados en Git |
-| **Autenticación** | Supabase Auth · la API valida el JWT | No se implementan contraseñas ni tokens a mano |
+| **Autenticación** | Supabase Auth · la API valida el token con JWKS (firma ECC P-256) | No se implementan contraseñas ni tokens a mano |
 | **Web** | Next.js 16 (App Router) · TanStack Query · Tailwind CSS · puerto 3000 | Estándar actual de React |
 | **Móvil** | **PWA**: el portal web se instala en el celular (Sprint 3). App nativa fuera del MVP | Cumple el canal móvil sin duplicar el frontend |
 | **IA / Machine learning** | Python + scikit-learn en un notebook (entrenamiento) · coeficientes en JSON usados por la API (Sprint 3) | La API no ejecuta Python; el modelo se reentrena fuera de línea |
 | **Pruebas** | Vitest | Una sola herramienta para dominio y casos de uso |
 | **CI** | GitHub Actions: lint + tests + build | Un pipeline sencillo |
-| **Despliegue** | **Vercel** (web y API) + **Supabase** (datos y autenticación) — ADR-002, *propuesta*; se valida con el spike PAN-09 antes del 22/09 | Plataforma nativa de Next.js, plan gratuito, despliegue continuo desde `main` |
+| **Despliegue** | **Vercel** (web y API) + **Supabase** (datos y autenticación) — ADR-002 · **fase final** (fecha a definir); hasta entonces todo corre en local | Plataforma nativa de Next.js, plan gratuito, despliegue continuo desde `main` |
 
 ---
 
@@ -229,9 +230,10 @@ La guía completa, con ejemplos, está en **`ARQUITECTURA_CLEAN.md`**. Resumen:
 
 | Sprint | Fechas | Estado | Incremento |
 |---|---|---|---|
-| **Sprint 1** — Base operativa | **08/09/2026 → 19/09/2026** | 🔄 En curso · confirmado | Equipo sobre la misma base, catálogos iniciales, maqueta del portal y primer despliegue en la nube |
-| **Sprint 2** — MVP 1 | **22/09/2026 → 03/10/2026** | ✅ Confirmado | Venta web por tramos con control de concurrencia, en la nube |
+| **Sprint 1** — Base operativa | **08/09/2026 → 19/09/2026** | 🔄 En curso · confirmado | Equipo en local sobre la misma base, catálogos iniciales y maqueta del portal |
+| **Sprint 2** — MVP 1 | **22/09/2026 → 03/10/2026** | ✅ Confirmado | Venta web por tramos con control de concurrencia (en local) |
 | **Sprint 3** — MVP 2 | *06/10/2026 → 17/10/2026* | ⚠️ **Sin confirmar** (fechas tentativas) | Taquilla, encomiendas, boleto QR, panel con predicción de demanda y PWA |
+| **Fase final** — Nube | *Fecha a definir* | ⏳ Pendiente | Despliegue en Vercel + Supabase (PAN-09, PAN-24). Obligatoria: sostiene *cloud computing* |
 
 - Los sprints van de **martes a sábado de la semana siguiente**, según las fechas del docente.
 - Cada incremento se puede demostrar por sí solo. Si el Sprint 3 no se confirma o se acorta, se aplica el plan de contingencia de `PRODUCT_BACKLOG.md`, sección 7.
@@ -253,7 +255,7 @@ La guía completa, con ejemplos, está en **`ARQUITECTURA_CLEAN.md`**. Resumen:
 
 - **In Progress:** existe una rama y un PR en borrador enlazado a la tarjeta.
 - **Review:** el PR está abierto, CI en verde y tiene revisor asignado (tabla 2.4).
-- **Done:** PR fusionado, desplegado en staging y DoD verificado. El despliegue en staging se exige desde que PAN-09 esté listo.
+- **Done:** PR fusionado, probado en local por el revisor y DoD verificado. El despliegue en staging se exige desde la fase final.
 
 ### 7.4 Definition of Ready (DoR)
 
@@ -271,7 +273,7 @@ La guía completa, con ejemplos, está en **`ARQUITECTURA_CLEAN.md`**. Resumen:
 - [ ] API conforme a las rutas y tipos de `shared/src/`
 - [ ] SQL en minúsculas y nombres idénticos al modelo aprobado (R1–R6)
 - [ ] PR aprobado por el revisor
-- [ ] Desplegado en staging y criterios de aceptación validados
+- [ ] Criterios de aceptación validados en local (en staging desde la fase final)
 
 ### 7.6 Convenciones Git
 
@@ -291,7 +293,7 @@ Las historias de usuario, los criterios de aceptación y las tarjetas están en 
 
 | Épica | Nombre | Backend | Frontend | Sprint | Prioridad |
 |---|---|---|---|---|---|
-| **E0** | Fundaciones y plataforma en la nube (repositorio, CI, despliegue Vercel + Supabase) | John · Ángel | Todos (entorno) | 1–2 | Must |
+| **E0** | Fundaciones y plataforma en la nube (repositorio, CI; despliegue Vercel + Supabase en la fase final) | John · Ángel | Todos (entorno) | 1 + fase final | Must |
 | **E1** | Identidad y acceso (usuarios, login, roles) | John | Brisa | 1–2 | Must |
 | **E2** | Clientes | Grisel | Grisel | 1 | Must |
 | **E3** | Terminales, flota y croquis de asientos | Ángel · Grisel | Brisa | 1–3 | Must |
@@ -314,7 +316,7 @@ Las historias de usuario, los criterios de aceptación y las tarjetas están en 
 
 | Tecnología | Estado | Cómo se incorpora | Dónde está en el backlog |
 |---|---|---|---|
-| **Cloud computing** | ✅ **Cumple al desplegar** (Sprints 1–2) | Vercel (PaaS/serverless: web y API con despliegue continuo, CDN y escalado automático) + Supabase (DBaaS con PostgreSQL gestionado, autenticación como servicio y respaldos) | E0 · HU-004 · ADR-002 |
+| **Cloud computing** | ⏳ **Cumple al desplegar** (fase final, obligatoria) | Vercel (PaaS/serverless: web y API con despliegue continuo, CDN y escalado automático) + Supabase (DBaaS con PostgreSQL gestionado, autenticación como servicio y respaldos) | E0 · HU-004 · ADR-002 |
 | **Machine learning** | ✅ **Cumple con la predicción de demanda** (Sprint 3; ver contingencia 7.1 del backlog) | Modelo supervisado de regresión lineal múltiple entrenado con el historial de ventas, validado con MAE, RMSE y R², y consumido por la API para sugerir buses de refuerzo | E11 · HU-033 |
 | **Big data** | ❌ No se incorpora | El volumen, la velocidad y la variedad de datos de una operadora de buses no justifican herramientas de big data. **No se debe declarar** en el documento | — |
 
@@ -355,6 +357,7 @@ Las historias de usuario, los criterios de aceptación y las tarjetas están en 
 | Vercel (plan gratuito) bloquea despliegues de commits de colaboradores en el repositorio privado | Alta | Medio | Proyectos de Vercel en la cuenta del dueño del repositorio (Ángel), que es quien fusiona a `main` (ADR-002) | Ángel + John |
 | Conflictos en archivos compartidos (`shared/src/endpoints.ts`, `index.ts`, `rutas.ts`, `contenedor.ts`, menú) con 5 ramas abiertas | Alta | Medio | PR de contrato pequeño y fusionado primero; cada integrante agrega solo sus líneas | Ángel |
 | Sprint 1 con 4 días hábiles restantes al crear el tablero (15/09) | Alta | Medio | Contingencia 7.3 del backlog: lo no terminado abre el Sprint 2 | Ángel |
+| Despliegue concentrado al final: problemas de la nube descubiertos tarde | Media | Alto | Checklist de ADR-002 listo de antemano; agendar la fase final en la Review del Sprint 2, no después | John + Ángel |
 | Modelo de datos cambiante tras aprobación | Media | Alto | Ronda de comentarios antes de congelar (6.1) | Ángel |
 | Exposición de datos por la API automática de Supabase | Media | Crítico | RLS sin políticas públicas + claves solo en backend (4.1) | John |
 | SM con poco tiempo para desarrollar | Media | Medio | 40 % SM, WIP 1, módulos CRUD | Ángel |
@@ -372,8 +375,10 @@ Las historias de usuario, los criterios de aceptación y las tarjetas están en 
 | 3 | Espacio de trabajo de Trello | ✅ Cualquiera |
 | 4 | Fechas de los sprints | ✅ Sprint 1 y 2 fijados por el docente · ⏳ **Sprint 3 sin confirmar** |
 | 5 | Modelo de datos v1.0 | ✅ Creado en Supabase (16 tablas) |
-| 6 | Despliegue (ADR-002) | ⏳ Propuesta: Vercel + Supabase; aceptar con el spike PAN-09 antes del 22/09 |
+| 6 | Despliegue (ADR-002) | ⏳ **Fase final** (fecha a definir). Hasta entonces, todo en local |
 | 7 | Product Backlog del MVP | ✅ `PRODUCT_BACKLOG.md` v1.0 |
 | 8 | Crear en Trello las tarjetas PAN-10 a PAN-24 (Sprint 2) | ⏳ Antes del Planning del 22/09 |
-| 9 | Documento de identidad boliviano (`ci`) en `clientes.tipo_documento` (P12) | ⏳ Decisión del Product Owner; si se confirma, migración nueva **antes de cerrar PAN-06** (19/09) |
+| 9 | Documento de identidad boliviano (`ci`) en `clientes.tipo_documento` (P12) | ✅ Migración `documentos_bolivia` aplicada (15/09) |
+| 11 | Autoría del repositorio del equipo: sin rastros de la cuenta Z&P, administrado por **AngelParedesH20** | ⏳ Ángel · pasos en `docs/repo2/CORRECCIONES_01.md` |
+| 12 | Copiar al repositorio del equipo los archivos ajustados para Bolivia | ⏳ Ángel · `docs/repo2/CORRECCIONES_01.md` |
 | 10 | Validación del plan v0.4 (15/09) | ✅ Sin rupturas de arquitectura; ajustes aplicados en este documento, `PRODUCT_BACKLOG.md`, ADR-002, ADR-003 y `GUIA_SPRINT_01.md` |

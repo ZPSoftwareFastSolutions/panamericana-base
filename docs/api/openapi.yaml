@@ -80,7 +80,7 @@ components:
           format: uuid
         placa:
           type: string
-          example: ABC-123
+          example: 2045KLP
         marca:
           type: string
           example: Volvo
@@ -122,7 +122,7 @@ components:
           example: placa_duplicada
         mensaje:
           type: string
-          example: Ya existe un bus con la placa ABC-123
+          example: Ya existe un bus con la placa 2045KLP
         detalles:
           type: object
 
