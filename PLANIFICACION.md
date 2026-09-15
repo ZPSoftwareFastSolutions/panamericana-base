@@ -1,6 +1,6 @@
 # PLANIFICACIÓN — Sistema de Gestión "Panamericana"
 
-> **Versión:** 0.4 · **Fecha:** 2026-09-15 · **Estado:** Calendario de 3 sprints y Product Backlog del MVP
+> **Versión:** 0.5 · **Fecha:** 2026-09-15 · **Estado:** Sprint 1 en curso · repositorio del equipo montado y corregido · contexto Bolivia · todo en local
 > **Entorno:** Proyecto aislado (cuarentena), sin dependencias ni contexto heredado.
 >
 > 📅 **Calendario vigente (desde v0.4):** Sprint 1 **08/09 → 19/09** · Sprint 2 **22/09 → 03/10** · Sprint 3 **06/10 → 17/10, sin confirmar por el docente**. Ya **no existe Sprint 0** ni los Sprints 4–6 de versiones anteriores.
@@ -12,25 +12,28 @@
 | 0.1 | Propuesta inicial de roles, stack y arquitectura. |
 | 0.2 | Ángel pasa a **Scrum Master + Backend**; Grisel pasa a **Backend + Frontend**. Stack simplificado para aprendizaje. Base de datos en **Supabase**. Flujo de aprobación de BD. Fechas de Sprint 0 y 1 confirmadas. |
 | 0.3 | Repositorio construido: workspaces (`shared`, `backend`, `web`), módulo de ejemplo `buses` de punta a punta, Next.js 16. Móvil aplazado para priorizar la web. Modelo de datos v0.9 con tripulación, tramos, tarifas y ventas. |
-| 0.5 | **Contexto Bolivia** (documentos `ci`/`ce`/`pasaporte`, placas, Bs). **Despliegue en la nube movido a la fase final**: todo corre en local hasta entonces. Tokens de Supabase firmados con **ECC P-256** (validación por JWKS). El repositorio del equipo lo administra **AngelParedesH20**. |
 | 0.4 | **Calendario comprimido a 3 sprints** (el docente fijó Sprint 1 del 08/09 al 19/09 y Sprint 2 del 22/09 al 03/10; el Sprint 3 está sin confirmar). Desaparece el Sprint 0: su guía pasa a ser la del Sprint 1. **Product Backlog del MVP** con épicas E0–E11 e historias de usuario. Despliegue en **Vercel + Supabase** (ADR-002, propuesta). Canal móvil como **PWA**. Nueva sección de **tecnologías emergentes**. |
+| 0.5 | **Contexto Bolivia** (documentos `ci`/`ce`/`pasaporte`, placas, Bs). **Despliegue en la nube movido a la fase final**: todo corre en local hasta entonces. Tokens de Supabase firmados con **ECC P-256** (validación por JWKS). El repositorio del equipo lo administra **AngelParedesH20**. |
 
 ### Documentos del proyecto
 
 | Documento | Propósito |
 |---|---|
+| `CLAUDE.md` | **Punto de entrada de cada sesión:** contexto, estado actual, próximos pasos y reglas. |
 | `PLANIFICACION.md` | Este documento: roles, stack, reglas, calendario y roadmap. |
 | `PRODUCT_BACKLOG.md` | **Épicas, historias de usuario, criterios de aceptación, tarjetas `PAN-xx` por sprint, carga por integrante y plan de contingencia.** Es la fuente de las tarjetas de Trello. |
 | `ARQUITECTURA_CLEAN.md` | Guía de trabajo: puesta en marcha, mapa del repositorio, flujo completo y recetas paso a paso. |
 | `PROPUESTA_BD.md` | Modelo de datos v1.0, creado en Supabase (nombres congelados). |
 | `docs/adr/` | Decisiones: ADR-001 (concurrencia), ADR-002 (despliegue en la nube), ADR-003 (uso de Supabase). |
 | `docs/guias-sprint/GUIA_SPRINT_NN.md` | Detalle técnico de las tarjetas de cada sprint. |
+| `REPLICACION_REPO2.md` | Reglas de aislamiento y cómo se transfiere la base al repositorio del equipo. |
+| `docs/repo2/` | README básico del repositorio del equipo y `CORRECCIONES_NN.md` (cambios puntuales que copia Ángel). |
 
 ---
 
 ## 1. Visión del Producto
 
-Sistema web y móvil, en entorno de **producción**, para la empresa de transporte **Panamericana**.
+Sistema web y móvil, pensado para **producción**, para la empresa de transporte **Panamericana**, que opera en **Bolivia (La Paz)**. Datos y reglas bolivianas: carnet de identidad (`ci`), placas `1234ABC`, montos en bolivianos y hora de La Paz.
 
 | Dominio | Alcance |
 |---|---|
@@ -112,9 +115,9 @@ Grisel (API encomiendas) ⇄  Grisel  (pantallas encomiendas) → integra en lay
 
 | Regla | Valor |
 |---|---|
-| WIP máximo *In Progress* — Ángel (SM + BE) | **1 tarjeta de desarrollo** |
-| WIP máximo *In Progress* — Grisel (BE + FE) | **2 tarjetas** (máx. 1 BE + 1 FE) |
-| WIP máximo *In Progress* — John, Brisa, Karime | **2 tarjetas** |
+| WIP máximo *En Progreso* — Ángel (SM + BE) | **1 tarjeta de desarrollo** |
+| WIP máximo *En Progreso* — Grisel (BE + FE) | **2 tarjetas** (máx. 1 BE + 1 FE) |
+| WIP máximo *En Progreso* — John, Brisa, Karime | **2 tarjetas** |
 | Tiempo máximo de una tarjeta en *Review* sin revisar | **24 h hábiles** |
 | Capacidad comprometida por sprint | ≤ **80 %** de la velocidad promedio |
 | Historia más grande permitida | **8 puntos** (si es mayor, se divide) |
@@ -134,7 +137,7 @@ Es una hipótesis inicial: se recalibra en la Review del Sprint 1 con la velocid
 
 ## 3. Stack Tecnológico (simplificado para aprender)
 
-**Principio:** usar la menor cantidad de herramientas posible para que el equipo **vea** la arquitectura en lugar de esconderla detrás de un framework. Las herramientas avanzadas se agregan cuando haya una necesidad real (ver `ARQUITECTURA_CLEAN.md`, sección 12).
+**Principio:** usar la menor cantidad de herramientas posible para que el equipo **vea** la arquitectura en lugar de esconderla detrás de un framework. Las herramientas avanzadas se agregan cuando haya una necesidad real (ver `ARQUITECTURA_CLEAN.md`, sección 14).
 
 | Capa | Tecnología | Por qué |
 |---|---|---|
@@ -199,14 +202,14 @@ La guía completa, con ejemplos, está en **`ARQUITECTURA_CLEAN.md`**. Resumen:
 
 ### 6.1 Flujo de aprobación del modelo de datos
 
-```
-1. Modelo v0.9 (PROPUESTA_BD.md)
-2. Se comparte con todo el equipo  →  comentarios hasta la fecha límite
-3. Se consolidan los cambios  →  versión v1.0
-4. Aprobación en reunión de equipo
-5. Nombres de tablas y campos CONGELADOS
-6. Migración inicial en Supabase staging  →  luego prod
-```
+| Paso | Estado |
+|---|---|
+| Borrador v0.1 y revisión (tripulación, tramos, tarifas, ventas) | ✅ 11–12/09 |
+| Modelo v1.0 aplicado en Supabase (16 tablas) y nombres **congelados** | ✅ 12/09 |
+| Contexto Bolivia: migración `documentos_bolivia` | ✅ 15/09 |
+| Proyecto de producción | ⏳ Fase final |
+
+**Desde ahora, un cambio al modelo** es una migración nueva (nunca editar las aplicadas), se refleja en `PROPUESTA_BD.md` y, si afecta al equipo, se registra en `docs/repo2/CORRECCIONES_NN.md`.
 
 ### 6.2 Restricciones obligatorias
 
@@ -251,10 +254,10 @@ La guía completa, con ejemplos, está en **`ARQUITECTURA_CLEAN.md`**. Resumen:
 
 ### 7.3 Flujo del tablero
 
-`To Do` → `In Progress` → `Review` → `Done`
+`Por Hacer` → `En Progreso` → `Testing` → `Completao` *(nombres elegidos por el equipo en Trello)*
 
-- **In Progress:** existe una rama y un PR en borrador enlazado a la tarjeta.
-- **Review:** el PR está abierto, CI en verde y tiene revisor asignado (tabla 2.4).
+- **En Progreso:** hay trabajo en la rama `dev/<integrante>` y, si ya existe, un PR en borrador enlazado a la tarjeta.
+- **Testing:** el PR está abierto, CI en verde y con revisor asignado (tabla 2.4), que prueba en local.
 - **Done:** PR fusionado, probado en local por el revisor y DoD verificado. El despliegue en staging se exige desde la fase final.
 
 ### 7.4 Definition of Ready (DoR)
@@ -377,8 +380,11 @@ Las historias de usuario, los criterios de aceptación y las tarjetas están en 
 | 5 | Modelo de datos v1.0 | ✅ Creado en Supabase (16 tablas) |
 | 6 | Despliegue (ADR-002) | ⏳ **Fase final** (fecha a definir). Hasta entonces, todo en local |
 | 7 | Product Backlog del MVP | ✅ `PRODUCT_BACKLOG.md` v1.0 |
-| 8 | Crear en Trello las tarjetas PAN-10 a PAN-24 (Sprint 2) | ⏳ Antes del Planning del 22/09 |
+| 8 | Guía y tarjetas de Trello del Sprint 2 (PAN-10 a PAN-23) | ⏳ Solo cuando el usuario lo pida, antes del Planning del 22/09 |
 | 9 | Documento de identidad boliviano (`ci`) en `clientes.tipo_documento` (P12) | ✅ Migración `documentos_bolivia` aplicada (15/09) |
-| 11 | Autoría del repositorio del equipo: sin rastros de la cuenta Z&P, administrado por **AngelParedesH20** | ⏳ Ángel · pasos en `docs/repo2/CORRECCIONES_01.md` |
-| 12 | Copiar al repositorio del equipo los archivos ajustados para Bolivia | ⏳ Ángel · `docs/repo2/CORRECCIONES_01.md` |
 | 10 | Validación del plan v0.4 (15/09) | ✅ Sin rupturas de arquitectura; ajustes aplicados en este documento, `PRODUCT_BACKLOG.md`, ADR-002, ADR-003 y `GUIA_SPRINT_01.md` |
+| 11 | Autoría del repositorio del equipo: sin rastros de la cuenta Z&P, administrado por **AngelParedesH20** | ✅ Aplicado por Ángel (15/09) · `docs/repo2/CORRECCIONES_01.md` |
+| 12 | Copiar al repositorio del equipo los archivos ajustados para Bolivia | ✅ Aplicado por Ángel (15/09) |
+| 13 | Invitar al equipo al tablero de Trello (hoy solo figura la cuenta conectada) | ⏳ Desde la interfaz de Trello; falta el correo de Ángel |
+| 14 | PAN-02: colaboradores, protección de `main` y ramas `dev/*` en el repositorio del equipo | ⏳ Ángel |
+| 15 | Fecha de la fase final de despliegue | ⏳ Se agenda en la Review del Sprint 2 (03/10) |

@@ -3,7 +3,9 @@
 Sistema web para venta de pasajes, gestión de flota, rutas y encomiendas de la empresa de transporte **Panamericana**.
 
 > **Repositorio privado de trabajo (Repositorio 1).** Acceso: John Zabaleta y Ángel Paredes.
-> El repositorio del equipo completo es el **Repositorio 2** (ver [REPLICACION_REPO2.md](REPLICACION_REPO2.md)).
+> El repositorio del equipo completo es el **Repositorio 2** (`AngelParedesH20/panamericana`, ver [REPLICACION_REPO2.md](REPLICACION_REPO2.md)).
+> **Contexto:** Bolivia (La Paz) · Sprint 1 en curso · todo corre en local.
+> **Para retomar el trabajo en una sesión nueva, empezar por [CLAUDE.md](CLAUDE.md).**
 
 ---
 
@@ -48,7 +50,7 @@ shared/      contrato compartido: direcciones de la API y tipos de datos
 backend/     API REST — Node.js + TypeScript + Express (Clean Architecture)
 web/         Next.js 16 — portal público + backoffice
 supabase/    migraciones .sql y datos de prueba
-docs/        contrato OpenAPI, decisiones (ADR) y guías por sprint
+docs/        decisiones (ADR), guías por sprint y archivos para el repositorio del equipo
 ```
 
 El módulo **`buses`** está implementado de punta a punta (base de datos → API → pantalla) y sirve de plantilla para los demás.
@@ -72,16 +74,17 @@ El módulo **`buses`** está implementado de punta a punta (base de datos → AP
 
 | Documento | Contenido |
 |---|---|
-| [CLAUDE.md](CLAUDE.md) | Contexto y reglas del proyecto para las sesiones de trabajo |
+| [CLAUDE.md](CLAUDE.md) | **Punto de entrada:** contexto, estado actual, próximos pasos y reglas |
 | [ARQUITECTURA_CLEAN.md](ARQUITECTURA_CLEAN.md) | Guía de trabajo: puesta en marcha, capas, flujo completo y recetas |
 | [PLANIFICACION.md](PLANIFICACION.md) | Roles, calendario de 3 sprints, reglas, roadmap y tecnologías emergentes |
 | [PRODUCT_BACKLOG.md](PRODUCT_BACKLOG.md) | Épicas, historias de usuario y tarjetas por sprint del MVP |
 | [PROPUESTA_BD.md](PROPUESTA_BD.md) | Modelo de datos v1.0, ya creado en Supabase (16 tablas) |
 | [REPLICACION_REPO2.md](REPLICACION_REPO2.md) | Cómo se crea y sincroniza el repositorio del equipo |
-| `docs/api/openapi.yaml` | Contrato de la API |
+| `docs/api/openapi.yaml` | Referencia interna del módulo `buses` (no se mantiene; el contrato vigente es `shared/src/`) |
 | `docs/adr/` | Decisiones de arquitectura |
 | `docs/guias-sprint/` | Guías por sprint (se convierten en tarjetas de Trello) |
 | `docs/repo2/README.md` | README básico que se copia al Repositorio 2 (el único `.md` que va allí) |
+| `docs/repo2/CORRECCIONES_NN.md` | Cambios puntuales que Ángel aplica en el Repositorio 2 (01 ✅ aplicada) |
 
 ---
 
@@ -90,6 +93,7 @@ El módulo **`buses`** está implementado de punta a punta (base de datos → AP
 1. **Clean Architecture:** las dependencias apuntan hacia adentro.
 2. **Un solo lugar para cada dirección de la API:** `shared/src/endpoints.ts`.
 3. **SQL en minúsculas** y nombres de campos idénticos al modelo aprobado (R1–R6).
-4. **Un dato se llama igual** en la base, en el backend y en la web (`numero_pisos`).
-5. **Cambios de esquema solo por migraciones**, nunca desde el panel de Supabase.
-6. **Nunca subir claves ni archivos `.env`.**
+4. **Datos y reglas bolivianas:** `ci`/`ce`/`pasaporte`, placas `1234ABC`, montos en bolivianos.
+5. **Un dato se llama igual** en la base, en el backend y en la web (`numero_pisos`).
+6. **Cambios de esquema solo por migraciones**, nunca desde el panel de Supabase.
+7. **Nunca subir claves ni archivos `.env`.**

@@ -1,6 +1,7 @@
 # Replicación al Repositorio 2 (repositorio del equipo)
 
-> **Versión:** 0.3 · **Fecha:** 2026-09-14
+> **Versión:** 0.4 · **Fecha:** 2026-09-15
+> **Estado:** ✅ Repositorio 2 montado por Ángel el 15/09 · ✅ `docs/repo2/CORRECCIONES_01.md` aplicadas (autoría AngelParedesH20 y ajustes para Bolivia)
 > **Documento interno del Repositorio 1.** No se copia al Repositorio 2.
 > **Regla principal:** el Repositorio 2 lleva **solo el stack** y un `README.md` básico. Ningún otro `.md`.
 
@@ -11,7 +12,8 @@
 | | **Repositorio 1** | **Repositorio 2** |
 |---|---|---|
 | Nombre | `panamericana-base` | `panamericana` |
-| Dueño | Z&P (John + Ángel) | Ángel |
+| GitHub | `ZPSoftwareFastSolutions/panamericana-base` | `AngelParedesH20/panamericana` |
+| Dueño | Z&P (`ZPSoftwareFastSolutions`) | **AngelParedesH20** |
 | Acceso | John, Ángel | Los 5 integrantes |
 | Visibilidad | Privado | Privado |
 | Propósito | Construir y validar la base técnica | Desarrollo del equipo completo |
@@ -43,7 +45,7 @@ flowchart LR
 
 ---
 
-## 3. Crear el Repositorio 2 (lo hace Ángel)
+## 3. Crear el Repositorio 2 (✅ hecho por Ángel el 15/09 · se conserva como referencia si hubiera que rehacerlo)
 
 ### 3.1 Carpeta local
 
@@ -309,6 +311,17 @@ La guía **nunca se copia** al Repositorio 2. Su contenido se convierte en **tar
 | Direcciones y tipos de la API | `shared/src/` |
 | Nombres de los datos | Las migraciones en `supabase/migrations/` |
 | Reglas de calidad | La CI (`lint`, `test`, `build`) y la revisión de cada PR |
+
+---
+
+### 8.3 Correcciones puntuales
+
+Cuando un cambio del repositorio base debe llegar al equipo fuera de una copia completa, se documenta en `docs/repo2/CORRECCIONES_NN.md`: qué archivos cambian, el comando de copia, cómo verificar y el commit. Ángel lo aplica y se marca el estado.
+
+| N.º | Contenido | Estado |
+|---|---|---|
+| 01 | Autoría de commits a AngelParedesH20 (sin Z&P) y 6 archivos ajustados para Bolivia | ✅ Aplicada el 15/09 |
+| 02 | *(la próxima)* | — |
 
 ---
 

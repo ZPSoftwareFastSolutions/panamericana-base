@@ -1,6 +1,7 @@
 # Correcciones 01 — Repositorio del equipo (`panamericana`)
 
 > **Fecha:** 15/09/2026 · **Para:** Ángel · **Documento interno:** no se copia al repositorio del equipo.
+> **Estado:** ✅ **Aplicada por Ángel el 15/09/2026.** Se conserva como registro y como receta si vuelve a aparecer la autoría de Z&P.
 > Hacerlo **en este orden** y, si es posible, **antes de invitar colaboradores y de crear las ramas `dev/*`**. Si ya se hizo alguna de las dos cosas, ver el paso 1.7.
 
 ---

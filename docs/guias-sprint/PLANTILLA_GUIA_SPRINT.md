@@ -41,13 +41,13 @@ supabase db push
 |---|---|---|---|
 | POST | `/v1/...` | | 201, 400, 409 |
 
-El contrato actualizado está en `docs/api/openapi.yaml`.
+Las rutas y los tipos se declaran en `shared/src/` (es el contrato que ve el equipo).
 
 ---
 
 ## 4. Backend — archivos por módulo
 
-Para cada módulo, en este orden (ver `ARQUITECTURA_CLEAN.md`, sección 10):
+Para cada módulo, en este orden (ver `ARQUITECTURA_CLEAN.md`, sección 8):
 
 | Paso | Archivo | Qué contiene |
 |---|---|---|

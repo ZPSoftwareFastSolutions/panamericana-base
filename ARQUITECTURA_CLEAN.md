@@ -162,7 +162,7 @@ panamericana/
 │   └── seed.sql              datos de prueba
 │
 └── docs/
-    ├── api/openapi.yaml      contrato en formato estándar
+    ├── api/openapi.yaml      referencia interna del módulo buses (no se mantiene; el contrato es shared/src)
     ├── adr/                  decisiones importantes y su porqué
     └── guias-sprint/         qué construir en cada sprint
 ```
@@ -368,7 +368,7 @@ Ejemplo: "registrar terminales". Cada paso puede ser un commit.
 | 1 | Confirmar tabla y campos en el modelo aprobado | `PROPUESTA_BD.md` |
 | 2 | Crear la migración | `supabase/migrations/000X_terminales.sql` |
 | 3 | Declarar el endpoint y los tipos | `shared/src/endpoints.ts`, `shared/src/tipos/terminal.ts` |
-| 4 | Documentar el endpoint | `docs/api/openapi.yaml` |
+| 4 | Revisar que el contrato quedó completo (rutas y tipos) | `shared/src/` |
 | 5 | Dominio: entidad, errores e interfaz | `backend/src/modulos/terminales/dominio/` |
 | 6 | Caso de uso + prueba | `backend/src/modulos/terminales/casos-de-uso/` |
 | 7 | Repositorio con SQL | `backend/src/modulos/terminales/adaptadores/PgTerminalRepositorio.ts` |
@@ -500,7 +500,7 @@ npx supabase db push
 - [ ] `npm run lint` sin errores
 - [ ] `npm test` en verde
 - [ ] `npm run build` compila
-- [ ] El endpoint está en `shared/src/endpoints.ts` y en `docs/api/openapi.yaml`
+- [ ] El endpoint y sus tipos están en `shared/src/`
 - [ ] SQL en minúsculas y nombres de campos sin cambios
 - [ ] No hay archivos `.env` ni claves en el cambio
 - [ ] La pantalla maneja cargando, error y lista vacía

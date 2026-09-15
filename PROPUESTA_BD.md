@@ -352,34 +352,35 @@ Traducido: *"para el mismo viaje y el mismo asiento, no pueden existir dos pasaj
 
 ---
 
-## 6. Preguntas que siguen abiertas
+## 6. Preguntas abiertas y decisiones provisionales del MVP
+
+Las decisiones marcadas ✅ se tomaron en `PRODUCT_BACKLOG.md` §2 y **no requieren migración**.
 
 | # | Pregunta | Qué cambiaría |
 |---|---|---|
-| **P5** | ¿El cliente necesita cuenta para comprar por web, o puede comprar como invitado? | Obligatoriedad de `ventas.cliente_id` y `clientes.usuario_id` |
-| **P6** | ¿Cuántos minutos se retiene un asiento mientras se paga? (propuesta: 10) | Valor de `reservado_hasta` |
+| ~~P5~~ | ✅ Compra como **invitado** (cuenta de cliente queda como *Could*) | Sin cambios |
+| ~~P6~~ | ✅ **10 minutos** (`MINUTOS_RESERVA_ASIENTO=10`) | Sin cambios |
 | **P7** | ¿Las encomiendas se pagan en origen, en destino o en ambos? | Momento en que se crea la `venta` de una encomienda |
-| **P8** | ¿Qué métodos de pago acepta la empresa? | Valores de `pagos.metodo` |
+| ~~P8~~ | ✅ **Pago simulado:** web `tarjeta`, taquilla `efectivo`, estado `aprobado`, `referencia_externa` = `SIMULADO-<codigo>` | Sin cambios |
 | **P9** | ¿Qué roles internos existen? (¿supervisor?, ¿contador?) | Valores de `usuarios.rol` |
-| **P10** | ¿Se pueden anular pasajes? ¿Hay devolución y con cuánta anticipación? | Estados de `pasajes` y `pagos` |
+| ~~P10~~ | ✅ Anulación **hasta 2 h antes**, solo en taquilla; el pago pasa a `reembolsado` (devolución manual) | Sin cambios |
 | **P11** | ¿Guardamos historial de cambios de los pasajes, como en encomiendas? | Nueva tabla `historial_pasajes` |
 | ~~P12~~ | ✅ **Resuelta (15/09):** Bolivia → `ci`, `ce` y `pasaporte` | Migración `documentos_bolivia` |
-| **P15** | ¿Las tarifas se definen viaje por viaje, o conviene una plantilla por ruta que se copie al programar? | Tabla `tarifas` por viaje o por ruta |
+| ~~P15~~ | ✅ Tarifas **por viaje**, como está en el modelo | Sin cambios |
 | **P16** | ¿La tripulación rota a mitad del recorrido en viajes largos? | `viajes_choferes` necesitaría tramo asignado |
-| **P17** | ¿El precio de un tramo se calcula por proporción de la distancia, o se define manualmente? | Posible tabla `tarifas_tramos` |
-| **P18** | ¿Algún nombre de tabla o campo no es claro? | Nombres (última oportunidad antes de congelarlos) |
+| ~~P17~~ | ✅ **Proporcional al tiempo:** precio completo × (minutos del tramo ÷ duración total), redondeado a Bs 0,50 | Sin cambios |
+| ~~P18~~ | ✅ Cerrada: los nombres quedaron **congelados** en v1.0 | — |
 
 ---
 
-## 7. Formato para enviar comentarios
+## 7. Cómo cambiar el modelo desde ahora
 
-| # | Tabla / campo | Tipo | Comentario | Propuesta |
-|---|---|---|---|---|
-| 1 | `choferes.categoria_licencia` | Duda | *Ejemplo: ¿validamos la categoría al asignar?* | *Agregar validación* |
-| 2 | P15 | Respuesta | | |
-| 3 | | | | |
+El modelo está aplicado y sus nombres congelados, así que la ronda de comentarios terminó. Un cambio sigue estos pasos:
 
-**Tipos:** `Duda` · `Cambio` · `Falta` · `Sobra` · `Respuesta` (a una pregunta P#)
+1. Escribir una **migración nueva** (nunca editar una aplicada): SQL en minúsculas, sin renombrar campos, con RLS en tablas nuevas.
+2. Aplicarla en Supabase y guardar el archivo como `supabase/migrations/<version>_<nombre>.sql`, con la versión que registró la base.
+3. Actualizar este documento: diccionario de tablas, sección 0 y tabla de migraciones.
+4. Si afecta al repositorio del equipo, registrarla en `docs/repo2/CORRECCIONES_NN.md` para que Ángel copie el archivo (no hay que volver a aplicarla: la base es compartida).
 
 ---
 
@@ -388,11 +389,11 @@ Traducido: *"para el mismo viaje y el mismo asiento, no pueden existir dos pasaj
 | Paso | Estado |
 |---|---|
 | 1. Incorporar la revisión (tripulación, tramos, tarifas, ventas) | ✅ Hecho |
-| 2. Escribir las migraciones `.sql` | ✅ 5 migraciones |
+| 2. Escribir las migraciones `.sql` | ✅ 6 migraciones (incluida `documentos_bolivia`) |
 | 3. Crear la base en Supabase | ✅ 16 tablas |
 | 4. Cargar datos de prueba y verificar la protección de asientos | ✅ Verificado |
 | 5. Congelar nombres | ✅ Reglas R2 y R3 activas |
-| 6. Responder P5–P18 | ⏳ Cada respuesta será una migración nueva |
+| 6. Preguntas abiertas restantes (P7, P9, P11, P16) | ⏳ Si alguna cambia el modelo, será una migración nueva |
 | 7. Crear el proyecto de producción antes de la entrega | ⏳ Pendiente |
 
 ### Migraciones aplicadas

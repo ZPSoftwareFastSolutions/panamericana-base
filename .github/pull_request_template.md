@@ -9,7 +9,7 @@ PAN-
 ## Checklist
 
 ### Arquitectura
-- [ ] El código está en la capa correcta (`ARQUITECTURA_CLEAN.md`, sección 8)
+- [ ] El código está en la capa correcta (`ARQUITECTURA_CLEAN.md`, sección 10)
 - [ ] El dominio no importa librerías externas
 - [ ] El caso de uso no recibe `req` ni `res`
 - [ ] Las instancias se crean solo en `contenedor.ts`
@@ -20,7 +20,7 @@ PAN-
 - [ ] El cambio de esquema es una migración en `supabase/migrations/`, no un cambio manual en el panel (R5)
 
 ### Contrato y pruebas
-- [ ] El endpoint está en `docs/api/openapi.yaml`
+- [ ] El endpoint y sus tipos están en `shared/src/`
 - [ ] Hay pruebas del caso de uso y pasan
 - [ ] Los errores devuelven el código HTTP correcto
 

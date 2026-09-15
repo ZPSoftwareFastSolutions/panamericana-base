@@ -6,7 +6,9 @@
 >
 > 🔁 **Antes era la "Guía del Sprint 0" (14/09 → 25/09).** Con el calendario de 3 sprints (`PLANIFICACION.md` v0.4) su contenido pasa al Sprint 1, que ya estaba en curso. Se había agregado la tarjeta **PAN-09** (spike de despliegue); **el 15/09 se archivó**: el despliegue pasa a la fase final y todo el Sprint 1 corre en local. Las historias de usuario de cada tarjeta están en `PRODUCT_BACKLOG.md`, sección 5.1.
 >
-> 🗂️ **Tablero de Trello:** https://trello.com/b/ida3R2kt/panamericana (creado el 15/09 con PAN-01 a PAN-09).
+> ✅ **Parte A ejecutada por Ángel el 15/09:** repositorio montado y `docs/repo2/CORRECCIONES_01.md` aplicadas. **Siguen pendientes de PAN-02:** colaboradores, protección de `main`, ramas `dev/*` e invitar al equipo al tablero.
+>
+> 🗂️ **Tablero de Trello:** https://trello.com/b/ida3R2kt/panamericana (creado el 15/09 con PAN-01 a PAN-09; PAN-09 archivada). Listas renombradas por el equipo: `Por Hacer`, `En Progreso`, `Testing`, `Completao`.
 >
 > 📌 **Esta guía se queda en el Repositorio 1.** Al Repositorio 2 no va ningún `.md` salvo un `README.md` básico. Al equipo le llega como **tarjetas de Trello** (Parte B) y el **mensaje de A9**.
 

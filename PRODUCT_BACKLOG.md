@@ -1,6 +1,6 @@
 # Product Backlog — Panamericana (MVP en 3 sprints)
 
-> **Versión:** 1.0 · **Fecha:** 2026-09-15 · **Estado:** Aprobado para planificar el Sprint 2
+> **Versión:** 1.1 · **Fecha:** 2026-09-15 · **Estado:** Sprint 1 en curso · contexto Bolivia · despliegue en la fase final · tarjetas del Sprint 2 sin cargar en Trello
 > **Fuentes:** `PLANIFICACION.md` v0.4 · análisis deductivo-inductivo (fase alpha) · `PROPUESTA_BD.md` v1.0 · ADR-001, ADR-002, ADR-003
 > **Documento interno del Repositorio 1.** Al equipo le llega como **tarjetas de Trello** (una por cada `PAN-xx`), nunca como archivo.
 
@@ -107,7 +107,7 @@ Estas decisiones responden de forma **provisional** las preguntas abiertas de `P
 **Como** Scrum Master **quiero** el repositorio del equipo con `main` protegida, una rama por integrante y el tablero de Trello **para** tener trazabilidad Épica → Historia → Tarjeta.
 - Repositorio 2 creado según `REPLICACION_REPO2.md` (solo stack, sin `.md` internos).
 - 5 ramas `dev/*`; `main` exige PR, CI en verde y 1 aprobación.
-- Tablero con listas `To Do → In Progress → Review → Done` y las tarjetas del sprint.
+- Tablero con listas `Por Hacer → En Progreso → Testing → Completao` y las tarjetas del sprint; el equipo invitado.
 
 **Must · 3 pts · Sprint 1 · PAN-02 · 🔄**
 
@@ -375,7 +375,7 @@ Estas decisiones responden de forma **provisional** las preguntas abiertas de `P
 
 Detalle de cada tarjeta: `docs/guias-sprint/GUIA_SPRINT_01.md`.
 
-**Tablero de Trello (creado el 15/09):** https://trello.com/b/ida3R2kt/panamericana — listas `To Do → In Progress → Review → Done`, 8 tarjetas activas con fecha límite 19/09 (PAN-09 archivada: el despliegue pasa a la fase final) y checklist de criterios de aceptación. PAN-01 y PAN-02 en *In Progress*. Las tarjetas no mencionan documentos internos.
+**Tablero de Trello (creado el 15/09):** https://trello.com/b/ida3R2kt/panamericana — listas `Por Hacer → En Progreso → Testing → Completao` (nombres elegidos por el equipo), 8 tarjetas activas con fecha límite 19/09 (PAN-09 archivada: el despliegue pasa a la fase final) y checklist de criterios de aceptación. PAN-01 y PAN-02 en *En Progreso*. **Pendiente:** invitar al equipo al tablero (la integración no envía invitaciones). Las tarjetas no mencionan documentos internos.
 
 | Tarjeta | Responsable | Trabajo | HU | Pts |
 |---|---|---|---|---|
