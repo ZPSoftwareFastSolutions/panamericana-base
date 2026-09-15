@@ -1,5 +1,5 @@
 -- datos de prueba para desarrollo
--- reglas: palabras sql en minusculas; nombres de campos identicos al modelo aprobado
+-- reglas: palabras sql en minusculas y nombres de campos en snake_case
 -- los ids son fijos para que el archivo se pueda volver a ejecutar sin duplicar filas
 
 -- usuarios internos

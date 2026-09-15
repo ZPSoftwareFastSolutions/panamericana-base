@@ -3,6 +3,8 @@
 > **Sprint:** 0 · **Fechas:** 14/09/2026 → 25/09/2026
 > **Para:** Ángel (montaje del repositorio) y todo el equipo (tareas)
 > **Objetivo:** que los 5 integrantes tengan el proyecto corriendo en su computadora, conectado a la base de datos real, y que cada uno entregue su primer módulo siguiendo la arquitectura.
+>
+> 📌 **Esta guía se queda en el Repositorio 1.** Al Repositorio 2 no va ningún `.md` salvo un `README.md` básico. Al equipo le llega como **tarjetas de Trello** (Parte B) y el **mensaje de A9**.
 
 ---
 
@@ -36,33 +38,44 @@ cd "F:\Universidad\6to\Proyecto III\panamericana" && git init -b main
 
 ---
 
-### A2. Traer los archivos base
+### A2. Traer los archivos base (solo el stack)
 
 Desde PowerShell:
 
 ```powershell
-robocopy "F:\Universidad\6to\Proyecto III\project_bus" "F:\Universidad\6to\Proyecto III\panamericana" /E /XD ".git" "node_modules" "dist" ".next" ".claude" "guias-sprint" /XF ".env" ".env.local" "REPLICACION_REPO2.md" "PLANIFICACION.md" "CLAUDE.md" "AGENTS.md" ".mcp.json"
+robocopy "F:\Universidad\6to\Proyecto III\project_bus" "F:\Universidad\6to\Proyecto III\panamericana" /E /XD ".git" "node_modules" "dist" ".next" ".claude" "docs" /XF "*.md" ".env" ".env.local" ".mcp.json"
 ```
 
 `robocopy` termina con un código distinto de 0 aunque todo salga bien; eso es normal.
 
-**Después de copiar:**
+Este comando **no copia ningún `.md` ni la carpeta `docs/`**. Ahora copia el README básico del proyecto:
 
-1. Abre `README.md` y borra estas dos líneas del inicio:
-   ```
-   > **Repositorio privado de trabajo (Repositorio 1).** Acceso: John Zabaleta y Ángel Paredes.
-   > El repositorio del equipo completo es el **Repositorio 2** (ver REPLICACION_REPO2.md).
-   ```
-   y la fila de `REPLICACION_REPO2.md` de la tabla de documentación.
+```powershell
+Copy-Item "F:\Universidad\6to\Proyecto III\project_bus\docs\repo2\README.md" "F:\Universidad\6to\Proyecto III\panamericana\README.md"
+```
 
-2. Crea la carpeta `docs/guias-sprint/` y copia **solo este archivo** (`GUIA_SPRINT_00.md`) dentro.
+Comprueba que el **único** `.md` es ese README (debe listar un solo archivo):
 
-3. Agrega la versión adaptada de `PLANIFICACION.md` que te pase John (sin las secciones internas).
+```powershell
+Get-ChildItem "F:\Universidad\6to\Proyecto III\panamericana" -Recurse -Filter *.md | Select-Object FullName
+```
 
-**Verifica que NO existan** (si aparecen, bórralos):
+Lo que debe quedar en la raíz del repositorio 2:
 
-```bash
-ls -a | grep -E "^\.claude|^CLAUDE.md|^AGENTS.md|^.mcp.json|^REPLICACION"
+```
+.github/workflows/ci.yml
+backend/
+shared/
+supabase/
+web/
+.editorconfig
+.gitattributes
+.gitignore
+.nvmrc
+.prettierrc
+package.json
+package-lock.json
+README.md
 ```
 
 ---
@@ -157,10 +170,16 @@ git remote add origin https://github.com/TU-USUARIO/panamericana.git
 git add .
 ```
 
-Antes de confirmar, revisa que **no** aparezca ningún `.env`:
+Antes de confirmar, revisa que **no** aparezca ningún `.env` ni ningún `.md` distinto de `README.md`:
 
 ```bash
 git status --short
+```
+
+Y que ningún archivo mencione documentos internos (este comando **no debe devolver nada**):
+
+```bash
+git grep --cached -nEi "ADR-|PROPUESTA_BD|ARQUITECTURA_CLEAN|PLANIFICACION|REPLICACION|claude"
 ```
 
 ```bash
@@ -226,7 +245,7 @@ git checkout main
 > 6. `npm run db:verificar` → debe decir "Conexion correcta" y listar 16 tablas.
 > 7. En dos terminales: `npm run dev:backend` y `npm run dev:web`.
 > 8. Abre http://localhost:3000/admin/buses y registra un bus de prueba.
-> 9. Lee `ARQUITECTURA_CLEAN.md` completo antes de escribir código. El módulo `buses` es el ejemplo a copiar.
+> 9. Antes de escribir código, recorre el módulo `buses` en `backend/src/modulos/buses` y en `web/src/modulos/buses`: es el ejemplo a copiar. Cada archivo tiene comentarios que explican qué hace.
 > 10. Trabaja en tu rama: `git checkout dev/tu-nombre`
 >
 > Nunca subas el archivo `.env`. Nunca ejecutes `npm install` dentro de `backend/` o `web/`.
@@ -269,7 +288,6 @@ Campos de la tabla `terminales`: `id`, `nombre` (único), `ciudad`, `direccion`,
 | 4 | `backend/src/modulos/terminales/casos-de-uso/` → `RegistrarTerminal.ts` + su `.test.ts`, `ListarTerminales.ts` |
 | 5 | `backend/src/modulos/terminales/adaptadores/` → `PgTerminalRepositorio.ts`, `terminalRutas.ts` |
 | 6 | `backend/src/contenedor.ts` y `backend/src/rutas.ts` |
-| 7 | `docs/api/openapi.yaml` |
 
 **Reglas de negocio para el dominio:** el nombre no puede estar vacío; no se permiten dos terminales con el mismo nombre (`NombreDuplicadoError` → 409).
 
@@ -279,7 +297,7 @@ Campos de la tabla `terminales`: `id`, `nombre` (único), `ciudad`, `direccion`,
 
 Campos de `usuarios`: `id`, `nombres`, `apellidos`, `correo` (único), `rol`, `activo`.
 
-Mismos 7 pasos que PAN-03, con módulo `usuarios`.
+Mismos 6 pasos que PAN-03, con módulo `usuarios`.
 
 **Reglas de negocio:** el correo debe tener formato válido y ser único (`CorreoDuplicadoError` → 409); `rol` solo puede ser `administrador`, `vendedor`, `encomiendas` o `cliente` (`RolInvalidoError` → 400).
 
@@ -289,7 +307,7 @@ Mismos 7 pasos que PAN-03, con módulo `usuarios`.
 
 Campos de `clientes`: `id`, `tipo_documento`, `numero_documento`, `nombres`, `apellidos`, `telefono`, `correo`, `fecha_nacimiento`.
 
-**Backend:** los mismos 7 pasos de PAN-03, con módulo `clientes`.
+**Backend:** los mismos 6 pasos de PAN-03, con módulo `clientes`.
 **Reglas:** `tipo_documento` solo `dni`, `ce` o `pasaporte`; si es `dni`, `numero_documento` debe tener 8 dígitos; no se repite la pareja tipo + número (409).
 
 **Frontend:**
@@ -365,8 +383,9 @@ En GitHub: **Compare & pull request** hacia `main`, pide revisión al compañero
 - [ ] Módulos `terminales`, `usuarios` y `clientes` funcionando
 - [ ] Pantallas de terminales y clientes accesibles desde el menú
 - [ ] Portal público con su maqueta del buscador
-- [ ] `docs/api/openapi.yaml` incluye todos los endpoints nuevos
+- [ ] `shared/src/endpoints.ts` incluye todos los endpoints nuevos
 - [ ] Ningún `.env` subido al repositorio
+- [ ] El repositorio 2 sigue sin ningún `.md` aparte del `README.md`
 - [ ] Tablero de Trello con el backlog del Sprint 1 listo
 
 ---

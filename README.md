@@ -72,12 +72,15 @@ El módulo **`buses`** está implementado de punta a punta (base de datos → AP
 
 | Documento | Contenido |
 |---|---|
+| [CLAUDE.md](CLAUDE.md) | Contexto y reglas del proyecto para las sesiones de trabajo |
 | [ARQUITECTURA_CLEAN.md](ARQUITECTURA_CLEAN.md) | Guía de trabajo: puesta en marcha, capas, flujo completo y recetas |
 | [PLANIFICACION.md](PLANIFICACION.md) | Roles, sprints, reglas y roadmap |
 | [PROPUESTA_BD.md](PROPUESTA_BD.md) | Modelo de datos v1.0, ya creado en Supabase (16 tablas) |
 | [REPLICACION_REPO2.md](REPLICACION_REPO2.md) | Cómo se crea y sincroniza el repositorio del equipo |
 | `docs/api/openapi.yaml` | Contrato de la API |
 | `docs/adr/` | Decisiones de arquitectura |
+| `docs/guias-sprint/` | Guías por sprint (se convierten en tarjetas de Trello) |
+| `docs/repo2/README.md` | README básico que se copia al Repositorio 2 (el único `.md` que va allí) |
 
 ---
 

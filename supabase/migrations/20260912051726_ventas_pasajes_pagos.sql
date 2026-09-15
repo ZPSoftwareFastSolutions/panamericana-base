@@ -52,7 +52,7 @@ create table if not exists pasajes (
   constraint pasajes_precio_valido check (precio >= 0),
   constraint pasajes_tramo_valido check (orden_destino > orden_origen),
 
-  -- ADR-001: para el mismo viaje y asiento, dos pasajes activos no pueden tener tramos que se crucen
+  -- para el mismo viaje y asiento, dos pasajes activos no pueden tener tramos que se crucen
   constraint pasajes_asiento_sin_traslape exclude using gist (
     viaje_id with =,
     asiento_id with =,

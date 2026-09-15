@@ -27,7 +27,6 @@ supabase/.temp/
 .supabase/
 
 # herramientas locales
-.claude/settings.local.json
 .vscode/
 .idea/
 

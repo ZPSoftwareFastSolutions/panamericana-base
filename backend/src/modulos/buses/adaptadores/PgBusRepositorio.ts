@@ -5,7 +5,7 @@ import type { BusRepositorio } from '../dominio/BusRepositorio';
 
 /**
  * Fila tal como viene de la tabla buses.
- * Los nombres son EXACTAMENTE los de la base de datos (regla R2).
+ * Los nombres son EXACTAMENTE los de la base de datos.
  */
 type FilaBus = {
   id: string;
@@ -17,7 +17,7 @@ type FilaBus = {
   estado: EstadoBus;
 };
 
-/** Aqui, y solo aqui, se escribe SQL del modulo buses. Palabras SQL en minusculas (regla R1). */
+/** Aqui, y solo aqui, se escribe SQL del modulo buses. Palabras SQL en minusculas. */
 export class PgBusRepositorio implements BusRepositorio {
   constructor(private readonly db: Pool) {}
 

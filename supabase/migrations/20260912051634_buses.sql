@@ -1,5 +1,5 @@
 -- migracion 0001: tabla buses (modulo de referencia)
--- reglas: palabras sql en minusculas (R1) y nombres de campos identicos al modelo aprobado (R2)
+-- reglas: palabras sql en minusculas y nombres de campos en snake_case
 
 create table if not exists buses (
   id uuid primary key default gen_random_uuid(),
@@ -16,6 +16,6 @@ create table if not exists buses (
   constraint buses_estado_valido check (estado in ('activo', 'mantenimiento', 'inactivo'))
 );
 
--- la api automatica de supabase no debe exponer esta tabla (ADR-003):
+-- la api automatica de supabase no debe exponer esta tabla:
 -- se activa rls y no se crean politicas para anon ni authenticated
 alter table buses enable row level security;
