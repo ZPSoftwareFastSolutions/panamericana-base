@@ -173,6 +173,7 @@ npm run db:verificar   # prueba la conexión y lista las tablas
 - **Cambios en el stack:** ejecutar `npm run lint`, `npm test` y `npm run build` antes del commit, y luego la búsqueda de rastros de la §3.3.
 - **Cambios que deben llegar al equipo:** documentarlos en `docs/repo2/CORRECCIONES_NN.md` (la siguiente es **02**) con la tabla de archivos, el comando de copia, la verificación y el estado. Avisar al usuario.
 - **Git:** commits en español, estilo *conventional*, con la línea de atribución. Ejecutar `git add`, `git commit` y `git push` **en llamadas separadas**: el clasificador de permisos bloquea a veces los comandos encadenados o el `push`. Si el `push` se bloquea, dejar el commit hecho y pedir al usuario que ejecute `git push`.
+  - La computadora guarda **dos cuentas de GitHub** (Z&P y AngelParedesH20). Por eso el remoto de este repositorio lleva el usuario en la URL (`https://ZPSoftwareFastSolutions@github.com/ZPSoftwareFastSolutions/panamericana-base.git`). Sin eso, el administrador de credenciales abre un selector de cuenta y el `push` se queda esperando.
 - **Herramientas:**
   - Los *heredoc* muy largos (más de ~5 KB) fallan en la herramienta Bash: usar la herramienta de escritura de archivos.
   - Para parches con barras invertidas, escribir un script de Python con cadenas *raw* en el scratchpad.
