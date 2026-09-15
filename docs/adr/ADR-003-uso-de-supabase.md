@@ -35,6 +35,7 @@ Supabase ofrece PostgreSQL gestionado, autenticación y una API automática sobr
 ## Consecuencias
 
 - El backend valida el token de Supabase Auth en cada petición (`compartido/adaptadores/http/autenticacion.ts`).
+- **Validación del token (PAN-10):** revisar en Supabase → Project Settings → JWT Keys qué tipo de firma usa el proyecto. Si usa claves asimétricas (lo habitual en proyectos nuevos), la API valida con el JWKS público (`https://tvyhpwpyxmbdfxogopnl.supabase.co/auth/v1/.well-known/jwks.json`) y `SUPABASE_JWT_SECRET` deja de ser necesario.
 - Si más adelante se quiere usar Realtime para el croquis de asientos, hará falta un nuevo ADR, porque rompe la regla de "datos solo por la API".
 - Las claves y la contrasena de la base nunca viajan por el repositorio: cada persona las copia del panel de Supabase.
 - Cuando se cree el proyecto de produccion, solo cambia `DATABASE_URL`; el codigo no se toca.

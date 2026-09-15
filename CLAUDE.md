@@ -15,7 +15,13 @@ Proyecto "Panamericana": sistema web de gestión de transporte (pasajes, flota, 
 
 ## Stack
 
-npm workspaces: `shared/` (rutas de la API y tipos), `backend/` (Node 24 + TypeScript + Express 5 + Zod + `pg`, puerto 4000), `web/` (Next.js 16 + Tailwind + TanStack Query, puerto 3000). Base de datos PostgreSQL en Supabase. Móvil aplazado.
+npm workspaces: `shared/` (rutas de la API y tipos), `backend/` (Node 24 + TypeScript + Express 5 + Zod + `pg`, puerto 4000), `web/` (Next.js 16 + Tailwind + TanStack Query, puerto 3000). Base de datos PostgreSQL en Supabase. Despliegue propuesto en Vercel (web y API) + Supabase (ADR-002, se valida con el spike PAN-09). Canal móvil como PWA en el MVP; app nativa fuera del MVP.
+
+## Calendario y alcance (vigente desde 2026-09-15)
+
+- **3 sprints, fijados por el docente:** Sprint 1 **08/09 → 19/09** · Sprint 2 **22/09 → 03/10** · Sprint 3 **06/10 → 17/10, sin confirmar**. Ya **no existe Sprint 0** ni los Sprints 4–6: cualquier mención a ellos es obsoleta.
+- **Fuente única del alcance:** `PRODUCT_BACKLOG.md` (épicas E0–E11, historias HU-###, tarjetas PAN-## por sprint, carga por integrante, contingencia si el Sprint 3 no se confirma). Cambios de fechas o alcance se reflejan ahí y en `PLANIFICACION.md` sección 7.1.
+- **Tecnologías emergentes (requisito de la asignatura):** cloud computing (Vercel + Supabase) y machine learning (predicción de demanda por regresión, HU-033, Must). El chatbot (HU-034) es Could y no reemplaza a la predicción. Big data no se declara. Ver `PLANIFICACION.md` sección 9.
 
 ```bash
 npm install            # solo en la raíz
@@ -43,10 +49,11 @@ npm run db:verificar   # prueba la conexión a la base
 
 ## Documentos de contexto
 
-`PLANIFICACION.md` (roles, sprints) · `ARQUITECTURA_CLEAN.md` (guía de trabajo) · `PROPUESTA_BD.md` (modelo v1.0) · `REPLICACION_REPO2.md` (montaje del repo 2) · `docs/adr/` · `docs/guias-sprint/` (guías por sprint, se usan para crear tarjetas de Trello, no se copian).
+`PLANIFICACION.md` (roles, calendario, tecnologías emergentes) · `PRODUCT_BACKLOG.md` (épicas, historias y tarjetas del MVP) · `ARQUITECTURA_CLEAN.md` (guía de trabajo) · `PROPUESTA_BD.md` (modelo v1.0) · `REPLICACION_REPO2.md` (montaje del repo 2) · `docs/adr/` · `docs/guias-sprint/` (guías por sprint, se usan para crear tarjetas de Trello, no se copian).
 
 ## Forma de trabajo
 
 - Iterativa: entregar `.md` paso a paso cuando se planifica.
 - `git push` a veces lo bloquea el clasificador de permisos: en ese caso, dejar el commit hecho y pedir al usuario que haga `git push`.
-- Trello: pendiente de recibir los correos del equipo para crear el tablero y asignar tarjetas.
+- Trello: tablero `Panamericana` creado el 15/09 con el Sprint 1 (PAN-01 a PAN-09): https://trello.com/b/ida3R2kt/panamericana. Cuenta conectada: "Oya Oya", espacio *DarkMode*. La integración **no invita miembros ni asigna responsables** (el responsable va en el título de la tarjeta). Las tarjetas **no mencionan** documentos internos, el repositorio base ni herramientas de IA.
+- El contrato que ve el equipo es `shared/src/` (el repositorio del equipo no tiene `docs/api/openapi.yaml`).

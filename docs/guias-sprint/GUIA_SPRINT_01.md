@@ -1,8 +1,12 @@
-# Guía del Sprint 0 — Fundaciones
+# Guía del Sprint 1 — Base operativa
 
-> **Sprint:** 0 · **Fechas:** 14/09/2026 → 25/09/2026
+> **Sprint:** 1 · **Fechas:** 08/09/2026 → 19/09/2026 (fijadas por el docente)
 > **Para:** Ángel (montaje del repositorio) y todo el equipo (tareas)
-> **Objetivo:** que los 5 integrantes tengan el proyecto corriendo en su computadora, conectado a la base de datos real, y que cada uno entregue su primer módulo siguiendo la arquitectura.
+> **Objetivo:** que los 5 integrantes tengan el proyecto corriendo en su computadora, conectado a la base de datos real, que cada uno entregue su primer módulo siguiendo la arquitectura y que exista un primer despliegue en la nube.
+>
+> 🔁 **Antes era la "Guía del Sprint 0" (14/09 → 25/09).** Con el calendario de 3 sprints (`PLANIFICACION.md` v0.4) su contenido pasa al Sprint 1, que ya estaba en curso. Se agrega la tarjeta **PAN-09** (spike de despliegue). Las historias de usuario de cada tarjeta están en `PRODUCT_BACKLOG.md`, sección 5.1.
+>
+> 🗂️ **Tablero de Trello:** https://trello.com/b/ida3R2kt/panamericana (creado el 15/09 con PAN-01 a PAN-09).
 >
 > 📌 **Esta guía se queda en el Repositorio 1.** Al Repositorio 2 no va ningún `.md` salvo un `README.md` básico. Al equipo le llega como **tarjetas de Trello** (Parte B) y el **mensaje de A9**.
 
@@ -252,7 +256,7 @@ git checkout main
 
 ---
 
-## Parte B — Tareas del Sprint 0
+## Parte B — Tareas del Sprint 1
 
 ### B0. Tarea de todos (obligatoria, primero)
 
@@ -264,15 +268,18 @@ git checkout main
 
 ### B1. Reparto
 
-| Tarjeta | Responsable | Trabajo | Puntos |
-|---|---|---|---|
-| **PAN-02** | Ángel | Montaje del repositorio, ramas, colaboradores y tablero de Trello | 3 |
-| **PAN-03** | Ángel | Módulo `terminales` en el backend (listar y registrar) | 3 |
-| **PAN-04** | John | Módulo `usuarios` en el backend (listar y registrar) | 3 |
-| **PAN-05** | John | Revisar los PR de los demás y dejar la CI en verde | 2 |
-| **PAN-06** | Grisel | Módulo `clientes` de punta a punta: API + pantalla del backoffice | 5 |
-| **PAN-07** | Brisa | Pantalla de terminales en el backoffice + opciones del menú lateral | 5 |
-| **PAN-08** | Karime | Estructura `app/(publico)/` + maqueta del buscador de viajes | 5 |
+| Tarjeta | Responsable | Trabajo | Historia | Puntos |
+|---|---|---|---|---|
+| **PAN-02** | Ángel | Montaje del repositorio, ramas, colaboradores y tablero de Trello | HU-002 | 3 |
+| **PAN-03** | Ángel | Módulo `terminales` en el backend (listar y registrar) | HU-010 | 3 |
+| **PAN-04** | John | Módulo `usuarios` en el backend (listar y registrar) | HU-006 | 3 |
+| **PAN-05** | John | Revisar los PR de los demás y dejar la CI en verde | HU-003 | 2 |
+| **PAN-06** | Grisel | Módulo `clientes` de punta a punta: API + pantalla del backoffice | HU-009 | 5 |
+| **PAN-07** | Brisa | Pantalla de terminales en el backoffice + opciones del menú lateral | HU-010 | 5 |
+| **PAN-08** | Karime | Estructura `app/(publico)/` + maqueta del buscador de viajes | HU-017 | 5 |
+| **PAN-09** | John | Spike de despliegue: primer despliegue de web y API en Vercel y ADR-002 aceptada | HU-004 | 3 |
+
+**Carga:** John 9 · Ángel 7 · Grisel 6 · Brisa 6 · Karime 6 (incluye PAN-01). Si una tarjeta no se termina el 19/09, pasa **al inicio** del Sprint 2 (`PRODUCT_BACKLOG.md`, sección 7.3).
 
 ### B2. Detalle de cada tarjeta
 
@@ -346,6 +353,27 @@ Campos de `clientes`: `id`, `tipo_documento`, `numero_documento`, `nombres`, `ap
 
 **Criterio de aceptación:** la portada se ve bien en celular y en computadora; el buscador valida que origen y destino sean distintos. Todavía no llama a la API.
 
+> ⚠️ **Choque de rutas en Next.js:** hoy existe `web/src/app/page.tsx`. Los grupos entre paréntesis no cambian la URL, así que `app/(publico)/page.tsx` y `app/page.tsx` resuelven los dos a `/` y `npm run build` falla. Hay que **eliminar** `app/page.tsx` y llevar la portada a `app/(publico)/page.tsx`.
+
+#### PAN-09 · Spike de despliegue en la nube — John
+
+Objetivo: comprobar que la propuesta de ADR-002 funciona **antes** del Sprint 2 y dejarla aceptada.
+
+| # | Paso |
+|---|---|
+| 1 | Crear en Vercel el proyecto de la web (directorio raíz `web`) conectado al Repositorio 2 |
+| 2 | Crear en Vercel el proyecto de la API (directorio raíz `backend`) y hacer que Express corra como función sin romper `npm run dev:backend` |
+| 3 | Cargar las variables de entorno en el panel de Vercel; en la API, `DATABASE_URL` con el **Transaction pooler** (puerto 6543) y `DB_POOL_MAX=3` (agregar la variable en `config.ts` y usarla en `baseDeDatos.ts`) |
+| 3b | Comandos de build (el paquete `shared` se compila antes): web `cd .. && npm run build:shared && npm run build --workspace web` · API `cd .. && npm run build:shared && npm run build --workspace backend` |
+| 3c | Los proyectos de Vercel van en la **cuenta de Ángel** (dueño del repositorio): en el plan gratuito se pueden bloquear despliegues de commits de colaboradores |
+| 4 | Configurar `NEXT_PUBLIC_API_URL` en la web y `ALLOWED_ORIGINS` en la API con los dominios de Vercel |
+| 5 | Verificar la tabla "Qué valida el spike" de ADR-002 y anotar los resultados |
+| 6 | Cambiar el estado de ADR-002 a **Aceptada** (o documentar el plan B) |
+
+**Criterio de aceptación:** la URL de la web en Vercel muestra `/admin/buses` con los buses de la base, y la URL de la API responde `/salud`. Ninguna clave queda en el repositorio.
+
+> Recordatorio del Repositorio 2: cualquier archivo de configuración (por ejemplo `vercel.json`) no menciona documentos internos.
+
 ### B3. Cómo se entrega cada tarjeta
 
 ```bash
@@ -375,7 +403,7 @@ En GitHub: **Compare & pull request** hacia `main`, pide revisión al compañero
 
 ---
 
-## Parte C — Checklist de cierre del Sprint 0
+## Parte C — Checklist de cierre del Sprint 1 (19/09)
 
 - [ ] Los 5 integrantes levantaron el proyecto y lo conectaron a la base
 - [ ] Las 5 ramas `dev/*` existen y `main` está protegida
@@ -386,7 +414,8 @@ En GitHub: **Compare & pull request** hacia `main`, pide revisión al compañero
 - [ ] `shared/src/endpoints.ts` incluye todos los endpoints nuevos
 - [ ] Ningún `.env` subido al repositorio
 - [ ] El repositorio 2 sigue sin ningún `.md` aparte del `README.md`
-- [ ] Tablero de Trello con el backlog del Sprint 1 listo
+- [ ] Web y API desplegadas en Vercel y ADR-002 aceptada (PAN-09)
+- [ ] Tablero de Trello con las tarjetas del Sprint 2 (PAN-10 a PAN-24) listas para el Planning del 22/09
 
 ---
 

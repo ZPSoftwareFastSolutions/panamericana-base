@@ -17,7 +17,7 @@
 
 > **¿Por qué Express y no NestJS?** Porque en Express se ve *todo*: no hay decoradores ni magia. El orden lo pone la arquitectura (las 4 capas), no el framework. Con menos herramientas que aprender, el equipo se concentra en el negocio.
 
-> **La app móvil no está en este repositorio todavía.** La prioridad es la web; el móvil entra en una épica posterior.
+> **La app móvil nativa no está en este repositorio.** En el MVP el canal móvil es el mismo portal web instalable como PWA (épica E8, Sprint 3).
 
 ---
 
@@ -512,8 +512,11 @@ npx supabase db push
 
 | Tema | Cuándo entra |
 |---|---|
-| App móvil (React Native) | Épica posterior, después de la web |
-| Login y roles (Supabase Auth) | Épica E1 |
-| Portal público de compra `app/(publico)/` | Épica E5 |
-| Pruebas E2E y validación automática de capas | Épica E10 |
+| App móvil nativa (React Native) | Fuera del MVP; el canal móvil es una PWA (E8, Sprint 3) |
+| Login y roles (Supabase Auth) | Épica E1, Sprint 2 |
+| Portal público de compra `app/(publico)/` | Maqueta en el Sprint 1; compra real en la épica E5, Sprint 2 |
+| Pruebas de humo en staging | Épica E10, Sprint 3 |
+| Validación automática de capas y del SQL | *Could*, fuera del compromiso del MVP |
 | Componentes de UI compartidos | Cuando el mismo componente se repita 3 veces |
+
+Sprints y tarjetas: `PRODUCT_BACKLOG.md`.
