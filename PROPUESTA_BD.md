@@ -21,6 +21,8 @@
 | Vender el asiento 1 del tramo 1→3 cuando ya está vendido el 1→2 | ❌ Rechazado (`23P01`, restricción `pasajes_asiento_sin_traslape`) |
 | Vender el asiento 1 del tramo 2→3 con el 1→2 ya vendido | ✅ Aceptado |
 
+> 🟡 **Revisión de normalización (22/09):** `docs/bd/ANALISIS_NORMALIZACION.md` verificó este modelo hasta 5FN y encontró 8 hallazgos (datos de persona duplicados, 7 columnas calculadas, catálogos e integridad de tramo). Propone un modelo **v2.0** de 26 tablas + 4 vistas. **Pendiente de decisión**: hasta entonces, v1.0 sigue vigente.
+
 > ⚠️ **Los nombres de tablas y campos están congelados** (reglas R2 y R3). Cualquier cambio a partir de aquí se hace con una migración nueva, nunca editando las existentes. Las preguntas de la sección 6 que sigan abiertas se resuelven así.
 
 ---

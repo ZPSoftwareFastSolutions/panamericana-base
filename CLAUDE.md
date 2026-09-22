@@ -199,6 +199,7 @@ npm run db:verificar   # prueba la conexión y lista las tablas
 | `docs/adr/` | ADR-001 concurrencia · ADR-002 despliegue · ADR-003 Supabase | Se toma o cambia una decisión técnica |
 | `docs/guias-sprint/` | `GUIA_SPRINT_01.md` y la plantilla (se convierten en tarjetas, no se copian) | Se planifica un sprint |
 | `docs/repo2/` | `README.md` básico del repositorio 2 · `CORRECCIONES_NN.md` | Hay cambios para el equipo |
+| `docs/bd/ANALISIS_NORMALIZACION.md` | Verificación de formas normales del modelo v1.0 y propuesta v2.0 (26 tablas + 4 vistas) | Se decide sobre la propuesta o cambia el modelo |
 | `docs/equipo/GUIA_DESARROLLO.md` | Guía para los 5 integrantes con el ejemplo `choferes` y el `.env` (con marcador en lugar de la contraseña) | Cambia el stack, una convención o el `.env` |
 | `compartir/` *(ignorada por git)* | Copia de la guía con el `.env` completo, lista para enviar al equipo | Se regenera cada vez que cambia la guía |
 
