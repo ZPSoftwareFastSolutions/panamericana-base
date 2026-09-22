@@ -170,7 +170,7 @@ Los dos repositorios usan **el mismo proyecto**, así que el equipo de 5 y nosot
 | Referencia | `tvyhpwpyxmbdfxogopnl` |
 | URL | `https://tvyhpwpyxmbdfxogopnl.supabase.co` |
 | Región | `us-east-1` |
-| Estado | 16 tablas creadas, con datos de prueba |
+| Estado | 26 tablas y 4 vistas creadas, con datos de prueba |
 
 **Lo que NO se comparte por el repositorio:** la contraseña de la base de datos y la cadena de conexión. Cada integrante las copia del panel de Supabase:
 

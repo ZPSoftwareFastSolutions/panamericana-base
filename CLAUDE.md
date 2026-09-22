@@ -1,6 +1,6 @@
 # CLAUDE.md — panamericana-base
 
-> **Punto de entrada para cualquier sesión.** Léelo completo antes de actuar. Última actualización: **15/09/2026**.
+> **Punto de entrada para cualquier sesión.** Léelo completo antes de actuar. Última actualización: **22/09/2026**.
 > Idioma de trabajo: **español** (documentos, respuestas, commits y comentarios del código).
 
 ---
@@ -50,19 +50,20 @@
 
 ---
 
-## 4. Estado actual (15/09/2026)
+## 4. Estado actual (22/09/2026)
 
 **Hecho**
 - Stack base con el módulo **`buses`** de punta a punta: BD → API → pantalla (11–12/09).
-- Base de datos en Supabase: **16 tablas, 6 migraciones**, datos de prueba bolivianos. La protección por tramos se verificó contra la base real.
+- Base de datos en Supabase: **modelo v2.0 normalizado (22/09)** — 26 tablas, 4 vistas, 10 migraciones, datos de prueba bolivianos. La protección por tramos y la integridad del tramo se verificaron contra la base real.
 - Plan v0.5 y `PRODUCT_BACKLOG.md` validados; sin rupturas de arquitectura.
 - **Repositorio 2 montado por Ángel (15/09)** y `docs/repo2/CORRECCIONES_01.md` **aplicadas**: autoría corregida a AngelParedesH20 y 6 archivos ajustados para Bolivia.
 - Tablero de Trello con el Sprint 1 (PAN-01 a PAN-08).
 - **Guía de desarrollo del equipo** (`docs/equipo/GUIA_DESARROLLO.md`, 15/09): cómo crear y llamar endpoints, `shared`, servicios, hooks, componentes `.tsx`, páginas, reglas, git y uso de asistentes de IA. Su ejemplo, el módulo `choferes`, se **extrajo, compiló (lint, 8 pruebas, build) y probó contra la base real** y luego se retiró del stack. La copia con el `.env` completo está en `compartir/GUIA_DESARROLLO_PANAMERICANA.md`, ignorada por git.
 
-**En curso:** Sprint 1 (08/09 → 19/09).
+**En curso:** Sprint 2 (22/09 → 03/10). El Sprint 1 cerró el 19/09; **falta registrar el resultado de su Review** en el backlog.
 
 **Próximos pasos (en orden)**
+0. **Entregar al equipo la corrección del modelo v2.0** (`docs/repo2/CORRECCIONES_02.md`) y la guía actualizada, **antes** de que empiecen las tarjetas PAN-13 a PAN-23.
 1. **Invitar al equipo al tablero de Trello:** hoy el único miembro es la cuenta conectada "Oya Oya". La integración no envía invitaciones: se hace desde la interfaz de Trello con los correos del §2 (falta el de Ángel).
 2. **Compartir la guía con el equipo:** enviar `compartir/GUIA_DESARROLLO_PANAMERICANA.md` por un canal privado. **No** se sube al repositorio 2 (regla: sin `.md`).
 3. **PAN-02 (Ángel):** colaboradores en GitHub, protección de `main` y ramas `dev/*`.
@@ -128,15 +129,16 @@ npm run db:verificar   # prueba la conexión y lista las tablas
   - La conexión directa `db.<ref>.supabase.co` es solo IPv6 y falla con `ENOTFOUND`.
   - `aws-1-...` responde `tenant not found`.
   - La contraseña vive **solo** en `backend/.env` (ignorado por git). Nunca va a archivos versionados, documentos, Trello ni commits.
-- **Reglas:** SQL con palabras reservadas en minúsculas · nombres de tablas y campos **congelados** (modelo v1.0) · cambios solo con **migraciones nuevas**, hacia adelante · toda tabla con RLS activado y sin políticas públicas (datos solo por la API).
-- **Migraciones aplicadas (6):** `buses` · `funciones_y_personas` · `flota_y_rutas` · `ventas_pasajes_pagos` (restricción de exclusión por tramo `pasajes_asiento_sin_traslape`, `btree_gist`) · `encomiendas` · `documentos_bolivia`.
+- **Reglas:** SQL con palabras reservadas en minúsculas · nombres de tablas y campos **congelados** (modelo v2.0, recongelados el 22/09) · cambios solo con **migraciones nuevas**, hacia adelante · toda tabla con RLS activado y sin políticas públicas (datos solo por la API) · **un dato que se puede calcular no se guarda**: va en una vista.
+- **Modelo v2.0 (22/09), normalizado hasta 5FN** (`docs/bd/ANALISIS_NORMALIZACION.md`): `personas` única + `usuarios`/`clientes`/`choferes` como roles · `usuarios_roles` · 8 catálogos con el código como clave (`tipos_documento`, `tipos_asiento`, `roles`, `canales_venta`, `metodos_pago`, `categorias_licencia`, `departamentos`, `ciudades`) · 4 vistas para los datos calculados · claves naturales en `rutas_paradas`, `viajes_choferes` y `tarifas` · claves foráneas compuestas que garantizan el tramo en `pasajes`.
+- **Migraciones aplicadas (10):** `buses` · `funciones_y_personas` · `flota_y_rutas` · `ventas_pasajes_pagos` (restricción de exclusión por tramo `pasajes_asiento_sin_traslape`, `btree_gist`) · `encomiendas` · `documentos_bolivia` · `catalogos` · `personas` · `derivados_y_vistas` · `integridad_y_claves`.
 - **Flujo para una migración nueva desde Claude:**
   1. Aplicarla con el MCP de Supabase (`apply_migration`).
   2. Leer la versión asignada con `list_migrations`.
   3. Guardar el archivo como `supabase/migrations/<version>_<nombre>.sql` con el mismo SQL.
   4. Actualizar `PROPUESTA_BD.md`.
   5. Si el cambio va al equipo, registrarlo en `docs/repo2/CORRECCIONES_NN.md`.
-- **Datos de prueba** (`supabase/seed.sql`, IDs fijos `00000000-0000-4000-8000-000000000xxx`): 2 usuarios, 2 clientes con CI, terminales La Paz, Oruro y Cochabamba, buses `2045KLP` y `3187HTR`, 4 asientos, 1 chofer, ruta La Paz → Oruro → Cochabamba, 1 viaje, tarifas, 1 venta y 1 pasaje (tramo 1→2). Si se prueban inserciones, **borrar lo creado** al terminar.
+- **Datos de prueba** (`supabase/seed.sql`, IDs fijos `00000000-0000-4000-8000-000000000xxx`, personas `...a0xx`): 5 personas, 2 usuarios con rol, 2 clientes, 1 chofer, terminales La Paz, Oruro y Cochabamba, buses `2045KLP` y `3187HTR`, 4 asientos, ruta La Paz → Oruro → Cochabamba, 1 viaje, 3 tarifas, 1 venta con pasaje (tramo 1→2) y pago. El archivo es **idempotente**. Si se prueban inserciones, **borrar lo creado** al terminar.
 - **Autenticación:** Supabase firma los tokens con **ECC P-256** (clave actual `4190b38b-…`). La API los valida con el JWKS `https://tvyhpwpyxmbdfxogopnl.supabase.co/auth/v1/.well-known/jwks.json` (`ES256`, audiencia `authenticated`). `SUPABASE_JWT_SECRET` **no se usa**. La web usará la clave publicable `sb_publishable_…`. **No revocar** la clave anterior Legacy HS256 hasta desactivar las claves *legacy* `anon` y `service_role`.
 
 ---
@@ -221,3 +223,4 @@ npm run db:verificar   # prueba la conexión y lista las tablas
 | 15/09 | Tokens ECC P-256 → validación por JWKS |
 | 15/09 | El repositorio 2 lo administra AngelParedesH20; sin rastros de Z&P (correcciones aplicadas) |
 | 15/09 | Trello solo con el Sprint 1 |
+| 22/09 | Revisión de normalización: modelo **v2.0** (26 tablas + 4 vistas) con `personas`, catálogos, vistas para los datos calculados y integridad del tramo en la base. Descongelamiento **único** de nombres, hecho antes del código del Sprint 2; nombres recongelados |

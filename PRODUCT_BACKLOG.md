@@ -97,7 +97,7 @@ Estas decisiones responden de forma **provisional** las preguntas abiertas de `P
 
 #### HU-001 · Entorno de desarrollo del equipo
 **Como** integrante del equipo **quiero** levantar el proyecto conectado a la base de datos real **para** desarrollar todos sobre la misma base.
-- `npm run db:verificar` responde "Conexion correcta" y lista 16 tablas.
+- `npm run db:verificar` responde "Conexion correcta" y lista 26 tablas y 4 vistas.
 - `/admin/buses` muestra los buses de prueba.
 - Capturas de las dos pruebas en la tarjeta de Trello.
 
@@ -142,7 +142,7 @@ Estas decisiones responden de forma **provisional** las preguntas abiertas de `P
 #### HU-006 · Registro de usuarios internos
 **Como** administrador **quiero** registrar y listar usuarios internos con su rol **para** controlar quién opera el sistema.
 - Correo con formato válido y único (409 si se repite).
-- `rol` solo `administrador`, `vendedor`, `encomiendas` o `cliente` (400 si no).
+- Los roles se asignan en `usuarios_roles` y deben existir en el catálogo `roles` (400 si no); un usuario puede tener varios.
 - En el MVP, la cuenta de acceso se crea en Supabase Auth y el `id` se copia al registro.
 
 **Must · 3 pts · Sprint 1 · PAN-04 · 🔄**
@@ -161,7 +161,8 @@ Estas decisiones responden de forma **provisional** las preguntas abiertas de `P
 
 #### HU-009 · Registrar y consultar clientes
 **Como** vendedor **quiero** registrar pasajeros, remitentes y destinatarios con su documento **para** no duplicarlos y reutilizarlos en ventas y encomiendas.
-- `tipo_documento` solo en la lista permitida; no se repite tipo + número (409).
+- El dato personal va en `personas` y el cliente es el rol que la enlaza (`clientes.persona_id`); si la persona ya existe por documento, se reutiliza.
+- `tipo_documento` debe existir en el catálogo `tipos_documento`; no se repite tipo + número en todo el sistema (409).
 - Desde `/admin/clientes` se registra un cliente y aparece en la tabla.
 - Existe una búsqueda por tipo y número de documento (la usan la compra y la taquilla).
 
@@ -200,7 +201,7 @@ Estas decisiones responden de forma **provisional** las preguntas abiertas de `P
 #### HU-014 · Rutas con paradas
 **Como** administrador **quiero** registrar rutas con paradas ordenadas **para** vender pasajes por tramo.
 - Una ruta tiene al menos 2 paradas; `orden` y `terminal_id` no se repiten dentro de la ruta.
-- `minutos_desde_origen` crece con el orden; la última parada coincide con `duracion_estimada_min`.
+- `minutos_desde_origen` y `km_desde_origen` crecen con el orden; la duración total se lee de la vista `rutas_resumen`.
 - Pantalla para crear la ruta y ordenar sus paradas.
 
 **Must · 8 pts · Sprint 2 · PAN-13, PAN-14 · ⏳**
@@ -208,7 +209,7 @@ Estas decisiones responden de forma **provisional** las preguntas abiertas de `P
 #### HU-015 · Programar viajes
 **Como** administrador **quiero** programar un viaje con ruta, bus, fecha de salida y precio base **para** ponerlo a la venta.
 - El bus debe estar `activo` y no tener otro viaje con horario cruzado (409).
-- `fecha_llegada_estimada` se calcula con la duración de la ruta y es posterior a la salida.
+- La llegada estimada y la hora de paso por cada parada se leen de la vista `viajes_horarios` (no se guardan).
 - El viaje nace `programado`; la pantalla lista los viajes por fecha.
 
 **Must · 6 pts · Sprint 2 · PAN-15, PAN-16 · ⏳**
@@ -216,7 +217,7 @@ Estas decisiones responden de forma **provisional** las preguntas abiertas de `P
 #### HU-016 · Tarifas por tipo de asiento
 **Como** administrador **quiero** definir el precio por tipo de asiento de cada viaje **para** cobrar distinto la cama y la semicama.
 - Un solo precio por viaje + tipo; precio mayor que 0.
-- Si no hay tarifa para un tipo, se usa `precio_base`.
+- Cada viaje debe tener tarifa para **cada tipo de asiento que tenga su bus** (ya no existe `precio_base`).
 - El croquis y el checkout muestran el precio del asiento, calculado por tramo (decisión P17).
 
 **Should · 5 pts · Sprint 3 · PAN-35, PAN-36 · ⏳**
@@ -338,7 +339,7 @@ Estas decisiones responden de forma **provisional** las preguntas abiertas de `P
 #### HU-030 · Pruebas de humo en staging y checklist de seguridad
 **Como** equipo **quiero** verificar el flujo completo en la nube antes de la demo **para** presentar un MVP estable.
 - Guion de humo ejecutado en staging: buscar → elegir asiento → reservar → pagar → boleto, más taquilla y encomienda.
-- Checklist: RLS activo en las 16 tablas, sin claves en el repositorio, CORS limitado al dominio de la web y rutas `/admin` protegidas.
+- Checklist: RLS activo en las 26 tablas y vistas sin acceso para `anon`, sin claves en el repositorio, CORS limitado al dominio de la web y rutas `/admin` protegidas.
 - Los defectos encontrados se registran como tarjetas.
 
 **Must · 3 pts · Sprint 3 · PAN-40 · ⏳**

@@ -78,7 +78,8 @@ El módulo **`buses`** está implementado de punta a punta (base de datos → AP
 | [ARQUITECTURA_CLEAN.md](ARQUITECTURA_CLEAN.md) | Guía de trabajo: puesta en marcha, capas, flujo completo y recetas |
 | [PLANIFICACION.md](PLANIFICACION.md) | Roles, calendario de 3 sprints, reglas, roadmap y tecnologías emergentes |
 | [PRODUCT_BACKLOG.md](PRODUCT_BACKLOG.md) | Épicas, historias de usuario y tarjetas por sprint del MVP |
-| [PROPUESTA_BD.md](PROPUESTA_BD.md) | Modelo de datos v1.0, ya creado en Supabase (16 tablas) |
+| [PROPUESTA_BD.md](PROPUESTA_BD.md) | Modelo de datos v2.0, ya creado en Supabase (26 tablas + 4 vistas) |
+| [docs/bd/ANALISIS_NORMALIZACION.md](docs/bd/ANALISIS_NORMALIZACION.md) | Verificación de formas normales del modelo y propuesta v2.0 |
 | [REPLICACION_REPO2.md](REPLICACION_REPO2.md) | Cómo se crea y sincroniza el repositorio del equipo |
 | `docs/api/openapi.yaml` | Referencia interna del módulo `buses` (no se mantiene; el contrato vigente es `shared/src/`) |
 | `docs/adr/` | Decisiones de arquitectura |

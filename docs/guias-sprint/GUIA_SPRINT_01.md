@@ -248,7 +248,7 @@ git checkout main
 > 4. `cp backend/.env.example backend/.env` y `cp web/.env.local.example web/.env.local`
 >    En PowerShell: `Copy-Item backend\.env.example backend\.env`
 > 5. En `backend/.env`, pega la `DATABASE_URL` que te paso por privado.
-> 6. `npm run db:verificar` → debe decir "Conexion correcta" y listar 16 tablas.
+> 6. `npm run db:verificar` → debe decir "Conexion correcta" y listar 26 tablas y 4 vistas.
 > 7. En dos terminales: `npm run dev:backend` y `npm run dev:web`.
 > 8. Abre http://localhost:3000/admin/buses y registra un bus de prueba.
 > 9. Antes de escribir código, recorre el módulo `buses` en `backend/src/modulos/buses` y en `web/src/modulos/buses`: es el ejemplo a copiar. Cada archivo tiene comentarios que explican qué hace.
@@ -286,7 +286,7 @@ git checkout main
 
 #### PAN-03 · Terminales (backend) — Ángel
 
-Campos de la tabla `terminales`: `id`, `nombre` (único), `ciudad`, `direccion`, `activo`.
+Campos de la tabla `terminales`: `id`, `nombre` (único), `ciudad_id` (→ `ciudades`), `direccion`, `activo`.
 
 | # | Archivo |
 |---|---|
@@ -307,16 +307,16 @@ Campos de `usuarios`: `id`, `nombres`, `apellidos`, `correo` (único), `rol`, `a
 
 Mismos 6 pasos que PAN-03, con módulo `usuarios`.
 
-**Reglas de negocio:** el correo debe tener formato válido y ser único (`CorreoDuplicadoError` → 409); `rol` solo puede ser `administrador`, `vendedor`, `encomiendas` o `cliente` (`RolInvalidoError` → 400).
+**Reglas de negocio:** el correo de la cuenta debe tener formato válido y ser único (`CorreoDuplicadoError` → 409); los roles se guardan en `usuarios_roles` y deben existir en el catálogo `roles` (`RolInvalidoError` → 400). Los datos personales van en `personas` (`usuarios.persona_id`).
 
 **Criterio de aceptación:** listar devuelve los 2 usuarios de prueba; registrar con un rol inventado responde 400.
 
 #### PAN-06 · Clientes de punta a punta — Grisel
 
-Campos de `clientes`: `id`, `tipo_documento`, `numero_documento`, `nombres`, `apellidos`, `telefono`, `correo`, `fecha_nacimiento`.
+Campos de `personas`: `id`, `tipo_documento`, `numero_documento`, `nombres`, `apellidos`, `telefono`, `correo`, `fecha_nacimiento`. La tabla `clientes` solo enlaza: `id` y `persona_id`.
 
 **Backend:** los mismos 6 pasos de PAN-03, con módulo `clientes`.
-**Reglas (Bolivia):** `tipo_documento` solo `ci`, `ce` o `pasaporte` (la base ya lo exige); si es `ci`, `numero_documento` tiene de 5 a 10 dígitos con complemento opcional de 2 caracteres (`4827351` o `4827351-1A`); celular de 8 dígitos; no se repite la pareja tipo + número (409).
+**Reglas (Bolivia):** `tipo_documento` debe existir en el catálogo `tipos_documento` (`ci`, `ce` o `pasaporte`; la base ya lo exige); si es `ci`, `numero_documento` tiene de 5 a 10 dígitos con complemento opcional de 2 caracteres (`4827351` o `4827351-1A`); celular de 8 dígitos; no se repite la pareja tipo + número (409).
 
 **Frontend:**
 

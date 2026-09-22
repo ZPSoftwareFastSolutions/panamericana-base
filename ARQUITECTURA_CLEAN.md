@@ -436,6 +436,14 @@ npx supabase db push
 - Las migraciones son **solo hacia adelante**: si algo salió mal, se crea otra que lo corrige.
 - Toda tabla nueva termina con `alter table <tabla> enable row level security;` (ADR-003).
 
+**Reglas del modelo v2.0 (normalizado hasta 5FN, ver `PROPUESTA_BD.md`):**
+
+- **Un dato que se puede calcular no se guarda.** Si sale de otras filas (un total, una duración, un estado que ya está en un historial), va en una **vista**, no en una columna.
+- **Un dato de una persona se guarda una sola vez**, en `personas`. `usuarios`, `clientes` y `choferes` son roles que la enlazan con `persona_id`.
+- **Las listas de valores compartidas son catálogos** (`tipos_documento`, `tipos_asiento`, `roles`, `metodos_pago`, …) con el código legible como clave primaria; el JSON de la API sigue mostrando `'ci'` o `'cama'`. Los **estados** de una máquina de estados se quedan como `check`.
+- **Las tablas puente usan clave natural**: `rutas_paradas (ruta_id, orden)`, `viajes_choferes (viaje_id, chofer_id)`, `tarifas (viaje_id, tipo_asiento)`.
+- Las **copias** solo se permiten si la base puede verificarlas con una clave foránea compuesta (el caso de `pasajes`, ADR-001).
+
 ---
 
 ## 10. ¿Dónde pongo este código?

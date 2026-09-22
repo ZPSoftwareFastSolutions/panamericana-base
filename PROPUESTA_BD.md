@@ -1,43 +1,51 @@
 # Propuesta de Base de Datos — Panamericana
 
-> **Versión:** 1.0 · **Estado:** ✅ Creada en Supabase · nombres congelados
-> **Fecha:** 2026-09-12
-> Incorpora las observaciones de la revisión del modelo v0.1.
+> **Versión:** 2.0 · **Estado:** ✅ Aplicada en Supabase · nombres congelados otra vez
+> **Fecha:** 2026-09-22 · reemplaza a la v1.0 del 12/09
+> Incorpora la revisión de normalización de `docs/bd/ANALISIS_NORMALIZACION.md` (modelo verificado hasta 5FN).
 
 ## 0. Estado actual
 
 | Dato | Valor |
 |---|---|
 | Proyecto Supabase | `panamericana` (ref `tvyhpwpyxmbdfxogopnl`) |
-| Tablas creadas | **16**, todas con RLS activado y sin políticas públicas |
-| Datos de prueba | `supabase/seed.sql`: 2 buses, 4 asientos, 3 terminales, 1 ruta La Paz → Oruro → Cochabamba, 1 viaje, 1 venta y 1 pasaje |
-| Migraciones | `supabase/migrations/` (6 archivos, aplicados) |
+| Tablas creadas | **26**, todas con RLS activado y sin políticas públicas |
+| Vistas | **4** (`rutas_resumen`, `viajes_horarios`, `ventas_totales`, `encomiendas_estado_actual`), con `security_invoker` y sin acceso para `anon` |
+| Datos de prueba | `supabase/seed.sql`: 5 personas, 2 usuarios con rol, 2 clientes, 1 chofer, 3 terminales, 2 buses, 4 asientos, 1 ruta con 3 paradas, 1 viaje, 3 tarifas, 1 venta con pasaje y pago |
+| Migraciones | `supabase/migrations/` (10 archivos, aplicados) |
 | Contexto | **Bolivia (La Paz):** documentos `ci`, `ce` y `pasaporte`; placas `1234ABC`; montos en bolivianos (Bs); fechas en hora de La Paz (UTC−4) |
 
-**Protección de asientos verificada en la base real:**
+**Pruebas ejecutadas contra la base real (22/09):**
 
 | Prueba | Resultado |
 |---|---|
-| Vender el asiento 1 del tramo 1→3 cuando ya está vendido el 1→2 | ❌ Rechazado (`23P01`, restricción `pasajes_asiento_sin_traslape`) |
+| Vender el asiento 1 del tramo 1→3 cuando ya está vendido el 1→2 | ❌ Rechazado (`23P01`, `pasajes_asiento_sin_traslape`) |
 | Vender el asiento 1 del tramo 2→3 con el 1→2 ya vendido | ✅ Aceptado |
+| Pasaje con un bus distinto al del viaje | ❌ Rechazado (`23503`, `pasajes_viaje_bus`) |
+| Pasaje con una parada que no existe en la ruta | ❌ Rechazado (`23503`, `pasajes_parada_destino`) |
+| Asiento con un tipo fuera del catálogo | ❌ Rechazado (`23503`, `asientos_tipo_fk`) |
+| Segundo rol para el mismo usuario | ✅ Aceptado |
+| `seed.sql` ejecutado dos veces seguidas | ✅ Sin duplicados |
 
-> 🟡 **Revisión de normalización (22/09):** `docs/bd/ANALISIS_NORMALIZACION.md` verificó este modelo hasta 5FN y encontró 8 hallazgos (datos de persona duplicados, 7 columnas calculadas, catálogos e integridad de tramo). Propone un modelo **v2.0** de 26 tablas + 4 vistas. **Pendiente de decisión**: hasta entonces, v1.0 sigue vigente.
-
-> ⚠️ **Los nombres de tablas y campos están congelados** (reglas R2 y R3). Cualquier cambio a partir de aquí se hace con una migración nueva, nunca editando las existentes. Las preguntas de la sección 6 que sigan abiertas se resuelven así.
+> ⚠️ **Los nombres de tablas y campos vuelven a estar congelados** (reglas R2 y R3). El descongelamiento del 22/09 fue **único y autorizado**, antes de escribir el código del Sprint 2. Cualquier cambio a partir de aquí se hace con una migración nueva.
 
 ---
 
-## 1. Qué cambió respecto a la v0.1
+## 1. Qué cambió respecto a la v1.0
 
-| # | Observación | Cambio aplicado |
+| # | Problema del modelo v1.0 | Cambio aplicado |
 |---|---|---|
-| 1 | Falta la gestión de la tripulación (P2) | Nuevas tablas **`choferes`** y **`viajes_choferes`** (conductor y ayudante por viaje) |
-| 2 | El modelo asumía viajes directos, sin paradas intermedias (P1) | Nueva tabla **`rutas_paradas`**. Los pasajes ahora se venden **por tramo** |
-| 3 | `precio_base` no alcanza si hay asientos `cama` y `semicama` (P3) | Nueva tabla **`tarifas`** (precio por viaje y tipo de asiento) |
-| 4 | `pagos` atado a un solo pasaje impide comprar varios juntos (P4) | Nueva tabla **`ventas`** que agrupa pasajes y encomiendas; **`pagos`** ahora se enlaza a la venta |
-| 5 | La estrategia de concurrencia es correcta | Se conserva, **ampliada a tramos** (ver sección 5) |
+| 1 | Los datos de una misma persona se guardaban hasta 3 veces (`usuarios`, `clientes`, `choferes`) | Tabla **`personas`**; las otras tres pasan a ser **roles** con `persona_id` |
+| 2 | Un usuario no podía tener dos roles | Catálogo **`roles`** + tabla puente **`usuarios_roles`** |
+| 3 | Dos caminos entre usuario y cliente | Se eliminó `clientes.usuario_id`: el vínculo va por `personas` |
+| 4 | 7 columnas se podían calcular (se desincronizaban) | Se eliminaron y se calculan con **4 vistas** |
+| 5 | Las mismas listas de valores repetidas en varios `check` | **8 catálogos** con el código legible como clave primaria |
+| 6 | `terminales.ciudad` texto libre; ciudad → departamento | Catálogos **`departamentos`** y **`ciudades`** |
+| 7 | La base no garantizaba que parada, ruta, asiento y bus correspondieran al viaje | **Claves foráneas compuestas** en `pasajes` |
+| 8 | `parada_origen_id` y `orden_origen` eran el mismo dato | El tramo se identifica por `(ruta_id, orden)`; se eliminaron las dos columnas `parada_*_id` |
+| 9 | Tablas puente con `id` decorativo | **Claves primarias naturales** en `rutas_paradas`, `viajes_choferes` y `tarifas` |
 
-**Preguntas ya respondidas:** P1 (sí hay tramos), P2 (sí hay tripulación), P3 (sí, precio por tipo de asiento), P4 (sí, compra múltiple).
+**Efecto en el contrato de la API:** los catálogos usan el código como clave (`'ci'`, `'cama'`, `'taquilla'`), así que **los campos y los valores del JSON no cambian**. Lo que cambia es de dónde salen: algunos se leen con un `join` o desde una vista.
 
 ---
 
@@ -47,32 +55,44 @@
 |---|---|---|
 | Nombres | Minúsculas, `snake_case`, español, **sin tildes ni ñ** | `numero_pisos`, `anio_fabricacion` |
 | Tablas | En plural | `buses`, `pasajes` |
-| Clave primaria | `id` de tipo `uuid` | `id` |
-| Clave foránea | `<entidad_en_singular>_id` | `bus_id`, `viaje_id` |
+| Clave primaria | `id` de tipo `uuid` en las entidades; **clave natural** en catálogos y tablas puente | `id` · `codigo` · `(viaje_id, tipo_asiento)` |
+| Catálogos | Clave primaria `codigo` legible, con `nombre` y `activo` | `tipos_asiento.codigo = 'cama'` |
+| Clave foránea | `<entidad_en_singular>_id` | `bus_id`, `persona_id` |
 | Fechas de auditoría | `creado_en`, `actualizado_en` (`timestamptz`) | — |
 | Fechas del negocio | `fecha_<evento>` | `fecha_salida` |
-| Montos | `numeric(10,2)` | `precio`, `total` |
-| Estados | Texto con lista de valores permitidos | `'activo'` |
+| Montos | `numeric(10,2)` | `precio`, `monto` |
+| Estados | Texto con lista de valores permitidos (`check`) | `'activo'` |
 | Palabras SQL | Siempre en minúsculas | `create table`, `not null` |
-| Moneda | Bolivianos (Bs) | `precio_base` 80.00 = Bs 80 |
-| Documentos de identidad | `ci` (carnet de identidad), `ce` (cédula de extranjero), `pasaporte` | `ci` `4827351` o `4827351-1A` |
+| Moneda | Bolivianos (Bs) | `precio` 80.00 = Bs 80 |
+| Documentos de identidad | `ci`, `ce`, `pasaporte` (catálogo `tipos_documento`) | `ci` `4827351` o `4827351-1A` |
 | Placas | 3 o 4 dígitos y 3 letras, sin guion | `2045KLP` |
+| **Datos calculados** | **No se guardan**: se leen de una vista | `ventas_totales.total` |
 
 ---
 
-## 3. Diagrama General
+## 3. Diagrama general
 
 ```mermaid
 erDiagram
-    usuarios |o--o| clientes : "cuenta de"
+    departamentos ||--o{ ciudades : "agrupa"
+    ciudades ||--o{ terminales : "ubica"
+    tipos_documento ||--o{ personas : "clasifica"
+    personas ||--o| usuarios : "es cuenta de"
+    personas ||--o| clientes : "es cliente"
+    personas ||--o| choferes : "es chofer"
+    roles ||--o{ usuarios_roles : "otorga"
+    usuarios ||--|{ usuarios_roles : "tiene"
+    categorias_licencia ||--o{ choferes : "habilita"
+    buses ||--|{ asientos : "tiene"
+    tipos_asiento ||--o{ asientos : "clasifica"
+    tipos_asiento ||--o{ tarifas : "define"
     rutas ||--|{ rutas_paradas : "tiene"
     terminales ||--o{ rutas_paradas : "es parada en"
     rutas ||--o{ viajes : "se programa en"
     buses ||--o{ viajes : "realiza"
-    buses ||--|{ asientos : "tiene"
     choferes ||--o{ viajes_choferes : "asignado en"
     viajes ||--|{ viajes_choferes : "lleva tripulacion"
-    viajes ||--o{ tarifas : "define precio por tipo"
+    viajes ||--|{ tarifas : "precio por tipo"
     viajes ||--o{ pasajes : "vende"
     asientos ||--o{ pasajes : "se asigna en"
     rutas_paradas ||--o{ pasajes : "sube / baja"
@@ -80,6 +100,8 @@ erDiagram
     ventas ||--|{ pasajes : "agrupa"
     ventas ||--o{ encomiendas : "agrupa"
     ventas ||--|{ pagos : "se cobra con"
+    canales_venta ||--o{ ventas : "origen"
+    metodos_pago ||--o{ pagos : "forma"
     clientes ||--o{ ventas : "compra"
     usuarios ||--o{ ventas : "vende en taquilla"
     clientes ||--o{ encomiendas : "envia / recibe"
@@ -89,11 +111,12 @@ erDiagram
     usuarios ||--o{ historial_encomiendas : "actualiza"
 ```
 
-**16 tablas en 5 áreas**
+**26 tablas en 6 áreas**
 
 | Área | Tablas |
 |---|---|
-| 🔐 Acceso y personas | `usuarios`, `clientes` |
+| 📚 Catálogos | `departamentos`, `ciudades`, `tipos_documento`, `tipos_asiento`, `categorias_licencia`, `canales_venta`, `metodos_pago`, `roles` |
+| 🔐 Personas y acceso | `personas`, `usuarios`, `usuarios_roles`, `clientes` |
 | 🚌 Flota y tripulación | `buses`, `asientos`, `choferes` |
 | 🗺️ Rutas y viajes | `terminales`, `rutas`, `rutas_paradas`, `viajes`, `viajes_choferes`, `tarifas` |
 | 🎫 Ventas | `ventas`, `pasajes`, `pagos` |
@@ -101,241 +124,270 @@ erDiagram
 
 ---
 
-## 4. Diccionario de Tablas
+## 4. Diccionario de tablas
 
-### 🔐 4.1 `usuarios`
-Personas que inician sesión. *Las contraseñas no se guardan aquí; las gestiona el servicio de autenticación.*
+*(`*` = obligatorio)*
 
-| Campo | Tipo | Obligatorio | Descripción |
-|---|---|---|---|
-| `id` | uuid | Sí | Mismo identificador del servicio de autenticación |
-| `nombres` | text | Sí | |
-| `apellidos` | text | Sí | |
-| `correo` | text | Sí | Único |
-| `rol` | text | Sí | `'administrador'`, `'vendedor'`, `'encomiendas'`, `'cliente'` |
-| `activo` | boolean | Sí | Por defecto `true` |
-| `creado_en` · `actualizado_en` | timestamptz | Sí | |
+### 📚 4.1 Catálogos
 
-### 🔐 4.2 `clientes`
+Todos tienen `codigo` (clave primaria), `nombre*`, `activo*` y `creado_en*`.
+
+| Tabla | Valores iniciales | Extras |
+|---|---|---|
+| `departamentos` | `lp`, `cb`, `sc`, `or`, `pt`, `ch`, `tj`, `be`, `pd` | Sin `activo` |
+| `ciudades` | La Paz, Oruro, Cochabamba | Clave `id` uuid · `departamento*` → `departamentos` · única por `(departamento, nombre)` |
+| `tipos_documento` | `ci`, `ce`, `pasaporte` | |
+| `tipos_asiento` | `normal`, `semicama`, `cama` | `orden*` para mostrarlos |
+| `categorias_licencia` | `a`, `b`, `c`, `m`, `p`, `t` | `descripcion` |
+| `canales_venta` | `web`, `movil`, `taquilla` | |
+| `metodos_pago` | `efectivo`, `tarjeta`, `transferencia`, `billetera_digital` | |
+| `roles` | `administrador`, `vendedor`, `encomiendas`, `cliente` | `descripcion` |
+
+> Agregar un rol, un método de pago o una ciudad es **insertar una fila**, no una migración.
+
+### 🔐 4.2 `personas`
+El dato de una persona vive **solo aquí**, sin importar si es pasajero, chofer o empleado.
+
+| Campo | Tipo | Descripción |
+|---|---|---|
+| `id`* | uuid | |
+| `tipo_documento`* | text | → `tipos_documento` |
+| `numero_documento`* | text | |
+| `nombres`* · `apellidos`* | text | |
+| `telefono` · `correo` | text | Contacto |
+| `fecha_nacimiento` | date | Para identificar menores de edad |
+| `creado_en`* · `actualizado_en`* | timestamptz | |
+
+**Reglas:** no se repite `tipo_documento` + `numero_documento` (única para todo el sistema).
+
+### 🔐 4.3 `usuarios`
+Cuentas que inician sesión. *Las contraseñas las gestiona el servicio de autenticación.*
+
+| Campo | Tipo | Descripción |
+|---|---|---|
+| `id`* | uuid | Mismo identificador del servicio de autenticación |
+| `persona_id`* | uuid | → `personas.id`. Único |
+| `correo`* | text | Correo **de la cuenta** (login). Único |
+| `activo`* | boolean | Por defecto `true` |
+| `creado_en`* · `actualizado_en`* | timestamptz | |
+
+### 🔐 4.4 `usuarios_roles`
+Un usuario puede tener varios roles.
+
+| Campo | Tipo | Descripción |
+|---|---|---|
+| `usuario_id`* + `rol`* | uuid + text | **Clave primaria**. `rol` → `roles.codigo` |
+| `creado_en`* | timestamptz | |
+
+### 🔐 4.5 `clientes`
 Pasajeros, remitentes y destinatarios. No necesitan cuenta.
 
-| Campo | Tipo | Obligatorio | Descripción |
-|---|---|---|---|
-| `id` | uuid | Sí | |
-| `usuario_id` | uuid | No | → `usuarios.id`. Único. Solo si tiene cuenta |
-| `tipo_documento` | text | Sí | `'ci'` (carnet de identidad), `'ce'` (cédula de extranjero), `'pasaporte'` |
-| `numero_documento` | text | Sí | |
-| `nombres` · `apellidos` | text | Sí | |
-| `telefono` · `correo` | text | No | |
-| `fecha_nacimiento` | date | No | Para identificar menores de edad |
-| `creado_en` · `actualizado_en` | timestamptz | Sí | |
+| Campo | Tipo | Descripción |
+|---|---|---|
+| `id`* | uuid | |
+| `persona_id`* | uuid | → `personas.id`. Único |
+| `creado_en`* · `actualizado_en`* | timestamptz | |
 
-**Reglas:** no se repite `tipo_documento` + `numero_documento`.
+### 🚌 4.6 `buses`
 
-### 🚌 4.3 `buses`
+| Campo | Tipo | Descripción |
+|---|---|---|
+| `id`* | uuid | |
+| `placa`* | text | Única · `1234ABC` |
+| `marca`* · `modelo`* | text | |
+| `anio_fabricacion` | integer | |
+| `numero_pisos`* | smallint | `1` o `2` |
+| `estado`* | text | `'activo'`, `'mantenimiento'`, `'inactivo'` |
+| `creado_en`* · `actualizado_en`* | timestamptz | |
 
-| Campo | Tipo | Obligatorio | Descripción |
-|---|---|---|---|
-| `id` | uuid | Sí | |
-| `placa` | text | Sí | Única |
-| `marca` · `modelo` | text | Sí | |
-| `anio_fabricacion` | integer | No | |
-| `numero_pisos` | smallint | Sí | `1` o `2` |
-| `estado` | text | Sí | `'activo'`, `'mantenimiento'`, `'inactivo'` |
-| `creado_en` · `actualizado_en` | timestamptz | Sí | |
+### 🚌 4.7 `asientos`
+`fila` y `columna` permiten dibujar el croquis.
 
-### 🚌 4.4 `asientos`
-`fila` y `columna` permiten dibujar el croquis en pantalla.
+| Campo | Tipo | Descripción |
+|---|---|---|
+| `id`* | uuid | |
+| `bus_id`* | uuid | → `buses.id` |
+| `numero`* | smallint | Número visible |
+| `piso`* | smallint | `1` o `2` |
+| `fila`* · `columna`* | smallint | Posición en el croquis |
+| `tipo`* | text | → `tipos_asiento.codigo` |
 
-| Campo | Tipo | Obligatorio | Descripción |
-|---|---|---|---|
-| `id` | uuid | Sí | |
-| `bus_id` | uuid | Sí | → `buses.id` |
-| `numero` | smallint | Sí | Número visible en el asiento |
-| `piso` | smallint | Sí | `1` o `2` |
-| `fila` · `columna` | smallint | Sí | Posición en el croquis |
-| `tipo` | text | Sí | `'normal'`, `'semicama'`, `'cama'` |
+**Reglas:** no se repite `numero` ni la posición (`piso`, `fila`, `columna`) en el mismo bus. Además `(id, bus_id)` es único, para que `pasajes` pueda exigir que el asiento sea del bus del viaje.
 
-**Reglas:** no se repite `numero` en el mismo bus, ni la posición (`piso`, `fila`, `columna`).
+### 🚌 4.8 `choferes`
 
-### 🚌 4.5 `choferes` *(nueva)*
+| Campo | Tipo | Descripción |
+|---|---|---|
+| `id`* | uuid | |
+| `persona_id`* | uuid | → `personas.id`. Único |
+| `numero_licencia`* | text | Único |
+| `categoria_licencia`* | text | → `categorias_licencia.codigo` |
+| `fecha_vencimiento_licencia`* | date | Permite alertar licencias vencidas |
+| `activo`* | boolean | Por defecto `true` |
+| `creado_en`* · `actualizado_en`* | timestamptz | |
 
-| Campo | Tipo | Obligatorio | Descripción |
-|---|---|---|---|
-| `id` | uuid | Sí | |
-| `tipo_documento` · `numero_documento` | text | Sí | `'ci'`, `'ce'` o `'pasaporte'`; únicos en conjunto |
-| `nombres` · `apellidos` | text | Sí | |
-| `numero_licencia` | text | Sí | Único |
-| `categoria_licencia` | text | Sí | Categoría habilitante |
-| `fecha_vencimiento_licencia` | date | Sí | Permite alertar licencias vencidas |
-| `telefono` | text | No | |
-| `activo` | boolean | Sí | Por defecto `true` |
-| `creado_en` · `actualizado_en` | timestamptz | Sí | |
+### 🗺️ 4.9 `terminales`
 
-### 🗺️ 4.6 `terminales`
+| Campo | Tipo | Descripción |
+|---|---|---|
+| `id`* | uuid | |
+| `nombre`* | text | Único |
+| `ciudad_id`* | uuid | → `ciudades.id` |
+| `direccion`* | text | |
+| `activo`* | boolean | Por defecto `true` |
+| `creado_en`* · `actualizado_en`* | timestamptz | |
 
-| Campo | Tipo | Obligatorio | Descripción |
-|---|---|---|---|
-| `id` | uuid | Sí | |
-| `nombre` | text | Sí | Único |
-| `ciudad` · `direccion` | text | Sí | |
-| `activo` | boolean | Sí | Por defecto `true` |
-| `creado_en` · `actualizado_en` | timestamptz | Sí | |
+### 🗺️ 4.10 `rutas`
+El origen y el destino son la primera y la última parada. **La duración y la distancia se leen de `rutas_resumen`.**
 
-### 🗺️ 4.7 `rutas` *(modificada)*
-Ya no guarda origen y destino: ahora son la primera y la última parada.
+| Campo | Tipo | Descripción |
+|---|---|---|
+| `id`* | uuid | |
+| `nombre`* | text | Ej.: "La Paz - Cochabamba" |
+| `activo`* | boolean | Por defecto `true` |
+| `creado_en`* · `actualizado_en`* | timestamptz | |
 
-| Campo | Tipo | Obligatorio | Descripción |
-|---|---|---|---|
-| `id` | uuid | Sí | |
-| `nombre` | text | Sí | Ej.: "La Paz – Cochabamba" |
-| `distancia_km` | numeric(7,2) | No | |
-| `duracion_estimada_min` | integer | Sí | Total del recorrido |
-| `activo` | boolean | Sí | Por defecto `true` |
-| `creado_en` · `actualizado_en` | timestamptz | Sí | |
-
-### 🗺️ 4.8 `rutas_paradas` *(nueva)*
+### 🗺️ 4.11 `rutas_paradas`
 El orden de terminales por los que pasa una ruta. **Es lo que permite vender tramos.**
 
-| Campo | Tipo | Obligatorio | Descripción |
-|---|---|---|---|
-| `id` | uuid | Sí | |
-| `ruta_id` | uuid | Sí | → `rutas.id` |
-| `terminal_id` | uuid | Sí | → `terminales.id` |
-| `orden` | smallint | Sí | `1` = origen; el mayor = destino final |
-| `minutos_desde_origen` | integer | Sí | Para calcular la hora de paso |
+| Campo | Tipo | Descripción |
+|---|---|---|
+| `ruta_id`* + `orden`* | uuid + smallint | **Clave primaria**. `orden` `1` = origen |
+| `terminal_id`* | uuid | → `terminales.id` |
+| `minutos_desde_origen`* | integer | Para calcular la hora de paso |
+| `km_desde_origen` | numeric(7,2) | Para la distancia de la ruta |
+| `creado_en`* · `actualizado_en`* | timestamptz | |
 
-**Reglas:** no se repite `orden` ni `terminal_id` dentro de la misma ruta; toda ruta tiene al menos 2 paradas.
+**Reglas:** no se repite `terminal_id` dentro de la misma ruta; toda ruta tiene al menos 2 paradas (lo valida el sistema).
 
-### 🗺️ 4.9 `viajes`
+### 🗺️ 4.12 `viajes`
+**La llegada estimada se lee de `viajes_horarios`; el precio, de `tarifas`.**
 
-| Campo | Tipo | Obligatorio | Descripción |
-|---|---|---|---|
-| `id` | uuid | Sí | |
-| `ruta_id` | uuid | Sí | → `rutas.id` |
-| `bus_id` | uuid | Sí | → `buses.id` |
-| `fecha_salida` | timestamptz | Sí | |
-| `fecha_llegada_estimada` | timestamptz | Sí | Posterior a `fecha_salida` |
-| `precio_base` | numeric(10,2) | Sí | Precio del recorrido completo en asiento `normal` |
-| `estado` | text | Sí | `'programado'`, `'en_ruta'`, `'finalizado'`, `'cancelado'` |
-| `creado_en` · `actualizado_en` | timestamptz | Sí | |
+| Campo | Tipo | Descripción |
+|---|---|---|
+| `id`* | uuid | |
+| `ruta_id`* | uuid | → `rutas.id` |
+| `bus_id`* | uuid | → `buses.id` |
+| `fecha_salida`* | timestamptz | |
+| `estado`* | text | `'programado'`, `'en_ruta'`, `'finalizado'`, `'cancelado'` |
+| `creado_en`* · `actualizado_en`* | timestamptz | |
 
-**Reglas:** un bus no puede tener dos viajes con horarios cruzados (lo valida el sistema).
+**Reglas:** un bus no puede tener dos viajes con horarios cruzados (lo valida el sistema). `(id, ruta_id)` y `(id, bus_id)` son únicos, para las claves foráneas compuestas de `pasajes`.
 
-### 🗺️ 4.10 `viajes_choferes` *(nueva)*
+### 🗺️ 4.13 `viajes_choferes`
 
-| Campo | Tipo | Obligatorio | Descripción |
-|---|---|---|---|
-| `id` | uuid | Sí | |
-| `viaje_id` | uuid | Sí | → `viajes.id` |
-| `chofer_id` | uuid | Sí | → `choferes.id` |
-| `rol` | text | Sí | `'conductor'`, `'ayudante'` |
+| Campo | Tipo | Descripción |
+|---|---|---|
+| `viaje_id`* + `chofer_id`* | uuid | **Clave primaria** |
+| `rol`* | text | `'conductor'`, `'ayudante'` |
+| `creado_en`* | timestamptz | |
 
-**Reglas:** un chofer no se repite en el mismo viaje; cada viaje necesita al menos un `'conductor'`; un chofer no puede estar en dos viajes que se cruzan en horario (lo valida el sistema).
+**Reglas:** cada viaje necesita al menos un `'conductor'`; un chofer no puede estar en dos viajes cruzados (lo valida el sistema).
 
-### 🗺️ 4.11 `tarifas` *(nueva)*
-Precio por tipo de asiento. Si no hay fila para un tipo, se usa `viajes.precio_base`.
+### 🗺️ 4.14 `tarifas`
+Precio del recorrido completo por tipo de asiento. El precio de un tramo se calcula proporcional al tiempo (decisión P17).
 
-| Campo | Tipo | Obligatorio | Descripción |
-|---|---|---|---|
-| `id` | uuid | Sí | |
-| `viaje_id` | uuid | Sí | → `viajes.id` |
-| `tipo_asiento` | text | Sí | `'normal'`, `'semicama'`, `'cama'` |
-| `precio` | numeric(10,2) | Sí | Precio del recorrido completo en ese tipo |
-| `creado_en` · `actualizado_en` | timestamptz | Sí | |
+| Campo | Tipo | Descripción |
+|---|---|---|
+| `viaje_id`* + `tipo_asiento`* | uuid + text | **Clave primaria**. `tipo_asiento` → `tipos_asiento.codigo` |
+| `precio`* | numeric(10,2) | Mayor que 0 |
+| `creado_en`* · `actualizado_en`* | timestamptz | |
 
-**Reglas:** un solo precio por `viaje_id` + `tipo_asiento`; `precio` mayor que 0.
+**Reglas:** un viaje debe tener tarifa para **cada tipo de asiento que tenga su bus** (lo valida el sistema).
 
-### 🎫 4.12 `ventas` *(nueva)*
-Una operación de compra. Agrupa varios pasajes (una familia) y/o encomiendas, y se cobra con **un solo pago**.
+### 🎫 4.15 `ventas`
+Una operación de compra: agrupa pasajes y/o encomiendas y se cobra junta. **El total se lee de `ventas_totales`.**
 
-| Campo | Tipo | Obligatorio | Descripción |
-|---|---|---|---|
-| `id` | uuid | Sí | |
-| `codigo` | text | Sí | Código visible de la operación. Único |
-| `cliente_id` | uuid | No | → `clientes.id` (quien compra) |
-| `usuario_id` | uuid | No | → `usuarios.id` (vendedor; vacío si fue web o app) |
-| `canal` | text | Sí | `'web'`, `'movil'`, `'taquilla'` |
-| `total` | numeric(10,2) | Sí | Suma de lo que agrupa |
-| `estado` | text | Sí | `'pendiente'`, `'pagada'`, `'anulada'`, `'expirada'` |
-| `creado_en` · `actualizado_en` | timestamptz | Sí | |
+| Campo | Tipo | Descripción |
+|---|---|---|
+| `id`* | uuid | |
+| `codigo`* | text | Código visible. Único |
+| `cliente_id` | uuid | → `clientes.id` (quien compra) |
+| `usuario_id` | uuid | → `usuarios.id` (vendedor; vacío si fue web o app) |
+| `canal`* | text | → `canales_venta.codigo` |
+| `estado`* | text | `'pendiente'`, `'pagada'`, `'anulada'`, `'expirada'` |
+| `creado_en`* · `actualizado_en`* | timestamptz | |
 
-### 🎫 4.13 `pasajes` *(modificada)*
+### 🎫 4.16 `pasajes`
 
-| Campo | Tipo | Obligatorio | Descripción |
-|---|---|---|---|
-| `id` | uuid | Sí | |
-| `codigo` | text | Sí | Código impreso en el boleto. Único |
-| `venta_id` | uuid | Sí | → `ventas.id` |
-| `viaje_id` | uuid | Sí | → `viajes.id` |
-| `asiento_id` | uuid | Sí | → `asientos.id` (del bus del viaje) |
-| `cliente_id` | uuid | Sí | → `clientes.id` (el pasajero) |
-| `parada_origen_id` | uuid | Sí | → `rutas_paradas.id` (dónde sube) |
-| `parada_destino_id` | uuid | Sí | → `rutas_paradas.id` (dónde baja) |
-| `orden_origen` | smallint | Sí | Copia del `orden` de la parada de subida |
-| `orden_destino` | smallint | Sí | Copia del `orden` de la parada de bajada |
-| `precio` | numeric(10,2) | Sí | Precio final cobrado |
-| `estado` | text | Sí | `'reservado'`, `'pagado'`, `'anulado'`, `'expirado'` |
-| `reservado_hasta` | timestamptz | No | Hasta cuándo se retiene el asiento |
-| `creado_en` · `actualizado_en` | timestamptz | Sí | |
+| Campo | Tipo | Descripción |
+|---|---|---|
+| `id`* | uuid | |
+| `codigo`* | text | Código impreso en el boleto. Único |
+| `venta_id`* | uuid | → `ventas.id` |
+| `viaje_id`* | uuid | → `viajes.id` |
+| `ruta_id`* · `bus_id`* | uuid | Copias verificadas por la base (sección 5.2) |
+| `asiento_id`* | uuid | → `asientos.id`, del bus del viaje |
+| `cliente_id`* | uuid | → `clientes.id` (el pasajero) |
+| `orden_origen`* · `orden_destino`* | smallint | Paradas donde sube y baja, dentro de `ruta_id` |
+| `precio`* | numeric(10,2) | Precio cobrado (histórico: no se recalcula) |
+| `estado`* | text | `'reservado'`, `'pagado'`, `'anulado'`, `'expirado'` |
+| `reservado_hasta` | timestamptz | Hasta cuándo se retiene el asiento |
+| `creado_en`* · `actualizado_en`* | timestamptz | |
 
-> **¿Por qué se copian `orden_origen` y `orden_destino`?** Porque la protección contra la doble venta (sección 5) se aplica en la propia base de datos y necesita esos números en la misma fila, sin consultar otra tabla.
+### 🎫 4.17 `pagos`
 
-### 🎫 4.14 `pagos` *(modificada)*
-Ahora se enlaza a la **venta**, no a un pasaje suelto.
+| Campo | Tipo | Descripción |
+|---|---|---|
+| `id`* | uuid | |
+| `venta_id`* | uuid | → `ventas.id` |
+| `monto`* | numeric(10,2) | Mayor que 0 |
+| `metodo`* | text | → `metodos_pago.codigo` |
+| `estado`* | text | `'pendiente'`, `'aprobado'`, `'rechazado'`, `'reembolsado'` |
+| `referencia_externa` | text | Código de la pasarela |
+| `creado_en`* | timestamptz | |
 
-| Campo | Tipo | Obligatorio | Descripción |
-|---|---|---|---|
-| `id` | uuid | Sí | |
-| `venta_id` | uuid | Sí | → `ventas.id` |
-| `monto` | numeric(10,2) | Sí | Mayor que 0 |
-| `metodo` | text | Sí | `'efectivo'`, `'tarjeta'`, `'transferencia'`, `'billetera_digital'` |
-| `estado` | text | Sí | `'pendiente'`, `'aprobado'`, `'rechazado'`, `'reembolsado'` |
-| `referencia_externa` | text | No | Código de la operación en la pasarela de pago |
-| `creado_en` | timestamptz | Sí | |
+### 📦 4.18 `encomiendas`
+**El estado y la fecha de entrega se leen de `encomiendas_estado_actual`.**
 
-### 📦 4.15 `encomiendas`
+| Campo | Tipo | Descripción |
+|---|---|---|
+| `id`* | uuid | |
+| `codigo_seguimiento`* | text | Único |
+| `venta_id` | uuid | → `ventas.id` (se asigna al cobrar) |
+| `remitente_id`* · `destinatario_id`* | uuid | → `clientes.id` |
+| `terminal_origen_id`* · `terminal_destino_id`* | uuid | → `terminales.id`, distintas |
+| `viaje_id` | uuid | → `viajes.id` (al despachar) |
+| `descripcion`* | text | Contenido declarado |
+| `peso_kg`* | numeric(6,2) | Mayor que 0 |
+| `costo`* | numeric(10,2) | Precio cobrado (histórico) |
+| `usuario_id`* | uuid | → `usuarios.id` (quien registró) |
+| `creado_en`* · `actualizado_en`* | timestamptz | |
 
-| Campo | Tipo | Obligatorio | Descripción |
-|---|---|---|---|
-| `id` | uuid | Sí | |
-| `codigo_seguimiento` | text | Sí | Único |
-| `venta_id` | uuid | No | → `ventas.id` (se asigna al cobrar) |
-| `remitente_id` · `destinatario_id` | uuid | Sí | → `clientes.id` |
-| `terminal_origen_id` · `terminal_destino_id` | uuid | Sí | → `terminales.id` |
-| `viaje_id` | uuid | No | → `viajes.id` (al despachar) |
-| `descripcion` | text | Sí | Contenido declarado |
-| `peso_kg` | numeric(6,2) | Sí | Mayor que 0 |
-| `costo` | numeric(10,2) | Sí | |
-| `estado` | text | Sí | `'registrada'`, `'en_transito'`, `'en_destino'`, `'entregada'`, `'cancelada'` |
-| `usuario_id` | uuid | Sí | → `usuarios.id` (quien registró) |
-| `fecha_entrega` | timestamptz | No | |
-| `creado_en` · `actualizado_en` | timestamptz | Sí | |
+### 📦 4.19 `historial_encomiendas`
+Cada cambio de estado. **Es la fuente del estado actual.**
 
-### 📦 4.16 `historial_encomiendas`
+| Campo | Tipo | Descripción |
+|---|---|---|
+| `id`* | uuid | |
+| `encomienda_id`* | uuid | → `encomiendas.id` |
+| `estado`* | text | `'registrada'`, `'en_transito'`, `'en_destino'`, `'entregada'`, `'cancelada'` |
+| `observacion` | text | |
+| `usuario_id`* | uuid | → `usuarios.id` |
+| `creado_en`* | timestamptz | |
 
-| Campo | Tipo | Obligatorio | Descripción |
-|---|---|---|---|
-| `id` | uuid | Sí | |
-| `encomienda_id` | uuid | Sí | → `encomiendas.id` |
-| `estado` | text | Sí | Estado al que cambió |
-| `observacion` | text | No | |
-| `usuario_id` | uuid | Sí | → `usuarios.id` |
-| `creado_en` | timestamptz | Sí | |
+### 👁️ 4.20 Vistas
+
+| Vista | Devuelve | Reemplaza a |
+|---|---|---|
+| `rutas_resumen` | `ruta_id`, `total_paradas`, `duracion_estimada_min`, `distancia_km` | `rutas.duracion_estimada_min`, `rutas.distancia_km` |
+| `viajes_horarios` | `viaje_id`, `orden`, `terminal_id`, `fecha_paso_estimada` | `viajes.fecha_llegada_estimada` |
+| `ventas_totales` | `venta_id`, `total` | `ventas.total` |
+| `encomiendas_estado_actual` | `encomienda_id`, `estado`, `fecha_estado`, `observacion` | `encomiendas.estado`, `encomiendas.fecha_entrega` |
 
 ---
 
 ## 5. Cómo evitamos vender dos veces el mismo asiento
 
-Con tramos, el problema se vuelve más fino: el asiento 12 puede ir ocupado de la parada 1 a la 3 y estar **libre** de la 3 a la 5.
+El asiento 12 puede ir ocupado de la parada 1 a la 3 y estar **libre** de la 3 a la 5.
 
 | # | Protección | En palabras simples |
 |---|---|---|
-| 1 | **Reserva temporal** | Al elegir el asiento se crea el pasaje como `'reservado'` con `reservado_hasta`. Si no se paga a tiempo, pasa a `'expirado'` y el asiento se libera |
+| 1 | **Reserva temporal** | Al elegir el asiento se crea el pasaje como `'reservado'` con `reservado_hasta`. Si no se paga a tiempo pasa a `'expirado'` y el asiento se libera |
 | 2 | **Turno en la base de datos** | Si dos personas confirman a la vez, la base las atiende de una en una |
 | 3 | **Candado por tramo** | La base **rechaza** un segundo pasaje activo del mismo asiento, en el mismo viaje, cuyo tramo **se cruce** con uno ya vendido |
 
-La tercera protección es una restricción de PostgreSQL que compara los tramos como rangos:
+### 5.1 La restricción
 
 ```sql
 create extension if not exists btree_gist;
@@ -350,63 +402,63 @@ alter table pasajes
   where (estado in ('reservado', 'pagado'));
 ```
 
-Traducido: *"para el mismo viaje y el mismo asiento, no pueden existir dos pasajes activos cuyos tramos se solapen"*. Vender de la parada 1 a la 3 y de la 3 a la 5 sí se permite; de la 1 a la 3 y de la 2 a la 4, no.
+Vender de la parada 1 a la 3 y de la 3 a la 5 sí se permite; de la 1 a la 3 y de la 2 a la 4, no.
+
+### 5.2 Por qué `pasajes` guarda `ruta_id`, `bus_id` y los órdenes
+
+La restricción se evalúa **dentro de la fila**: necesita los órdenes ahí mismo, sin consultar otra tabla. Esas copias podrían mentir, así que la base las verifica con **claves foráneas compuestas**:
+
+```sql
+alter table pasajes
+  add constraint pasajes_viaje_ruta foreign key (viaje_id, ruta_id) references viajes (id, ruta_id),
+  add constraint pasajes_viaje_bus foreign key (viaje_id, bus_id) references viajes (id, bus_id),
+  add constraint pasajes_asiento_del_bus foreign key (asiento_id, bus_id) references asientos (id, bus_id),
+  add constraint pasajes_parada_origen foreign key (ruta_id, orden_origen) references rutas_paradas (ruta_id, orden),
+  add constraint pasajes_parada_destino foreign key (ruta_id, orden_destino) references rutas_paradas (ruta_id, orden);
+```
+
+Traducido: *no existe ningún `insert` ni `update` que pueda dejar un pasaje con una parada de otra ruta o un asiento de otro bus*. Es una redundancia **sin anomalía posible**, y es el único lugar del modelo donde se acepta.
 
 ---
 
-## 6. Preguntas abiertas y decisiones provisionales del MVP
+## 6. Preguntas abiertas
 
-Las decisiones marcadas ✅ se tomaron en `PRODUCT_BACKLOG.md` §2 y **no requieren migración**.
+Las decisiones marcadas ✅ están en `PRODUCT_BACKLOG.md` §2 y **no requieren migración**.
 
 | # | Pregunta | Qué cambiaría |
 |---|---|---|
-| ~~P5~~ | ✅ Compra como **invitado** (cuenta de cliente queda como *Could*) | Sin cambios |
-| ~~P6~~ | ✅ **10 minutos** (`MINUTOS_RESERVA_ASIENTO=10`) | Sin cambios |
 | **P7** | ¿Las encomiendas se pagan en origen, en destino o en ambos? | Momento en que se crea la `venta` de una encomienda |
-| ~~P8~~ | ✅ **Pago simulado:** web `tarjeta`, taquilla `efectivo`, estado `aprobado`, `referencia_externa` = `SIMULADO-<codigo>` | Sin cambios |
-| **P9** | ¿Qué roles internos existen? (¿supervisor?, ¿contador?) | Valores de `usuarios.rol` |
-| ~~P10~~ | ✅ Anulación **hasta 2 h antes**, solo en taquilla; el pago pasa a `reembolsado` (devolución manual) | Sin cambios |
+| ~~P9~~ | ✅ **Resuelta (22/09):** los roles son **datos** del catálogo `roles`; agregar uno es un `insert` | Sin cambios |
 | **P11** | ¿Guardamos historial de cambios de los pasajes, como en encomiendas? | Nueva tabla `historial_pasajes` |
-| ~~P12~~ | ✅ **Resuelta (15/09):** Bolivia → `ci`, `ce` y `pasaporte` | Migración `documentos_bolivia` |
-| ~~P15~~ | ✅ Tarifas **por viaje**, como está en el modelo | Sin cambios |
-| **P16** | ¿La tripulación rota a mitad del recorrido en viajes largos? | `viajes_choferes` necesitaría tramo asignado |
-| ~~P17~~ | ✅ **Proporcional al tiempo:** precio completo × (minutos del tramo ÷ duración total), redondeado a Bs 0,50 | Sin cambios |
-| ~~P18~~ | ✅ Cerrada: los nombres quedaron **congelados** en v1.0 | — |
+| **P16** | ¿La tripulación rota a mitad del recorrido en viajes largos? | `viajes_choferes` necesitaría el tramo asignado |
+| ~~P5, P6, P8, P10, P12, P15, P17, P18~~ | ✅ Resueltas en la v1.0 (ver `PRODUCT_BACKLOG.md` §2) | Sin cambios |
 
 ---
 
 ## 7. Cómo cambiar el modelo desde ahora
 
-El modelo está aplicado y sus nombres congelados, así que la ronda de comentarios terminó. Un cambio sigue estos pasos:
-
 1. Escribir una **migración nueva** (nunca editar una aplicada): SQL en minúsculas, sin renombrar campos, con RLS en tablas nuevas.
 2. Aplicarla en Supabase y guardar el archivo como `supabase/migrations/<version>_<nombre>.sql`, con la versión que registró la base.
-3. Actualizar este documento: diccionario de tablas, sección 0 y tabla de migraciones.
-4. Si afecta al repositorio del equipo, registrarla en `docs/repo2/CORRECCIONES_NN.md` para que Ángel copie el archivo (no hay que volver a aplicarla: la base es compartida).
+3. Actualizar este documento: diccionario, sección 0 y tabla de migraciones.
+4. Si afecta al repositorio del equipo, registrarla en `docs/repo2/CORRECCIONES_NN.md` (la base es compartida: no se vuelve a aplicar, solo se copian los archivos).
+
+**Antes de agregar una columna, preguntarse:** ¿este dato se puede calcular con otros que ya existen? Si la respuesta es sí, va en una vista.
 
 ---
 
-## 8. Próximos pasos
-
-| Paso | Estado |
-|---|---|
-| 1. Incorporar la revisión (tripulación, tramos, tarifas, ventas) | ✅ Hecho |
-| 2. Escribir las migraciones `.sql` | ✅ 6 migraciones (incluida `documentos_bolivia`) |
-| 3. Crear la base en Supabase | ✅ 16 tablas |
-| 4. Cargar datos de prueba y verificar la protección de asientos | ✅ Verificado |
-| 5. Congelar nombres | ✅ Reglas R2 y R3 activas |
-| 6. Preguntas abiertas restantes (P7, P9, P11, P16) | ⏳ Si alguna cambia el modelo, será una migración nueva |
-| 7. Crear el proyecto de producción antes de la entrega | ⏳ Pendiente |
-
-### Migraciones aplicadas
+## 8. Migraciones aplicadas
 
 | Archivo | Contenido |
 |---|---|
 | `20260912051634_buses.sql` | `buses` |
 | `20260912051645_funciones_y_personas.sql` | función de auditoría, `usuarios`, `clientes` |
 | `20260912051709_flota_y_rutas.sql` | `asientos`, `choferes`, `terminales`, `rutas`, `rutas_paradas`, `viajes`, `viajes_choferes`, `tarifas` |
-| `20260912051726_ventas_pasajes_pagos.sql` | `ventas`, `pasajes` (con la restricción por tramos), `pagos` |
+| `20260912051726_ventas_pasajes_pagos.sql` | `ventas`, `pasajes` (restricción por tramos), `pagos` |
 | `20260912051740_encomiendas.sql` | `encomiendas`, `historial_encomiendas` |
-| `20260915052138_documentos_bolivia.sql` | `clientes` y `choferes` aceptan `ci`, `ce` y `pasaporte` (antes `dni`) |
+| `20260915052138_documentos_bolivia.sql` | `ci`, `ce` y `pasaporte` (antes `dni`) |
+| `20260922143655_catalogos.sql` | los 8 catálogos con sus valores iniciales |
+| `20260922143733_personas.sql` | `personas`, `usuarios_roles` y los tres roles enlazados |
+| `20260922143814_derivados_y_vistas.sql` | quita las 7 columnas calculadas y crea las 4 vistas |
+| `20260922143903_integridad_y_claves.sql` | claves naturales, catálogos como FK y la integridad del tramo |
 
-Todas las tablas tienen `creado_en` y `actualizado_en`; un *trigger* mantiene `actualizado_en` al día automáticamente.
+Todas las tablas (salvo las puente y las de historial) tienen `creado_en` y `actualizado_en`; un *trigger* mantiene `actualizado_en` al día.

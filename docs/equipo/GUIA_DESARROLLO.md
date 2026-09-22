@@ -1,6 +1,6 @@
 # Guía de Desarrollo — Panamericana
 
-> **Para:** todo el equipo · **Versión:** 1.0 · **Fecha:** 15/09/2026
+> **Para:** todo el equipo · **Versión:** 1.1 · **Fecha:** 22/09/2026 (modelo de datos normalizado)
 > **Objetivo:** que cualquier integrante pueda agregar endpoints, pantallas y módulos **sin romper la arquitectura**, por su cuenta o con ayuda de un asistente de IA.
 > **Ejemplo que se usa en toda la guía:** el módulo **`choferes`** completo (listar con filtro, ver detalle, registrar y actualizar). Todo el código de esta guía **compila y funciona** con el proyecto actual.
 
@@ -87,7 +87,7 @@ Si en `DATABASE_URL` ves `<CONTRASEÑA_DE_LA_BASE>`, pídele la contraseña a Á
 npm run db:verificar
 ```
 
-Debe decir `Conexion correcta` y listar **16 tablas**.
+Debe decir `Conexion correcta` y listar **26 tablas** y **4 vistas**.
 
 En **dos terminales**:
 
@@ -174,6 +174,20 @@ Si un componente usa **hooks** (`useState`, `useQuery`, `useParams`…) o **even
 
 ---
 
+### 2.4 Cómo está organizada la base de datos
+
+La base está **normalizada**: cada dato se guarda **una sola vez**. Tres consecuencias prácticas:
+
+| Regla | Qué significa al programar |
+|---|---|
+| **Los datos de una persona están en `personas`** | `usuarios`, `clientes` y `choferes` guardan `persona_id`. Para mostrar un nombre se hace `join` con `personas` (solo en el repositorio) |
+| **Las listas de valores son catálogos** | `tipos_documento`, `tipos_asiento`, `roles`, `metodos_pago`, `canales_venta`, `categorias_licencia`, `departamentos` y `ciudades`. Guardan el código de siempre (`'ci'`, `'cama'`), así que **el JSON de la API no cambia** |
+| **Lo que se puede calcular no se guarda** | El total de una venta, la duración de una ruta, la hora de llegada de un viaje y el estado de una encomienda se leen de las vistas `ventas_totales`, `rutas_resumen`, `viajes_horarios` y `encomiendas_estado_actual` |
+
+> Una vista se consulta igual que una tabla: `select total from ventas_totales where venta_id = $1`.
+
+---
+
 ## 3. El recorrido de una petición
 
 Ejemplo: el administrador registra un chofer.
@@ -209,7 +223,12 @@ Si algo falla, el error "sube" solo hasta `manejadorErrores.ts`, que responde co
 
 ### 4.0 Qué vamos a construir
 
-La tabla `choferes` ya existe en la base: `id`, `tipo_documento`, `numero_documento`, `nombres`, `apellidos`, `numero_licencia`, `categoria_licencia`, `fecha_vencimiento_licencia`, `telefono`, `activo`.
+Las dos tablas ya existen en la base:
+
+- **`personas`**: `id`, `tipo_documento`, `numero_documento`, `nombres`, `apellidos`, `telefono`, `correo`, `fecha_nacimiento`.
+- **`choferes`**: `id`, `persona_id` (→ `personas.id`), `numero_licencia`, `categoria_licencia`, `fecha_vencimiento_licencia`, `activo`.
+
+Los datos personales **no se repiten** en cada tabla: un chofer que además compre un pasaje es **una sola persona**. Para el resto del código (tipos, entidad, API y pantallas) el chofer se ve como un solo objeto con todos sus campos; el `join` lo hace únicamente el repositorio.
 
 | Método | Ruta | Qué hace | Respuestas |
 |---|---|---|---|
@@ -442,7 +461,8 @@ export class Chofer {
       nombres: datos.nombres.trim(),
       apellidos: datos.apellidos.trim(),
       numero_licencia: datos.numero_licencia.trim().toUpperCase(),
-      categoria_licencia: datos.categoria_licencia.trim().toUpperCase(),
+      // el catalogo categorias_licencia guarda los codigos en minuscula: 'a', 'b', 'c'...
+      categoria_licencia: datos.categoria_licencia.trim().toLowerCase(),
       fecha_vencimiento_licencia: datos.fecha_vencimiento_licencia,
       telefono: Chofer.validarTelefono(datos.telefono),
       activo: true,
@@ -629,7 +649,7 @@ const datosValidos = {
   nombres: 'Pedro',
   apellidos: 'Ramos',
   numero_licencia: '5120478',
-  categoria_licencia: 'C',
+  categoria_licencia: 'c',
   fecha_vencimiento_licencia: '2028-05-31',
   telefono: '70011223',
 };
@@ -688,7 +708,7 @@ import type { TipoDocumento } from '../dominio/Chofer';
 import type { ChoferRepositorio } from '../dominio/ChoferRepositorio';
 import { ChoferDuplicadoError } from '../dominio/errores';
 
-/** fila tal como viene de la tabla choferes (mismos nombres) */
+/** fila tal como sale del join de choferes con personas (mismos nombres que las columnas) */
 type FilaChofer = {
   id: string;
   tipo_documento: TipoDocumento;
@@ -702,9 +722,13 @@ type FilaChofer = {
   activo: boolean;
 };
 
+// los datos personales estan en "personas" y los de la licencia en "choferes": por eso el join
 // las columnas "date" se piden como texto (::text) para recibir "2028-05-31" y no un objeto Date
-const COLUMNAS = `id, tipo_documento, numero_documento, nombres, apellidos, numero_licencia,
-       categoria_licencia, fecha_vencimiento_licencia::text, telefono, activo`;
+const COLUMNAS = `ch.id, p.tipo_documento, p.numero_documento, p.nombres, p.apellidos,
+       ch.numero_licencia, ch.categoria_licencia, ch.fecha_vencimiento_licencia::text,
+       p.telefono, ch.activo`;
+
+const DESDE = `from choferes ch join personas p on p.id = ch.persona_id`;
 
 export class PgChoferRepositorio implements ChoferRepositorio {
   constructor(private readonly db: Pool) {}
@@ -713,9 +737,9 @@ export class PgChoferRepositorio implements ChoferRepositorio {
     // si el filtro llega vacio ($1 = null) se listan todos
     const resultado = await this.db.query<FilaChofer>(
       `select ${COLUMNAS}
-         from choferes
-        where ($1::boolean is null or activo = $1)
-        order by apellidos, nombres`,
+         ${DESDE}
+        where ($1::boolean is null or ch.activo = $1)
+        order by p.apellidos, p.nombres`,
       [filtro.activo ?? null],
     );
     return resultado.rows.map((fila) => Chofer.reconstruir(fila));
@@ -723,7 +747,7 @@ export class PgChoferRepositorio implements ChoferRepositorio {
 
   async buscarPorId(id: string): Promise<Chofer | null> {
     const resultado = await this.db.query<FilaChofer>(
-      `select ${COLUMNAS} from choferes where id = $1`,
+      `select ${COLUMNAS} ${DESDE} where ch.id = $1`,
       [id],
     );
     const fila = resultado.rows[0];
@@ -731,48 +755,85 @@ export class PgChoferRepositorio implements ChoferRepositorio {
   }
 
   async existeDocumento(tipo_documento: TipoDocumento, numero_documento: string): Promise<boolean> {
+    // pregunta si esa persona YA es chofer (puede existir como cliente y eso no estorba)
     const resultado = await this.db.query(
-      'select 1 from choferes where tipo_documento = $1 and numero_documento = $2',
+      `select 1 ${DESDE} where p.tipo_documento = $1 and p.numero_documento = $2`,
       [tipo_documento, numero_documento],
     );
     return (resultado.rowCount ?? 0) > 0;
   }
 
   async guardar(chofer: Chofer): Promise<void> {
+    // son dos inserts (persona + chofer): van en una transaccion para que no quede a medias
+    const conexion = await this.db.connect();
     try {
-      await this.db.query(
-        `insert into choferes (id, tipo_documento, numero_documento, nombres, apellidos, numero_licencia,
-                               categoria_licencia, fecha_vencimiento_licencia, telefono, activo)
-         values ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)`,
+      await conexion.query('begin');
+
+      // si la persona ya existe por documento se reutiliza, y se aprovecha para actualizar su celular
+      const persona = await conexion.query<{ id: string }>(
+        `insert into personas (tipo_documento, numero_documento, nombres, apellidos, telefono)
+         values ($1, $2, $3, $4, $5)
+         on conflict (tipo_documento, numero_documento)
+         do update set telefono = coalesce(excluded.telefono, personas.telefono)
+         returning id`,
         [
-          chofer.id,
           chofer.tipo_documento,
           chofer.numero_documento,
           chofer.nombres,
           chofer.apellidos,
+          chofer.telefono,
+        ],
+      );
+
+      await conexion.query(
+        `insert into choferes (id, persona_id, numero_licencia, categoria_licencia,
+                               fecha_vencimiento_licencia, activo)
+         values ($1, $2, $3, $4, $5, $6)`,
+        [
+          chofer.id,
+          persona.rows[0]?.id,
           chofer.numero_licencia,
           chofer.categoria_licencia,
           chofer.fecha_vencimiento_licencia,
-          chofer.telefono,
           chofer.activo,
         ],
       );
+
+      await conexion.query('commit');
     } catch (error) {
+      await conexion.query('rollback');
       // 23505 = la base rechazo un valor repetido (por ejemplo, el numero de licencia)
       if ((error as { code?: string }).code === '23505') {
         throw new ChoferDuplicadoError();
       }
       throw error;
+    } finally {
+      conexion.release();
     }
   }
 
   async actualizar(chofer: Chofer): Promise<void> {
+    // el celular vive en personas y el estado activo en choferes: otra vez, una transaccion
     // actualizado_en lo cambia solo un trigger de la base
-    await this.db.query('update choferes set telefono = $2, activo = $3 where id = $1', [
-      chofer.id,
-      chofer.telefono,
-      chofer.activo,
-    ]);
+    const conexion = await this.db.connect();
+    try {
+      await conexion.query('begin');
+      await conexion.query('update choferes set activo = $2 where id = $1', [
+        chofer.id,
+        chofer.activo,
+      ]);
+      await conexion.query(
+        `update personas set telefono = $2
+          where id = (select persona_id from choferes where id = $1)`,
+        [chofer.id, chofer.telefono],
+      );
+      await conexion.query('commit');
+    } catch (error) {
+      await conexion.query('rollback');
+      throw error;
+    } finally {
+      conexion.release();
+    }
   }
 }
 ```
@@ -909,7 +970,7 @@ curl http://localhost:4000/v1/choferes/00000000-0000-4000-8000-000000000501
 ```
 
 ```bash
-curl -X POST http://localhost:4000/v1/choferes -H "Content-Type: application/json" -d '{"tipo_documento":"ci","numero_documento":"ABC","nombres":"X","apellidos":"Y","numero_licencia":"1","categoria_licencia":"C","fecha_vencimiento_licencia":"2028-01-01"}'
+curl -X POST http://localhost:4000/v1/choferes -H "Content-Type: application/json" -d '{"tipo_documento":"ci","numero_documento":"ABC","nombres":"X","apellidos":"Y","numero_licencia":"1","categoria_licencia":"c","fecha_vencimiento_licencia":"2028-01-01"}'
 ```
 
 | Prueba | Respuesta esperada |
@@ -1150,7 +1211,7 @@ const VALORES_INICIALES: RegistrarChoferEntrada = {
   nombres: '',
   apellidos: '',
   numero_licencia: '',
-  categoria_licencia: 'C',
+  categoria_licencia: 'c',
   fecha_vencimiento_licencia: '',
   telefono: '',
 };
@@ -1217,7 +1278,7 @@ export function FormularioChofer() {
       />
       <input
         className={CAMPO}
-        placeholder="Categoría de licencia (ej. C)"
+        placeholder="Categoría de licencia (ej. c)"
         value={valores.categoria_licencia}
         onChange={(e) => setValores({ ...valores, categoria_licencia: e.target.value })}
         required
@@ -1490,6 +1551,7 @@ export function MiComponente() {
 
 - **No** crees ni modifiques tablas desde el panel de Supabase.
 - **Avisa a John** antes: los cambios de esquema se hacen con una **migración nueva** en `supabase/migrations/` y la base es compartida.
+- **Si el dato se puede calcular con otros que ya existen, no se guarda**: se lee de una vista (`ventas_totales`, `rutas_resumen`, `viajes_horarios`, `encomiendas_estado_actual`).
 - Reglas del SQL: palabras en **minúsculas** (`create table`, `not null`), **nunca renombrar** campos existentes y activar RLS en tablas nuevas (`alter table x enable row level security;`).
 
 ---
@@ -1584,6 +1646,9 @@ Proyecto: Panamericana (Bolivia). Monorepo con npm workspaces.
   Los componentes nunca usan fetch: servicio (clienteHttp + RUTAS_API) -> hook (useQuery/useMutation) -> componente.
   Componentes con hooks llevan 'use client'. En page.tsx, params es una Promise.
 - Los nombres de campos son IDENTICOS a la base de datos (snake_case). No renombrar.
+- Base normalizada: los datos personales viven en la tabla "personas" y usuarios, clientes y choferes la enlazan con persona_id (join en el repositorio).
+- Las listas de valores son catalogos (tipos_documento, tipos_asiento, roles, metodos_pago, canales_venta, categorias_licencia, departamentos, ciudades) y guardan el codigo legible: ci, cama, taquilla.
+- Lo que se puede calcular NO se guarda: total de una venta, duracion de una ruta, hora de llegada y estado de una encomienda se leen de vistas.
 - Datos bolivianos: documentos ci/ce/pasaporte, placas 1234ABC, celulares de 8 digitos, montos en bolivianos.
 - No crear tablas ni cambiar el esquema: eso se coordina aparte.
 Sigue el mismo patron del modulo "buses" que ya existe.

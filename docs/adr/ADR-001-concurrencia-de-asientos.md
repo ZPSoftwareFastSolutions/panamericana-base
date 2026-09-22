@@ -35,7 +35,7 @@ alter table pasajes
   where (estado in ('reservado', 'pagado'));
 ```
 
-Por eso `pasajes` guarda `orden_origen` y `orden_destino` (copiados de `rutas_paradas.orden`): la restricción se evalúa dentro de la misma fila, sin consultar otra tabla.
+Por eso `pasajes` guarda `ruta_id`, `orden_origen` y `orden_destino`: la restricción se evalúa dentro de la misma fila, sin consultar otra tabla. Desde el modelo v2.0 (22/09) el tramo se identifica por `(ruta_id, orden)` —ya no existen `parada_origen_id` ni `parada_destino_id`— y claves foráneas compuestas garantizan que la parada pertenece a la ruta del viaje y el asiento al bus del viaje.
 
 El conflicto se convierte en el error de dominio `AsientoNoDisponibleError` y en una respuesta **HTTP 409** con código `asiento_no_disponible`.
 

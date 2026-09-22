@@ -1,6 +1,6 @@
 # Análisis de normalización y propuesta de modelo v2.0
 
-> **Fecha:** 2026-09-22 · **Estado:** 🟡 Propuesta — **requiere luz verde antes de aplicar**
+> **Fecha:** 2026-09-22 · **Estado:** ✅ **Aplicada el 22/09/2026** (opción A, modelo v2.0 completo) — ver la sección 11
 > **Alcance:** las 16 tablas del modelo v1.0 (`PROPUESTA_BD.md`), verificadas contra la base real de Supabase.
 > **Objetivo pedido:** que el modelo esté normalizado **hasta 5FN** y quede bien estructurado para que el equipo trabaje cómodo.
 
@@ -25,7 +25,7 @@
 
 **Recomendación:** aplicar el **modelo v2.0** (26 tablas + 4 vistas) **hoy, antes de que el equipo escriba el código del Sprint 2**. Hoy es el Planning: PAN-13 a PAN-23 tocan justamente `rutas`, `viajes`, `ventas` y `pasajes`. Si se aplica después, el cambio deja de costar 4 migraciones y pasa a costar 4 migraciones **más** reescribir código ya revisado.
 
-**Lo que hay que decidir (sección 9):** esto exige **descongelar los nombres una sola vez** (reglas R2/R3) y avisar al equipo con una corrección (`docs/repo2/CORRECCIONES_02.md`). No se aplica nada sin tu confirmación.
+**Lo que había que decidir (sección 9):** esto exigía **descongelar los nombres una sola vez** (reglas R2/R3) y avisar al equipo con una corrección (`docs/repo2/CORRECCIONES_02.md`). ✅ Autorizado y aplicado el 22/09 (opción A); los nombres quedaron congelados otra vez.
 
 ---
 
@@ -217,12 +217,12 @@ Los catálogos usan el **código legible como clave primaria** (`'ci'`, `'cama'`
 | `terminales` | `ciudad` (texto) → **`ciudad_id`** → `ciudades` |
 | `asientos` | `tipo` → clave foránea a `tipos_asiento` |
 | `rutas` | **quita** `duracion_estimada_min` y `distancia_km` (vista `rutas_resumen`) |
-| `rutas_paradas` | **agrega** `km_desde_origen`; clave primaria natural `(ruta_id, orden)`; `unique (ruta_id, terminal_id)` |
+| `rutas_paradas` | **agrega** `km_desde_origen`; clave primaria natural `(ruta_id, orden)`, se elimina el `id` uuid; `unique (ruta_id, terminal_id)` |
 | `viajes` | **quita** `fecha_llegada_estimada` (vista `viajes_horarios`) y `precio_base` (pasa a `tarifas`); **agrega** las claves únicas que usan las FK compuestas |
-| `viajes_choferes` | clave primaria natural `(viaje_id, chofer_id)`; `rol` → catálogo |
+| `viajes_choferes` | clave primaria natural `(viaje_id, chofer_id)`. `rol` se queda como `check`: solo lo usa esta tabla (criterio de la sección 1) |
 | `tarifas` | clave primaria natural `(viaje_id, tipo_asiento)`; **obligatoria** para cada tipo de asiento del bus |
 | `ventas` | **quita** `total` (vista `ventas_totales`); `canal` → `canales_venta` |
-| `pasajes` | **agrega** `ruta_id` y `bus_id` como columnas de integridad (sección 5.2). Todo lo demás **igual**, incluida la restricción de exclusión |
+| `pasajes` | **agrega** `ruta_id` y `bus_id` como columnas de integridad (sección 5.2) y **elimina** `parada_origen_id` y `parada_destino_id`: con la parada identificada por `(ruta_id, orden)` eran el mismo dato dos veces. La restricción de exclusión no cambia |
 | `pagos` | `metodo` → `metodos_pago` |
 | `encomiendas` | **quita** `estado` y `fecha_entrega` (vista `encomiendas_estado_actual`) |
 | `historial_encomiendas` | sin cambios |
@@ -377,3 +377,32 @@ Solo hacia adelante (R5), sin tocar las 6 migraciones ya aplicadas. Como la base
 | Fecha | Hecho |
 |---|---|
 | 22/09/2026 | Verificación de las 16 tablas contra la base real; 8 hallazgos; propuesta v2.0 (26 tablas + 4 vistas) |
+| 22/09/2026 | **Aplicada la opción A** (modelo completo) con 4 migraciones; documentación y guía del equipo actualizadas |
+
+---
+
+## 11. Resultado de la aplicación
+
+Las 4 migraciones se aplicaron en el orden previsto y la base quedó con **26 tablas y 4 vistas**.
+
+| Verificación | Resultado |
+|---|---|
+| `npm run db:verificar` | 26 tablas y 4 vistas |
+| Doble venta: tramo 1→3 sobre un 1→2 ya vendido | ❌ `23P01` (correcto) |
+| Tramo 2→3 del mismo asiento | ✅ aceptado |
+| Pasaje con bus de otro viaje o parada de otra ruta | ❌ `23503`: las claves foráneas compuestas funcionan |
+| Asiento con un tipo fuera del catálogo | ❌ `23503` |
+| Segundo rol para el mismo usuario | ✅ aceptado |
+| `seed.sql` ejecutado dos veces seguidas | ✅ sin duplicados |
+| `npm run lint` · `npm test` · `npm run build` | ✅ 4 pruebas y build completo |
+| Ejemplo de la guía del equipo (módulo `choferes`) | ✅ extraído, compilado (8 pruebas) y probado contra la API: **13 casos, 0 fallos**; datos de prueba borrados |
+| Avisos de seguridad de Supabase | Solo el informativo de siempre (RLS activo sin políticas: es el diseño) |
+
+**Ajustes que surgieron al aplicar:**
+
+1. El dominio del ejemplo pasaba `categoria_licencia` a **mayúscula** y el catálogo guarda los códigos en **minúscula** (`'c'`). Se corrigió la guía: los códigos de catálogo van en minúscula.
+2. `viajes_choferes.rol` se quedó como `check` (solo lo usa esa tabla), en lugar del catálogo que preveía la sección 4.3.
+3. `pasajes` perdió `parada_origen_id` y `parada_destino_id`: con `rutas_paradas` identificada por `(ruta_id, orden)`, esas columnas eran una segunda copia del mismo dato.
+4. `npm run db:verificar` ahora separa tablas y vistas en su salida.
+
+**Pendiente:** que Ángel aplique `docs/repo2/CORRECCIONES_02.md` en el repositorio del equipo y avise al grupo **antes** de que empiecen las tarjetas del Sprint 2.

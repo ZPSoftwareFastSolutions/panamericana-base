@@ -207,6 +207,7 @@ La guía completa, con ejemplos, está en **`ARQUITECTURA_CLEAN.md`**. Resumen:
 |---|---|
 | Borrador v0.1 y revisión (tripulación, tramos, tarifas, ventas) | ✅ 11–12/09 |
 | Modelo v1.0 aplicado en Supabase (16 tablas) y nombres **congelados** | ✅ 12/09 |
+| Modelo **v2.0** normalizado hasta 5FN (26 tablas + 4 vistas) y nombres recongelados | ✅ 22/09 |
 | Contexto Bolivia: migración `documentos_bolivia` | ✅ 15/09 |
 | Proyecto de producción | ⏳ Fase final |
 
@@ -378,7 +379,7 @@ Las historias de usuario, los criterios de aceptación y las tarjetas están en 
 | 2 | Correos o usuarios de Trello de los 5 integrantes | ✅ Recibidos. Tablero creado con el Sprint 1 el 15/09: https://trello.com/b/ida3R2kt/panamericana · ⏳ invitar al equipo desde Trello (la integración no envía invitaciones) |
 | 3 | Espacio de trabajo de Trello | ✅ Cualquiera |
 | 4 | Fechas de los sprints | ✅ Sprint 1 y 2 fijados por el docente · ⏳ **Sprint 3 sin confirmar** |
-| 5 | Modelo de datos v1.0 | ✅ Creado en Supabase (16 tablas) |
+| 5 | Modelo de datos v2.0 | ✅ Creado en Supabase (26 tablas + 4 vistas, normalizado hasta 5FN) |
 | 6 | Despliegue (ADR-002) | ⏳ **Fase final** (fecha a definir). Hasta entonces, todo en local |
 | 7 | Product Backlog del MVP | ✅ `PRODUCT_BACKLOG.md` v1.0 |
 | 8 | Guía y tarjetas de Trello del Sprint 2 (PAN-10 a PAN-23) | ⏳ Solo cuando el usuario lo pida, antes del Planning del 22/09 |
