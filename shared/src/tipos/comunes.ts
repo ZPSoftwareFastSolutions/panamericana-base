@@ -4,3 +4,6 @@ export type RespuestaError = {
   mensaje: string;
   detalles?: unknown;
 };
+
+/** documentos de identidad aceptados en Bolivia (catalogo tipos_documento) */
+export type TipoDocumento = 'ci' | 'ce' | 'pasaporte';

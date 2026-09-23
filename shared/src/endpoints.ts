@@ -17,4 +17,38 @@ export const RUTAS_API = {
     /** formato para la web */
     detalle: (id: string): string => `/v1/buses/${id}`,
   },
+
+  catalogos: {
+    /** GET listar las ciudades activas */
+    ciudades: '/v1/catalogos/ciudades',
+    /** GET listar los tipos de documento: ci, ce, pasaporte */
+    tiposDocumento: '/v1/catalogos/tipos-documento',
+    /** GET listar los roles de usuario */
+    roles: '/v1/catalogos/roles',
+  },
+
+  terminales: {
+    /** GET listar · POST registrar */
+    base: '/v1/terminales',
+    /** GET detalle (formato para Express) */
+    porId: '/v1/terminales/:id',
+    /** formato para la web */
+    detalle: (id: string): string => `/v1/terminales/${id}`,
+  },
+
+  usuarios: {
+    /** GET listar · POST registrar */
+    base: '/v1/usuarios',
+  },
+
+  clientes: {
+    /** GET listar · POST registrar */
+    base: '/v1/clientes',
+    /** GET buscar por documento (formato para Express) */
+    buscar: '/v1/clientes/buscar',
+    /** formato para la web: arma la busqueda con sus parametros */
+    buscarPorDocumento: (tipo_documento: string, numero_documento: string): string =>
+      `/v1/clientes/buscar?tipo_documento=${encodeURIComponent(tipo_documento)}` +
+      `&numero_documento=${encodeURIComponent(numero_documento)}`,
+  },
 } as const;
