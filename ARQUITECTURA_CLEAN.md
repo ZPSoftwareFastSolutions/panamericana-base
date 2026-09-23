@@ -130,9 +130,15 @@ panamericana/
 │       │       └── adaptadores/
 │       │           ├── busRutas.ts           entrada HTTP
 │       │           └── PgBusRepositorio.ts   SQL
-│       ├── compartido/
-│       │   ├── dominio/ErrorDeDominio.ts                 clase base de errores
-│       │   └── adaptadores/http/manejadorErrores.ts      error → código HTTP
+│       ├── compartido/                 NÚCLEO: lo que usan varios módulos
+│       │   ├── dominio/
+│       │   │   ├── ErrorDeDominio.ts       clase base de errores
+│       │   │   ├── erroresComunes.ts       DatoObligatorioError
+│       │   │   ├── Persona.ts              reglas bolivianas de una persona (CI, celular, correo)
+│       │   │   └── erroresPersona.ts       errores de los datos personales
+│       │   └── adaptadores/
+│       │       ├── http/manejadorErrores.ts   error → código HTTP
+│       │       └── pg/                        transaccion.ts · personasSql.ts · erroresPg.ts
 │       ├── infraestructura/
 │       │   ├── config.ts        lee el .env
 │       │   ├── baseDeDatos.ts   conexión a Supabase
@@ -146,16 +152,19 @@ panamericana/
 │       ├── app/                              RUTAS: lo que el usuario ve en la URL
 │       │   ├── layout.tsx                    envoltura general
 │       │   ├── proveedores.tsx               cache de datos (TanStack Query)
-│       │   ├── page.tsx                      "/"
+│       │   ├── (publico)/                    portal: layout.tsx y page.tsx ("/")
 │       │   └── (backoffice)/
-│       │       ├── layout.tsx                menú lateral del panel
-│       │       └── admin/buses/page.tsx      "/admin/buses"
+│       │       ├── layout.tsx                usa MenuLateral
+│       │       └── admin/{buses,terminales,clientes}/page.tsx
 │       ├── modulos/
 │       │   └── buses/                        ← MÓDULO DE EJEMPLO (copiar esta forma)
 │       │       ├── componentes/              lo que se ve (tabla, formulario)
 │       │       ├── hooks/                    lógica: cuándo pedir, cargando, error
 │       │       └── servicios/                llamadas a la API
-│       └── compartido/servicios/clienteHttp.ts   único lugar con fetch
+│       └── compartido/
+│           ├── servicios/clienteHttp.ts      único lugar con fetch
+│           ├── componentes/                  Boton, Campo, CampoSeleccion, MenuLateral
+│           └── utilidades/fechas.ts          hoyEnBolivia, formatearFecha
 │
 ├── supabase/
 │   ├── migrations/           archivos .sql que crean y cambian las tablas
@@ -441,6 +450,8 @@ npx supabase db push
 - **Un dato que se puede calcular no se guarda.** Si sale de otras filas (un total, una duración, un estado que ya está en un historial), va en una **vista**, no en una columna.
 - **Un dato de una persona se guarda una sola vez**, en `personas`. `usuarios`, `clientes` y `choferes` son roles que la enlazan con `persona_id`.
 - **Las listas de valores compartidas son catálogos** (`tipos_documento`, `tipos_asiento`, `roles`, `metodos_pago`, …) con el código legible como clave primaria; el JSON de la API sigue mostrando `'ci'` o `'cama'`. Los **estados** de una máquina de estados se quedan como `check`.
+- **Una persona en la API:** los roles de una persona (cliente, usuario, chofer) se devuelven **aplanados**, con los campos de `personas` al mismo nivel (`{ id, tipo_documento, numero_documento, nombres, … }`). Una **referencia** a otra entidad se devuelve como **objeto anidado** con el nombre de la entidad en singular (`terminal.ciudad = { id, nombre, departamento }`).
+- **Reutilizar el núcleo:** las reglas de una persona se validan con `crearPersona` (`compartido/dominio/Persona.ts`) y se guardan con `guardarPersona` dentro de `enTransaccion`; nunca se copian en cada módulo.
 - **Las tablas puente usan clave natural**: `rutas_paradas (ruta_id, orden)`, `viajes_choferes (viaje_id, chofer_id)`, `tarifas (viaje_id, tipo_asiento)`.
 - Las **copias** solo se permiten si la base puede verificarlas con una clave foránea compuesta (el caso de `pasajes`, ADR-001).
 

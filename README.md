@@ -85,7 +85,8 @@ El módulo **`buses`** está implementado de punta a punta (base de datos → AP
 | `docs/adr/` | Decisiones de arquitectura |
 | `docs/guias-sprint/` | Guías por sprint (se convierten en tarjetas de Trello) |
 | `docs/repo2/README.md` | README básico que se copia al Repositorio 2 (el único `.md` que va allí) |
-| `docs/repo2/CORRECCIONES_NN.md` | Cambios puntuales que Ángel aplica en el Repositorio 2 (01 ✅ aplicada) |
+| `docs/repo2/CORRECCIONES_NN.md` | Cambios puntuales que Ángel aplica en el Repositorio 2 (01 y 02 ✅ aplicadas) |
+| `docs/repo2/REPLICACION_SPRINT_01.md` | Cómo gestionar el Sprint 1 en el Repositorio 2: tarjetas, orden de PR, revisión, rescate y prueba de aceptación |
 | `docs/equipo/GUIA_DESARROLLO.md` | Guía de desarrollo para los 5 integrantes (se comparte por fuera del repositorio; la copia con `.env` está en `compartir/`, ignorada por git) |
 
 ---

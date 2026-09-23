@@ -1,7 +1,7 @@
 # Correcciones 02 — Repositorio del equipo (`panamericana`)
 
 > **Fecha:** 22/09/2026 · **Para:** Ángel · **Documento interno:** no se copia al repositorio del equipo.
-> **Estado:** ⏳ Pendiente de aplicar. Hacerlo **antes** de que el equipo empiece las tarjetas del Sprint 2.
+> **Estado:** ✅ **Aplicada por Ángel** (confirmado el 23/09).
 
 ---
 
@@ -127,7 +127,7 @@ git checkout -b dev/angel
 
 | Paso | Estado |
 |---|---|
-| Copiar los 6 archivos | ⏳ |
-| Verificar (`db:verificar`, `test`, `build`, sin rastros) | ⏳ |
-| Commit y push | ⏳ |
-| Avisar al equipo | ⏳ |
+| Copiar los 6 archivos | ✅ |
+| Verificar (`db:verificar`, `test`, `build`, sin rastros) | ✅ |
+| Commit y push | ✅ |
+| Avisar al equipo | ✅ |

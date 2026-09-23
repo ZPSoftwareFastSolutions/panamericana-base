@@ -319,6 +319,8 @@ La guía **nunca se copia** al Repositorio 2. Su contenido se convierte en **tar
 
 Cuando un cambio del repositorio base debe llegar al equipo fuera de una copia completa, se documenta en `docs/repo2/CORRECCIONES_NN.md`: qué archivos cambian, el comando de copia, cómo verificar y el commit. Ángel lo aplica y se marca el estado.
 
+**Trabajo de un sprint:** cuando un sprint se construye primero aquí como referencia, se escribe `docs/repo2/REPLICACION_SPRINT_NN.md`. No es una copia: el equipo construye cada tarjeta en su rama y Ángel usa el documento para ordenar los PR, revisar contra la referencia, destrabar con copias puntuales (modo rescate) y comparar ambos repositorios al cierre.
+
 | N.º | Contenido | Estado |
 |---|---|---|
 | 01 | Autoría de commits a AngelParedesH20 (sin Z&P) y 6 archivos ajustados para Bolivia | ✅ Aplicada el 15/09 |

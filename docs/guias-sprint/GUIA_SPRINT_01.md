@@ -278,9 +278,11 @@ git checkout main
 | **PAN-05** | John | Revisar los PR de los demás y dejar la CI en verde | HU-003 | 2 |
 | **PAN-06** | Grisel | Módulo `clientes` de punta a punta: API + pantalla del backoffice | HU-009 | 5 |
 | **PAN-07** | Brisa | Pantalla de terminales en el backoffice + opciones del menú lateral | HU-010 | 5 |
-| **PAN-08** | Karime | Estructura `app/(publico)/` + maqueta del buscador de viajes | HU-017 | 5 |
+| **PAN-08** | Karime | Estructura `app/(publico)/` + maqueta del buscador de viajes (+ `Boton`, `Campo`, `fechas`) | HU-017 | 5 |
+| **PAN-41** | John | Núcleo compartido de personas (agregada el 23/09) | HU-006, HU-009 | 2 |
+| **PAN-42** | Grisel | Catálogos: ciudades, tipos de documento y roles (agregada el 23/09) | HU-009, HU-010 | 2 |
 
-**Carga:** John 6 · Ángel 7 · Grisel 6 · Brisa 6 · Karime 6 (incluye PAN-01). Si una tarjeta no se termina el 19/09, pasa **al inicio** del Sprint 2 (`PRODUCT_BACKLOG.md`, sección 7.3).
+**Carga:** John 8 · Ángel 7 · Grisel 8 · Brisa 6 · Karime 6 (incluye PAN-01). **Actualización 23/09:** el detalle vigente de cada tarjeta, los archivos exactos y el orden de los PR están en `docs/repo2/REPLICACION_SPRINT_01.md`. Si una tarjeta no se termina el 19/09, pasa **al inicio** del Sprint 2 (`PRODUCT_BACKLOG.md`, sección 7.3).
 
 ### B2. Detalle de cada tarjeta
 
@@ -303,7 +305,7 @@ Campos de la tabla `terminales`: `id`, `nombre` (único), `ciudad_id` (→ `ciud
 
 #### PAN-04 · Usuarios (backend) — John
 
-Campos de `usuarios`: `id`, `nombres`, `apellidos`, `correo` (único), `rol`, `activo`.
+Tablas: `personas` (datos personales), `usuarios` (`id`, `persona_id`, `correo` único, `activo`) y `usuarios_roles` (`usuario_id`, `rol`). Un usuario puede tener varios roles.
 
 Mismos 6 pasos que PAN-03, con módulo `usuarios`.
 

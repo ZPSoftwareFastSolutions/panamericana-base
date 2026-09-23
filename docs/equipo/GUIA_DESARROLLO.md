@@ -1,6 +1,6 @@
 # Guía de Desarrollo — Panamericana
 
-> **Para:** todo el equipo · **Versión:** 1.1 · **Fecha:** 22/09/2026 (modelo de datos normalizado)
+> **Para:** todo el equipo · **Versión:** 1.2 · **Fecha:** 23/09/2026 (piezas compartidas del Sprint 1)
 > **Objetivo:** que cualquier integrante pueda agregar endpoints, pantallas y módulos **sin romper la arquitectura**, por su cuenta o con ayuda de un asistente de IA.
 > **Ejemplo que se usa en toda la guía:** el módulo **`choferes`** completo (listar con filtro, ver detalle, registrar y actualizar). Todo el código de esta guía **compila y funciona** con el proyecto actual.
 
@@ -188,6 +188,28 @@ La base está **normalizada**: cada dato se guarda **una sola vez**. Tres consec
 
 ---
 
+### 2.5 Piezas compartidas que ya existen (úsalas, no las copies)
+
+Antes de escribir algo "genérico", revisa si ya está aquí:
+
+| Pieza | Dónde | Para qué |
+|---|---|---|
+| `crearPersona`, `normalizarDocumento`, `normalizarTelefono`, `normalizarCorreo` | `backend/src/compartido/dominio/Persona.ts` | Reglas bolivianas de una persona: CI, CE, pasaporte, celular de 8 dígitos, correo |
+| `TipoDocumentoInvalidoError`, `DocumentoInvalidoError`, `TelefonoInvalidoError`, `CorreoInvalidoError`… | `backend/src/compartido/dominio/erroresPersona.ts` | Errores de los datos personales (400) |
+| `DatoObligatorioError` | `backend/src/compartido/dominio/erroresComunes.ts` | Un texto obligatorio llegó vacío (400) |
+| `enTransaccion(pool, trabajo)` | `backend/src/compartido/adaptadores/pg/transaccion.ts` | Varias consultas que se guardan todas juntas o ninguna |
+| `guardarPersona(conexion, persona)` | `backend/src/compartido/adaptadores/pg/personasSql.ts` | Guarda la persona (o reutiliza la que ya existe con ese documento) y devuelve su `id` |
+| `CODIGOS_PG`, `codigoPg(error)` | `backend/src/compartido/adaptadores/pg/erroresPg.ts` | Reconocer errores de la base: valor repetido (23505), referencia inexistente (23503) |
+| `Boton` | `web/src/compartido/componentes/Boton.tsx` | Botón con estado "Guardando..." |
+| `Campo`, `CampoSeleccion` | `web/src/compartido/componentes/Campo.tsx` | Campos de formulario con etiqueta y mensaje de error |
+| `MenuLateral` | `web/src/compartido/componentes/MenuLateral.tsx` | Menú del panel; resalta la pantalla actual |
+| `hoyEnBolivia`, `formatearFecha` | `web/src/compartido/utilidades/fechas.ts` | "Hoy" en hora de La Paz y fechas `dd/mm/aaaa` |
+| `useCiudades`, `useTiposDocumento`, `useRoles` | `web/src/modulos/catalogos/hooks/useCatalogos.ts` | Listas para llenar selectores |
+
+> **Regla:** si una pieza la necesitan **dos módulos o más**, va en `compartido/`. Si solo la usa uno, va dentro de ese módulo.
+
+---
+
 ## 3. El recorrido de una petición
 
 Ejemplo: el administrador registra un chofer.
@@ -249,13 +271,7 @@ Los datos personales **no se repiten** en cada tabla: un chofer que además comp
 
 ### Paso 1 — `shared/`: el contrato
 
-**1a. Tipos.** Si `TipoDocumento` todavía no existe en `shared/src/tipos/comunes.ts`, agrégalo (clientes también lo usa: **no lo declares dos veces**):
-
-```ts
-// en: shared/src/tipos/comunes.ts (agregar al final)
-/** documentos de identidad aceptados en Bolivia */
-export type TipoDocumento = 'ci' | 'ce' | 'pasaporte';
-```
+**1a. Tipos.** `TipoDocumento` **ya existe** en `shared/src/tipos/comunes.ts` (lo usan clientes, usuarios y choferes): impórtalo, **no lo declares otra vez**.
 
 Archivo nuevo con los tipos del chofer. Los nombres de los campos son **exactamente** los de la tabla:
 
@@ -300,12 +316,9 @@ export type ActualizarChoferEntrada = {
 **1b. Exportarlos** en `shared/src/index.ts` (agrega tus líneas; no borres las de otros):
 
 ```ts
-// en: shared/src/index.ts (agregar)
-export type { RespuestaError, TipoDocumento } from './tipos/comunes';
+// en: shared/src/index.ts (agregar al final)
 export type { ActualizarChoferEntrada, Chofer, RegistrarChoferEntrada } from './tipos/chofer';
 ```
-
-> Si la línea de `./tipos/comunes` ya existe, solo añade `TipoDocumento` dentro de las llaves.
 
 **1c. Rutas** en `shared/src/endpoints.ts`, dentro de `RUTAS_API`:
 
@@ -327,29 +340,14 @@ export type { ActualizarChoferEntrada, Chofer, RegistrarChoferEntrada } from './
 
 ### Paso 2 — Backend: dominio
 
-**2a. Errores del negocio.** Cada error sabe su código HTTP. El manejador de errores lo traduce solo.
+**2a. Errores del negocio.** Cada error sabe su código HTTP. El manejador de errores lo traduce solo. Los errores de los datos personales (documento, celular) **ya existen** en el núcleo compartido (sección 2.5): aquí solo van los del chofer.
 
 ```ts
 // archivo: backend/src/modulos/choferes/dominio/errores.ts
 import { ErrorDeDominio } from '../../../compartido/dominio/ErrorDeDominio';
 
-export class DocumentoInvalidoError extends ErrorDeDominio {
-  readonly codigo = 'documento_invalido';
-  readonly estadoHttp = 400;
-
-  constructor(numero: string) {
-    super(`El numero de documento "${numero}" no tiene un formato valido`);
-  }
-}
-
-export class TelefonoInvalidoError extends ErrorDeDominio {
-  readonly codigo = 'telefono_invalido';
-  readonly estadoHttp = 400;
-
-  constructor(telefono: string) {
-    super(`El celular "${telefono}" debe tener 8 digitos y empezar con 6 o 7`);
-  }
-}
+// los errores de los DATOS PERSONALES (documento, celular, correo) ya existen en
+// compartido/dominio/erroresPersona.ts: aqui van solo los errores propios del chofer
 
 export class LicenciaVencidaError extends ErrorDeDominio {
   readonly codigo = 'licencia_vencida';
@@ -379,13 +377,16 @@ export class ChoferNoEncontradoError extends ErrorDeDominio {
 }
 ```
 
-**2b. Entidad.** Aquí viven las reglas. No importa Express, `pg`, Zod ni `@panamericana/shared`.
+**2b. Entidad.** Aquí viven las reglas. No importa Express, `pg`, Zod ni `@panamericana/shared`. Sí puede usar el **núcleo compartido del dominio** (`compartido/dominio/`), que tampoco depende de librerías.
 
 ```ts
 // archivo: backend/src/modulos/choferes/dominio/Chofer.ts
-import { DocumentoInvalidoError, LicenciaVencidaError, TelefonoInvalidoError } from './errores';
+import { crearPersona, normalizarTelefono } from '../../../compartido/dominio/Persona';
+import type { TipoDocumento } from '../../../compartido/dominio/Persona';
+import { LicenciaVencidaError } from './errores';
 
-export type TipoDocumento = 'ci' | 'ce' | 'pasaporte';
+// el tipo de documento es de TODAS las personas: vive en el nucleo compartido y aqui se reexporta
+export type { TipoDocumento };
 
 export type DatosNuevoChofer = {
   tipo_documento: TipoDocumento;
@@ -404,14 +405,13 @@ export type DatosChofer = Omit<DatosNuevoChofer, 'telefono'> & {
   activo: boolean;
 };
 
-// ci boliviano: 5 a 10 digitos con complemento opcional de 2 caracteres (ej. 5120478-1A)
-const FORMATO_CI = /^\d{5,10}(-[0-9A-Z]{2})?$/;
-// celular boliviano: 8 digitos que empiezan con 6 o 7
-const FORMATO_CELULAR = /^[67]\d{7}$/;
-
 /**
  * Entidad del dominio: las REGLAS del negocio sobre un chofer.
  * Los campos se llaman igual que en la base de datos.
+ *
+ * Las reglas de la PERSONA (CI boliviano, celular, nombres) ya existen en
+ * compartido/dominio/Persona.ts: se reutilizan, no se copian. Aqui solo van
+ * las reglas propias del chofer (la licencia).
  */
 export class Chofer {
   readonly id: string;
@@ -443,12 +443,10 @@ export class Chofer {
    * Recibe "hoy" desde afuera para que las pruebas no dependan del reloj.
    */
   static crear(datos: DatosNuevoChofer, hoy: Date): Chofer {
-    const numero_documento = datos.numero_documento.trim().toUpperCase();
+    // 1) reglas de la persona: documento, nombres y celular (nucleo compartido)
+    const persona = crearPersona(datos, hoy);
 
-    if (datos.tipo_documento === 'ci' && !FORMATO_CI.test(numero_documento)) {
-      throw new DocumentoInvalidoError(datos.numero_documento);
-    }
-
+    // 2) regla propia del chofer: la licencia debe estar vigente
     const hoyTexto = hoy.toISOString().slice(0, 10);
     if (datos.fecha_vencimiento_licencia <= hoyTexto) {
       throw new LicenciaVencidaError(datos.fecha_vencimiento_licencia);
@@ -456,15 +454,15 @@ export class Chofer {
 
     return new Chofer({
       id: crypto.randomUUID(),
-      tipo_documento: datos.tipo_documento,
-      numero_documento,
-      nombres: datos.nombres.trim(),
-      apellidos: datos.apellidos.trim(),
+      tipo_documento: persona.tipo_documento,
+      numero_documento: persona.numero_documento,
+      nombres: persona.nombres,
+      apellidos: persona.apellidos,
       numero_licencia: datos.numero_licencia.trim().toUpperCase(),
       // el catalogo categorias_licencia guarda los codigos en minuscula: 'a', 'b', 'c'...
       categoria_licencia: datos.categoria_licencia.trim().toLowerCase(),
       fecha_vencimiento_licencia: datos.fecha_vencimiento_licencia,
-      telefono: Chofer.validarTelefono(datos.telefono),
+      telefono: persona.telefono,
       activo: true,
     });
   }
@@ -478,20 +476,9 @@ export class Chofer {
   actualizar(cambios: { telefono?: string | null; activo?: boolean }): Chofer {
     return new Chofer({
       ...this,
-      telefono: cambios.telefono === undefined ? this.telefono : Chofer.validarTelefono(cambios.telefono),
+      telefono: cambios.telefono === undefined ? this.telefono : normalizarTelefono(cambios.telefono),
       activo: cambios.activo ?? this.activo,
     });
-  }
-
-  private static validarTelefono(telefono?: string | null): string | null {
-    if (telefono === undefined || telefono === null || telefono.trim() === '') {
-      return null;
-    }
-    const limpio = telefono.replace(/\s/g, '');
-    if (!FORMATO_CELULAR.test(limpio)) {
-      throw new TelefonoInvalidoError(telefono);
-    }
-    return limpio;
   }
 }
 ```
@@ -611,7 +598,8 @@ export class ActualizarChofer {
 import { describe, expect, it } from 'vitest';
 import type { Chofer, TipoDocumento } from '../dominio/Chofer';
 import type { ChoferRepositorio } from '../dominio/ChoferRepositorio';
-import { ChoferDuplicadoError, DocumentoInvalidoError, LicenciaVencidaError } from '../dominio/errores';
+import { DocumentoInvalidoError } from '../../../compartido/dominio/erroresPersona';
+import { ChoferDuplicadoError, LicenciaVencidaError } from '../dominio/errores';
 import { RegistrarChofer } from './RegistrarChofer';
 
 /** repositorio falso: guarda en memoria */
@@ -703,6 +691,9 @@ describe('RegistrarChofer', () => {
 ```ts
 // archivo: backend/src/modulos/choferes/adaptadores/PgChoferRepositorio.ts
 import type { Pool } from 'pg';
+import { CODIGOS_PG, codigoPg } from '../../../compartido/adaptadores/pg/erroresPg';
+import { guardarPersona } from '../../../compartido/adaptadores/pg/personasSql';
+import { enTransaccion } from '../../../compartido/adaptadores/pg/transaccion';
 import { Chofer } from '../dominio/Chofer';
 import type { TipoDocumento } from '../dominio/Chofer';
 import type { ChoferRepositorio } from '../dominio/ChoferRepositorio';
@@ -764,60 +755,43 @@ export class PgChoferRepositorio implements ChoferRepositorio {
   }
 
   async guardar(chofer: Chofer): Promise<void> {
-    // son dos inserts (persona + chofer): van en una transaccion para que no quede a medias
-    const conexion = await this.db.connect();
     try {
-      await conexion.query('begin');
+      // dos inserts (persona + chofer): enTransaccion los guarda juntos o no guarda ninguno
+      await enTransaccion(this.db, async (conexion) => {
+        // si la persona ya existe por documento (por ejemplo, es cliente), se reutiliza
+        const persona_id = await guardarPersona(conexion, {
+          ...chofer,
+          correo: null,
+          fecha_nacimiento: null,
+        });
 
-      // si la persona ya existe por documento se reutiliza, y se aprovecha para actualizar su celular
-      const persona = await conexion.query<{ id: string }>(
-        `insert into personas (tipo_documento, numero_documento, nombres, apellidos, telefono)
-         values ($1, $2, $3, $4, $5)
-         on conflict (tipo_documento, numero_documento)
-         do update set telefono = coalesce(excluded.telefono, personas.telefono)
-         returning id`,
-        [
-          chofer.tipo_documento,
-          chofer.numero_documento,
-          chofer.nombres,
-          chofer.apellidos,
-          chofer.telefono,
-        ],
-      );
-
-      await conexion.query(
-        `insert into choferes (id, persona_id, numero_licencia, categoria_licencia,
-                               fecha_vencimiento_licencia, activo)
-         values ($1, $2, $3, $4, $5, $6)`,
-        [
-          chofer.id,
-          persona.rows[0]?.id,
-          chofer.numero_licencia,
-          chofer.categoria_licencia,
-          chofer.fecha_vencimiento_licencia,
-          chofer.activo,
-        ],
-      );
-
-      await conexion.query('commit');
+        await conexion.query(
+          `insert into choferes (id, persona_id, numero_licencia, categoria_licencia,
+                                 fecha_vencimiento_licencia, activo)
+           values ($1, $2, $3, $4, $5, $6)`,
+          [
+            chofer.id,
+            persona_id,
+            chofer.numero_licencia,
+            chofer.categoria_licencia,
+            chofer.fecha_vencimiento_licencia,
+            chofer.activo,
+          ],
+        );
+      });
     } catch (error) {
-      await conexion.query('rollback');
-      // 23505 = la base rechazo un valor repetido (por ejemplo, el numero de licencia)
-      if ((error as { code?: string }).code === '23505') {
+      // la base rechazo un valor repetido (por ejemplo, el numero de licencia)
+      if (codigoPg(error) === CODIGOS_PG.VALOR_REPETIDO) {
         throw new ChoferDuplicadoError();
       }
       throw error;
-    } finally {
-      conexion.release();
     }
   }
 
   async actualizar(chofer: Chofer): Promise<void> {
     // el celular vive en personas y el estado activo en choferes: otra vez, una transaccion
     // actualizado_en lo cambia solo un trigger de la base
-    const conexion = await this.db.connect();
-    try {
-      await conexion.query('begin');
+    await enTransaccion(this.db, async (conexion) => {
       await conexion.query('update choferes set activo = $2 where id = $1', [
         chofer.id,
         chofer.activo,
@@ -827,13 +801,7 @@ export class PgChoferRepositorio implements ChoferRepositorio {
           where id = (select persona_id from choferes where id = $1)`,
         [chofer.id, chofer.telefono],
       );
-      await conexion.query('commit');
-    } catch (error) {
-      await conexion.query('rollback');
-      throw error;
-    } finally {
-      conexion.release();
-    }
+    });
   }
 }
 ```
@@ -1203,6 +1171,9 @@ export function TablaChoferes() {
 
 import { useState } from 'react';
 import type { RegistrarChoferEntrada, TipoDocumento } from '@panamericana/shared';
+import { Boton } from '@/compartido/componentes/Boton';
+import { Campo, CampoSeleccion } from '@/compartido/componentes/Campo';
+import { useTiposDocumento } from '@/modulos/catalogos/hooks/useCatalogos';
 import { useRegistrarChofer } from '../hooks/useRegistrarChofer';
 
 const VALORES_INICIALES: RegistrarChoferEntrada = {
@@ -1216,10 +1187,13 @@ const VALORES_INICIALES: RegistrarChoferEntrada = {
   telefono: '',
 };
 
-const CAMPO = 'rounded border border-slate-300 px-3 py-2';
-
+/**
+ * Formulario de registro. Usa los componentes compartidos Campo, CampoSeleccion y Boton
+ * (cada campo trae su etiqueta) y los tipos de documento salen del catalogo de la API.
+ */
 export function FormularioChofer() {
   const [valores, setValores] = useState<RegistrarChoferEntrada>(VALORES_INICIALES);
+  const tiposDocumento = useTiposDocumento();
   const registrar = useRegistrarChofer();
 
   function alEnviar(evento: React.FormEvent<HTMLFormElement>) {
@@ -1232,83 +1206,70 @@ export function FormularioChofer() {
     );
   }
 
+  const opcionesDocumento = (tiposDocumento.data ?? []).map((tipo) => ({
+    valor: tipo.codigo,
+    texto: tipo.nombre,
+  }));
+
   return (
     <form onSubmit={alEnviar} className="flex flex-col gap-3 rounded-lg border border-slate-300 bg-white p-4">
       <h2 className="font-semibold">Registrar chofer</h2>
 
-      <div className="flex gap-2">
-        <select
-          className={CAMPO}
-          value={valores.tipo_documento}
-          onChange={(e) => setValores({ ...valores, tipo_documento: e.target.value as TipoDocumento })}
-        >
-          <option value="ci">CI</option>
-          <option value="ce">CE</option>
-          <option value="pasaporte">Pasaporte</option>
-        </select>
-        <input
-          className={`${CAMPO} flex-1`}
-          placeholder="Número (ej. 5120478)"
-          value={valores.numero_documento}
-          onChange={(e) => setValores({ ...valores, numero_documento: e.target.value })}
-          required
-        />
-      </div>
-
-      <input
-        className={CAMPO}
-        placeholder="Nombres"
+      <CampoSeleccion
+        etiqueta="Tipo de documento"
+        opciones={opcionesDocumento}
+        value={valores.tipo_documento}
+        onChange={(e) => setValores({ ...valores, tipo_documento: e.target.value as TipoDocumento })}
+      />
+      <Campo
+        etiqueta="Numero de documento"
+        placeholder="Ej. 5120478"
+        value={valores.numero_documento}
+        onChange={(e) => setValores({ ...valores, numero_documento: e.target.value })}
+        required
+      />
+      <Campo
+        etiqueta="Nombres"
         value={valores.nombres}
         onChange={(e) => setValores({ ...valores, nombres: e.target.value })}
         required
       />
-      <input
-        className={CAMPO}
-        placeholder="Apellidos"
+      <Campo
+        etiqueta="Apellidos"
         value={valores.apellidos}
         onChange={(e) => setValores({ ...valores, apellidos: e.target.value })}
         required
       />
-      <input
-        className={CAMPO}
-        placeholder="Número de licencia"
+      <Campo
+        etiqueta="Numero de licencia"
         value={valores.numero_licencia}
         onChange={(e) => setValores({ ...valores, numero_licencia: e.target.value })}
         required
       />
-      <input
-        className={CAMPO}
-        placeholder="Categoría de licencia (ej. c)"
+      <Campo
+        etiqueta="Categoria de licencia"
+        placeholder="Ej. c"
         value={valores.categoria_licencia}
         onChange={(e) => setValores({ ...valores, categoria_licencia: e.target.value })}
         required
       />
-
-      <label className="flex flex-col gap-1 text-sm text-slate-600">
-        Vencimiento de la licencia
-        <input
-          type="date"
-          className={CAMPO}
-          value={valores.fecha_vencimiento_licencia}
-          onChange={(e) => setValores({ ...valores, fecha_vencimiento_licencia: e.target.value })}
-          required
-        />
-      </label>
-
-      <input
-        className={CAMPO}
-        placeholder="Celular (opcional, ej. 70011223)"
+      <Campo
+        etiqueta="Vencimiento de la licencia"
+        type="date"
+        value={valores.fecha_vencimiento_licencia}
+        onChange={(e) => setValores({ ...valores, fecha_vencimiento_licencia: e.target.value })}
+        required
+      />
+      <Campo
+        etiqueta="Celular (opcional)"
+        placeholder="Ej. 70011223"
         value={valores.telefono ?? ''}
         onChange={(e) => setValores({ ...valores, telefono: e.target.value })}
       />
 
-      <button
-        type="submit"
-        disabled={registrar.isPending}
-        className="rounded bg-slate-900 px-4 py-2 text-white disabled:opacity-50"
-      >
-        {registrar.isPending ? 'Guardando...' : 'Registrar'}
-      </button>
+      <Boton type="submit" cargando={registrar.isPending}>
+        Registrar
+      </Boton>
 
       {registrar.error && (
         <p role="alert" className="text-red-600">
@@ -1457,10 +1418,10 @@ export default async function PaginaDetalleChofer({ params }: { params: Promise<
 
 ### Paso 11 — Web: agregar la opción al menú
 
-En `web/src/app/(backoffice)/layout.tsx`, agrega tu opción al arreglo `MENU` (no borres las de otros):
+En `web/src/compartido/componentes/MenuLateral.tsx`, agrega tu opción al arreglo `OPCIONES` (no borres las de otros). El menú resalta solo la pantalla activa:
 
 ```tsx
-// en: web/src/app/(backoffice)/layout.tsx (agregar dentro de MENU)
+// en: web/src/compartido/componentes/MenuLateral.tsx (agregar dentro de OPCIONES)
   { etiqueta: 'Choferes', ruta: '/admin/choferes' },
 ```
 
@@ -1544,7 +1505,7 @@ export function MiComponente() {
 ### 5.7 Componentes reutilizables
 
 - Si lo usa **un solo módulo** → `web/src/modulos/<modulo>/componentes/`.
-- Si lo usan **varios** → `web/src/compartido/componentes/` (como `InsigniaEstado`).
+- Si lo usan **varios** → `web/src/compartido/componentes/` (como `Boton`, `Campo`, `MenuLateral` o `InsigniaEstado`).
 - Reciben datos por *props* y **no** llaman a la API.
 
 ### 5.8 Si tu tarjeta necesita cambiar la base de datos
@@ -1649,6 +1610,7 @@ Proyecto: Panamericana (Bolivia). Monorepo con npm workspaces.
 - Base normalizada: los datos personales viven en la tabla "personas" y usuarios, clientes y choferes la enlazan con persona_id (join en el repositorio).
 - Las listas de valores son catalogos (tipos_documento, tipos_asiento, roles, metodos_pago, canales_venta, categorias_licencia, departamentos, ciudades) y guardan el codigo legible: ci, cama, taquilla.
 - Lo que se puede calcular NO se guarda: total de una venta, duracion de una ruta, hora de llegada y estado de una encomienda se leen de vistas.
+- Reutilizar lo compartido, no copiarlo: backend/src/compartido/dominio/Persona.ts (crearPersona: reglas de CI y celular), compartido/adaptadores/pg (enTransaccion, guardarPersona, CODIGOS_PG), web/src/compartido/componentes (Boton, Campo, CampoSeleccion, MenuLateral) y modulos/catalogos (useCiudades, useTiposDocumento).
 - Datos bolivianos: documentos ci/ce/pasaporte, placas 1234ABC, celulares de 8 digitos, montos en bolivianos.
 - No crear tablas ni cambiar el esquema: eso se coordina aparte.
 Sigue el mismo patron del modulo "buses" que ya existe.

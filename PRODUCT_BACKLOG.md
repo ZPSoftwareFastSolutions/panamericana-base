@@ -376,7 +376,9 @@ Estas decisiones responden de forma **provisional** las preguntas abiertas de `P
 
 Detalle de cada tarjeta: `docs/guias-sprint/GUIA_SPRINT_01.md`.
 
-**Tablero de Trello (creado el 15/09):** https://trello.com/b/ida3R2kt/panamericana — listas `Por Hacer → En Progreso → Testing → Completao` (nombres elegidos por el equipo), 8 tarjetas activas con fecha límite 19/09 (PAN-09 archivada: el despliegue pasa a la fase final) y checklist de criterios de aceptación. PAN-01 y PAN-02 en *En Progreso*. **Pendiente:** invitar al equipo al tablero (la integración no envía invitaciones). Las tarjetas no mencionan documentos internos.
+**Tablero de Trello (creado el 15/09):** https://trello.com/b/ida3R2kt/panamericana — listas `Por Hacer → En Progreso → Testing → Completao` (nombres elegidos por el equipo), checklist de criterios de aceptación y el equipo ya invitado. PAN-09 archivada (el despliegue pasa a la fase final). Las tarjetas no mencionan documentos internos.
+
+**Estado al 23/09:** el Sprint 1 cerró sin sus módulos, así que sus tarjetas pasan **al inicio del Sprint 2** con prioridad máxima (§7.3). En `panamericana-base` el sprint está **construido y validado** (commit `04677cb`: 32 pruebas unitarias y 31 casos de aceptación contra la base real). Las tarjetas se corrigieron para el modelo v2.0 y se crearon **PAN-41** y **PAN-42**, que cubren las piezas que usan varios módulos. La replicación en el repositorio del equipo se gestiona con `docs/repo2/REPLICACION_SPRINT_01.md`.
 
 | Tarjeta | Responsable | Trabajo | HU | Pts |
 |---|---|---|---|---|
@@ -387,7 +389,9 @@ Detalle de cada tarjeta: `docs/guias-sprint/GUIA_SPRINT_01.md`.
 | PAN-05 | John | Revisión de PR y CI en verde | HU-003 | 2 |
 | PAN-06 | Grisel | Módulo `clientes` de punta a punta | HU-009 | 5 |
 | PAN-07 | Brisa | Pantalla de terminales y menú lateral | HU-010 | 5 |
-| PAN-08 | Karime | Portal público y maqueta del buscador | HU-017 | 5 |
+| PAN-08 | Karime | Portal público y maqueta del buscador (+ `Boton`, `Campo`, `fechas`) | HU-017 | 5 |
+| PAN-41 | John | Núcleo compartido de personas: reglas bolivianas, transacciones y errores de la base | HU-006, HU-009 | 2 |
+| PAN-42 | Grisel | Catálogos: ciudades, tipos de documento y roles (API + servicio web) | HU-009, HU-010 | 2 |
 
 ### 5.2 Sprint 2 — 22/09 → 03/10 · MVP 1
 
@@ -451,12 +455,12 @@ Decisión del 15/09: hasta esta fase **todo corre en local**. Es obligatoria por
 
 | Integrante | Capacidad | Sprint 1 | Sprint 2 | Sprint 3 |
 |---|---|---|---|---|
-| John | 10 | 6 | 11 | 11 |
-| Grisel | 10 | 6 | 10 (solo BE) | 10 |
+| John | 10 | 8 | 11 | 11 |
+| Grisel | 10 | 8 | 10 (solo BE) | 10 |
 | Brisa | 10 | 6 | 9 | 10 |
 | Karime | 10 | 6 | 10 | 10 |
 | Ángel | 6 | 7 | 5 | 6 |
-| **Total** | **46** | **31** | **45** | **47** |
+| **Total** | **46** | **35** | **45** | **47** |
 
 **Ajustes respecto al *ownership* de `PLANIFICACION.md` (2.1):**
 - **Grisel apoya Operaciones en el Sprint 2** (croquis, viajes, búsqueda y disponibilidad), porque sus módulos propios (encomiendas y reportes) son del Sprint 3 y Ángel tiene solo 6 puntos. En el Sprint 2 hace solo backend; lo compensa en el Sprint 3.

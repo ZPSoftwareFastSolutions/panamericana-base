@@ -1,6 +1,6 @@
 # CLAUDE.md — panamericana-base
 
-> **Punto de entrada para cualquier sesión.** Léelo completo antes de actuar. Última actualización: **22/09/2026**.
+> **Punto de entrada para cualquier sesión.** Léelo completo antes de actuar. Última actualización: **23/09/2026**.
 > Idioma de trabajo: **español** (documentos, respuestas, commits y comentarios del código).
 
 ---
@@ -27,6 +27,7 @@
 
 - **Z&P Software Fast Solutions** es la marca de John y Ángel: GitHub `ZPSoftwareFastSolutions`, correo `zapasoftwarefastsolutions@gmail.com`, organización de Supabase del mismo nombre. Es la identidad global de git en la computadora de trabajo.
 - *Ownership*, capacidad y revisores: `PLANIFICACION.md` §2. Ajustes temporales por sprint: `PRODUCT_BACKLOG.md` §6.
+- Los cinco ya son miembros del tablero de Trello (la cuenta "Oya Oya" es la de Ángel).
 
 ---
 
@@ -50,28 +51,30 @@
 
 ---
 
-## 4. Estado actual (22/09/2026)
+## 4. Estado actual (23/09/2026)
 
 **Hecho**
 - Stack base con el módulo **`buses`** de punta a punta: BD → API → pantalla (11–12/09).
 - Base de datos en Supabase: **modelo v2.0 normalizado (22/09)** — 26 tablas, 4 vistas, 10 migraciones, datos de prueba bolivianos. La protección por tramos y la integridad del tramo se verificaron contra la base real.
 - Plan v0.5 y `PRODUCT_BACKLOG.md` validados; sin rupturas de arquitectura.
 - **Repositorio 2 montado por Ángel (15/09)** y `docs/repo2/CORRECCIONES_01.md` **aplicadas**: autoría corregida a AngelParedesH20 y 6 archivos ajustados para Bolivia.
-- Tablero de Trello con el Sprint 1 (PAN-01 a PAN-08).
-- **Guía de desarrollo del equipo** (`docs/equipo/GUIA_DESARROLLO.md`, 15/09): cómo crear y llamar endpoints, `shared`, servicios, hooks, componentes `.tsx`, páginas, reglas, git y uso de asistentes de IA. Su ejemplo, el módulo `choferes`, se **extrajo, compiló (lint, 8 pruebas, build) y probó contra la base real** y luego se retiró del stack. La copia con el `.env` completo está en `compartir/GUIA_DESARROLLO_PANAMERICANA.md`, ignorada por git.
+- Tablero de Trello con el Sprint 1: PAN-01 a PAN-08 corregidas para el modelo v2.0 (23/09) y dos tarjetas nuevas, **PAN-41** (núcleo de personas, John) y **PAN-42** (catálogos, Grisel).
+- **Sprint 1 construido y validado aquí (23/09, commit `04677cb`)**: núcleo compartido de personas, módulos `catalogos`, `terminales`, `usuarios` y `clientes` (API), pantallas de terminales y clientes, `MenuLateral` con opción activa, componentes `Boton`/`Campo` y portal público con buscador. 32 pruebas unitarias, **31 casos de aceptación contra la base real** y revisión visual en computadora y celular. Sin migraciones nuevas.
+- **Replicación al equipo:** `docs/repo2/REPLICACION_SPRINT_01.md` (orden de PR en 5 días, archivos por tarjeta, revisión, modo rescate, comparación entre repositorios y prueba de aceptación).
+- `docs/repo2/CORRECCIONES_02.md` (modelo v2.0) **aplicada** por Ángel.
+- **Guía de desarrollo del equipo** (`docs/equipo/GUIA_DESARROLLO.md`, v1.2 del 23/09): cómo crear y llamar endpoints, `shared`, servicios, hooks, componentes `.tsx`, páginas, reglas, git y uso de asistentes de IA. Su ejemplo, el módulo `choferes`, se **extrajo, compiló junto al Sprint 1 (lint, 36 pruebas, build) y probó contra la base real (13 casos)** y luego se retiró del stack. La copia con el `.env` completo está en `compartir/GUIA_DESARROLLO_PANAMERICANA.md`, ignorada por git.
 
-**En curso:** Sprint 2 (22/09 → 03/10). El Sprint 1 cerró el 19/09; **falta registrar el resultado de su Review** en el backlog.
+**En curso:** Sprint 2 (22/09 → 03/10). El Sprint 1 cerró el 19/09 sin sus módulos: sus tarjetas se completan **al inicio del Sprint 2** en el repositorio del equipo, guiadas por `REPLICACION_SPRINT_01.md`. Agenda apretada: las fechas de vencimiento de Trello no se usan.
 
 **Próximos pasos (en orden)**
-0. **Entregar al equipo la corrección del modelo v2.0** (`docs/repo2/CORRECCIONES_02.md`) y la guía actualizada, **antes** de que empiecen las tarjetas PAN-13 a PAN-23.
-1. **Invitar al equipo al tablero de Trello:** hoy el único miembro es la cuenta conectada "Oya Oya". La integración no envía invitaciones: se hace desde la interfaz de Trello con los correos del §2 (falta el de Ángel).
-2. **Compartir la guía con el equipo:** enviar `compartir/GUIA_DESARROLLO_PANAMERICANA.md` por un canal privado. **No** se sube al repositorio 2 (regla: sin `.md`).
+0. **Ángel ejecuta `REPLICACION_SPRINT_01.md`**: contrato `shared/` el día 1, luego PAN-41 y PAN-08 A, PAN-42, PAN-03/04 y PAN-06/07/08 B; cierre con la prueba de aceptación y la comparación entre repositorios. Asignar a mano a John en PAN-41 y a Grisel en PAN-42.
+1. **Compartir la guía actualizada (v1.2)** con el equipo: `compartir/GUIA_DESARROLLO_PANAMERICANA.md` por un canal privado. **No** se sube al repositorio 2 (regla: sin `.md`).
+2. Cuando el equipo termine el Sprint 1: registrar el resultado en el backlog (✅ y velocidad real) y recalibrar la capacidad.
 3. **PAN-02 (Ángel):** colaboradores en GitHub, protección de `main` y ramas `dev/*`.
-4. **Review del Sprint 1 (sábado 19/09):** marcar ✅ en el backlog, recalibrar la capacidad con la velocidad real y pasar lo no terminado al inicio del Sprint 2 (backlog §7.3).
-5. **Solo si el usuario lo pide:** escribir `docs/guias-sprint/GUIA_SPRINT_02.md` y cargar en Trello las tarjetas PAN-10 a PAN-23 antes del Planning del martes 22/09. Hasta entonces, **en Trello solo existe el Sprint 1**.
-6. En la Review del Sprint 2 (03/10): **agendar la fase final de despliegue** (PAN-09 y PAN-24).
-7. PAN-10 (Sprint 2): login con validación por JWKS. Después, desactivar las claves *legacy* y recién entonces revocar la clave HS256 (§8).
-8. Confirmar con el docente si existe el Sprint 3 (si no, aplicar la contingencia del backlog §7.1).
+4. **Solo si el usuario lo pide:** construir aquí el Sprint 2 como referencia, escribir `docs/guias-sprint/GUIA_SPRINT_02.md` / `REPLICACION_SPRINT_02.md` y cargar en Trello las tarjetas PAN-10 a PAN-23. Hasta entonces, **en Trello solo existe el Sprint 1** (PAN-01 a PAN-08, PAN-41 y PAN-42).
+5. En la Review del Sprint 2 (03/10): **agendar la fase final de despliegue** (PAN-09 y PAN-24).
+6. PAN-10 (Sprint 2): login con validación por JWKS. Después, desactivar las claves *legacy* y recién entonces revocar la clave HS256 (§8).
+7. Confirmar con el docente si existe el Sprint 3 (si no, aplicar la contingencia del backlog §7.1).
 
 ---
 
@@ -79,8 +82,8 @@
 
 | Etapa | Fechas | Estado | Incremento |
 |---|---|---|---|
-| Sprint 1 — Base operativa | 08/09 → 19/09 | 🔄 En curso | Entorno local, terminales, usuarios, clientes y maqueta del portal |
-| Sprint 2 — MVP 1 | 22/09 → 03/10 | Confirmado | Venta web por tramos con control de concurrencia y login del backoffice |
+| Sprint 1 — Base operativa | 08/09 → 19/09 | ✅ Referencia lista (23/09) · el equipo lo completa al inicio del Sprint 2 | Entorno local, terminales, usuarios, clientes y maqueta del portal |
+| Sprint 2 — MVP 1 | 22/09 → 03/10 | 🔄 En curso | Venta web por tramos con control de concurrencia y login del backoffice |
 | Sprint 3 — MVP 2 | 06/10 → 17/10 | ⚠️ Sin confirmar | Taquilla, anulación, encomiendas, boleto QR, panel con predicción de demanda y PWA |
 | Fase final — Nube | Fecha a definir | ⏳ | Despliegue en Vercel + Supabase (obligatorio: sostiene *cloud computing*) |
 
@@ -118,7 +121,11 @@ npm run db:verificar   # prueba la conexión y lista las tablas
 - **Web:** `web/src/modulos/<modulo>/{servicios,hooks,componentes}` y páginas en `web/src/app/`. Los componentes nunca usan `fetch`.
 - **Rutas de Next.js:** los grupos entre paréntesis no cambian la URL. `app/page.tsx` y `app/(publico)/page.tsx` chocan en `/`, así que al crear el portal público se elimina `app/page.tsx` (tarjeta PAN-08).
 - **Un dato se llama igual** en la base, el backend y la web (`numero_pisos`).
-- **Módulo de referencia:** `buses` (incluye la regla de placa boliviana en `Bus.crear`).
+- **Módulo de referencia:** `buses` (incluye la regla de placa boliviana en `Bus.crear`). Para módulos con personas, `clientes`; para relaciones con catálogos, `terminales`.
+- **Núcleo compartido (Sprint 1):** `backend/src/compartido/dominio/Persona.ts` (`crearPersona` y reglas bolivianas), `erroresPersona.ts`, `erroresComunes.ts`; `compartido/adaptadores/pg/` (`enTransaccion`, `guardarPersona`, `CODIGOS_PG`). Web: `compartido/componentes/` (`Boton`, `Campo`, `CampoSeleccion`, `MenuLateral`), `compartido/utilidades/fechas.ts` y `modulos/catalogos` (`useCiudades`, `useTiposDocumento`, `useRoles`). Si algo lo usan dos módulos o más, va en `compartido/`.
+- **Forma del JSON:** los roles de una persona (cliente, usuario, chofer) se devuelven **aplanados** con los campos de `personas`; una referencia a otra entidad va **anidada** con su nombre en singular (`terminal.ciudad`). Tras guardar, los casos de uso **vuelven a leer** el registro (una persona existente conserva sus nombres).
+- **Menú del panel:** `web/src/compartido/componentes/MenuLateral.tsx` (arreglo `OPCIONES`), ya no `layout.tsx`.
+- **Portada estática:** "hoy" se calcula en el navegador al validar (`hoyEnBolivia`) y los `input type=date` con `min`/`max` llevan `suppressHydrationWarning`.
 
 ---
 
@@ -147,7 +154,8 @@ npm run db:verificar   # prueba la conexión y lista las tablas
 
 - **Tablero:** https://trello.com/b/ida3R2kt/panamericana (privado) · cuenta conectada **"Oya Oya"** · espacio de trabajo *DarkMode*.
 - **Listas** (el equipo las renombró; respetar esos nombres): `Por Hacer` → `En Progreso` → `Testing` → `Completao`.
-- **Tarjetas:** Sprint 1, PAN-01 a PAN-08, con fecha límite 19/09 09:00 de La Paz (`2026-09-19T13:00:00.000Z`). **PAN-09 está archivada** porque el despliegue pasó a la fase final.
+- **Tarjetas:** Sprint 1, PAN-01 a PAN-08 (fecha límite original 19/09; ya no se usa) más **PAN-41** y **PAN-42** (23/09, sin fecha). **PAN-09 está archivada** porque el despliegue pasó a la fase final. Las descripciones reflejan el modelo v2.0 y el código de referencia del 23/09.
+- **Miembros:** los cinco integrantes ya están en el tablero; la integración no asigna, así que los responsables de tarjetas nuevas los agrega Ángel a mano.
 - **Formato de tarjeta:**
   - Título: `PAN-xx · Trabajo · Responsable · N pts`.
   - Descripción (máx. 2048 caracteres): historia de usuario, archivos a crear, reglas de negocio, rama y revisor.
@@ -178,13 +186,17 @@ npm run db:verificar   # prueba la conexión y lista las tablas
   - La computadora guarda **dos cuentas de GitHub** (Z&P y AngelParedesH20). Por eso el remoto de este repositorio lleva el usuario en la URL (`https://ZPSoftwareFastSolutions@github.com/ZPSoftwareFastSolutions/panamericana-base.git`). Sin eso, el administrador de credenciales abre un selector de cuenta y el `push` se queda esperando.
 - **Herramientas:**
   - Los *heredoc* muy largos (más de ~5 KB) fallan en la herramienta Bash: usar la herramienta de escritura de archivos.
-  - Para parches con barras invertidas, escribir un script de Python con cadenas *raw* en el scratchpad.
+  - **No hay Python en esta computadora**: los parches y verificaciones se hacen con scripts de **Node** en el scratchpad (para usar `pg` desde el scratchpad: `createRequire('F:/Universidad/6to/Proyecto III/project_bus/package.json')`).
+  - Varios `.md` usan saltos de línea CRLF: normalizar a LF antes de buscar texto y restaurar al guardar.
+  - `next dev` crea `web/AGENTS.md` y `web/CLAUDE.md` cuando detecta un asistente de IA y cambia `web/next-env.d.ts`. Están excluidos en `.git/info/exclude`; borrarlos y revertir `next-env.d.ts` después de levantar la web. **Nunca** van al repositorio 2.
+  - Para detener los servidores: buscar el PID del puerto (4000 o 3000) con `netstat -ano` y `taskkill //PID <pid> //T //F`.
 - **Mantener al día los documentos** según la tabla del §12 cada vez que cambie algo.
 - **Guía del equipo:** si cambia algo del stack que la guía enseña (estructura, `shared`, `clienteHttp`, convenciones, `.env`), actualizar `docs/equipo/GUIA_DESARROLLO.md`, volver a verificar su código y regenerar la copia de `compartir/`.
   - Verificación: extraer los bloques que empiezan con `// archivo:` y aplicar los fragmentos `// en:`; correr lint, pruebas y build; probar la API; **retirar el ejemplo** y borrar los datos de prueba.
   - La copia se genera reemplazando `<CONTRASEÑA_DE_LA_BASE>` con la `DATABASE_URL` de `backend/.env`. La versión versionada nunca lleva la contraseña.
   - Contenido limpio: sin repositorio base, Z&P, documentos internos ni códigos `HU-`. Solo puede mencionar asistentes de IA de forma genérica, como apoyo del integrante.
-  - El ejemplo `choferes` **no** está en el stack a propósito. Si alguien implementa HU-013 (choferes), revisar que la guía no contradiga ese código.
+  - El ejemplo `choferes` **no** está en el stack a propósito. Desde la v1.2 (23/09) usa el núcleo compartido (`crearPersona`, `guardarPersona`, `enTransaccion`) y los componentes `Campo`/`Boton`. Si alguien implementa HU-013 (choferes), revisar que la guía no contradiga ese código.
+  - **Antes de extraer el ejemplo, hacer commit del trabajo pendiente**: el script edita `endpoints.ts`, `index.ts`, `contenedor.ts`, `rutas.ts` y `MenuLateral.tsx`, y la limpieza se hace con `git checkout` de esos archivos.
 
 ---
 
@@ -196,11 +208,11 @@ npm run db:verificar   # prueba la conexión y lista las tablas
 | `PLANIFICACION.md` | Roles, stack, reglas R1–R7, Scrum, calendario, roadmap, tecnologías emergentes, riesgos y pendientes | Cambian roles, fechas, reglas o riesgos |
 | `PRODUCT_BACKLOG.md` | Épicas, historias, decisiones de alcance, tarjetas por sprint, carga y contingencia | Cambia el alcance, una tarjeta o su estado |
 | `ARQUITECTURA_CLEAN.md` | Guía de trabajo: puesta en marcha, mapa del repositorio, flujo completo y recetas | Cambia la estructura o una convención |
-| `PROPUESTA_BD.md` | Modelo de datos v1.0, migraciones, datos de prueba y preguntas abiertas | Hay una migración nueva |
+| `PROPUESTA_BD.md` | Modelo de datos v2.0, migraciones, datos de prueba y preguntas abiertas | Hay una migración nueva |
 | `REPLICACION_REPO2.md` | Reglas de aislamiento, copia al repositorio 2, ramas y sincronización | Cambia cómo se transfiere al equipo |
 | `docs/adr/` | ADR-001 concurrencia · ADR-002 despliegue · ADR-003 Supabase | Se toma o cambia una decisión técnica |
 | `docs/guias-sprint/` | `GUIA_SPRINT_01.md` y la plantilla (se convierten en tarjetas, no se copian) | Se planifica un sprint |
-| `docs/repo2/` | `README.md` básico del repositorio 2 · `CORRECCIONES_NN.md` | Hay cambios para el equipo |
+| `docs/repo2/` | `README.md` básico del repositorio 2 · `CORRECCIONES_NN.md` (01 y 02 ✅) · `REPLICACION_SPRINT_NN.md` (gestión de cada sprint en el repositorio del equipo) | Hay cambios para el equipo o se construye un sprint |
 | `docs/bd/ANALISIS_NORMALIZACION.md` | Verificación de formas normales del modelo v1.0 y propuesta v2.0 (26 tablas + 4 vistas) | Se decide sobre la propuesta o cambia el modelo |
 | `docs/equipo/GUIA_DESARROLLO.md` | Guía para los 5 integrantes con el ejemplo `choferes` y el `.env` (con marcador en lugar de la contraseña) | Cambia el stack, una convención o el `.env` |
 | `compartir/` *(ignorada por git)* | Copia de la guía con el `.env` completo, lista para enviar al equipo | Se regenera cada vez que cambia la guía |
@@ -224,3 +236,6 @@ npm run db:verificar   # prueba la conexión y lista las tablas
 | 15/09 | El repositorio 2 lo administra AngelParedesH20; sin rastros de Z&P (correcciones aplicadas) |
 | 15/09 | Trello solo con el Sprint 1 |
 | 22/09 | Revisión de normalización: modelo **v2.0** (26 tablas + 4 vistas) con `personas`, catálogos, vistas para los datos calculados y integridad del tramo en la base. Descongelamiento **único** de nombres, hecho antes del código del Sprint 2; nombres recongelados |
+| 23/09 | Sprint 1 construido y validado como **referencia** en este repositorio; el equipo lo replica con `REPLICACION_SPRINT_01.md` (contrato `shared/` primero, PR chicos compartidos antes que los módulos) |
+| 23/09 | Tarjetas nuevas PAN-41 (núcleo de personas, John) y PAN-42 (catálogos, Grisel): las piezas que usan varios módulos tienen dueño |
+| 23/09 | Núcleo compartido `compartido/` para reglas de persona y transacciones; JSON aplanado para personas y anidado para referencias |
