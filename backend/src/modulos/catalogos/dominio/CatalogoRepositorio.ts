@@ -5,4 +5,5 @@ export interface CatalogoRepositorio {
   listarCiudades(): Promise<Ciudad[]>;
   listarTiposDocumento(): Promise<ElementoCatalogo[]>;
   listarRoles(): Promise<ElementoCatalogo[]>;
+  listarTiposAsiento(): Promise<ElementoCatalogo[]>;
 }

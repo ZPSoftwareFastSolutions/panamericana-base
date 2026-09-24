@@ -10,15 +10,18 @@ import { busRutas } from './modulos/buses/adaptadores/busRutas';
 import { catalogoRutas } from './modulos/catalogos/adaptadores/catalogoRutas';
 import { clienteRutas } from './modulos/clientes/adaptadores/clienteRutas';
 import { croquisRutas } from './modulos/croquis/adaptadores/croquisRutas';
+import { encomiendaRutas } from './modulos/encomiendas/adaptadores/encomiendaRutas';
 import { rutaRutas } from './modulos/rutas/adaptadores/rutaRutas';
 import { sesionRutas } from './modulos/sesion/adaptadores/sesionRutas';
 import { terminalRutas } from './modulos/terminales/adaptadores/terminalRutas';
 import { usuarioRutas } from './modulos/usuarios/adaptadores/usuarioRutas';
+import { taquillaRutas } from './modulos/ventas/adaptadores/taquillaRutas';
 import { ventaRutas } from './modulos/ventas/adaptadores/ventaRutas';
 import { viajeRutas } from './modulos/viajes/adaptadores/viajeRutas';
 
 export function registrarRutas(app: Express): void {
-  // publicas (portal): catalogos, busqueda de viajes, asientos del tramo y compra como invitado
+  // publicas (portal): catalogos, busqueda de viajes, asientos del tramo, compra como invitado,
+  // boleto y seguimiento de encomiendas (encomiendaRutas mezcla publico y protegido)
   app.use(catalogoRutas(casosDeUso));
   app.use(ventaRutas(casosDeUso, limiteReservas));
 
@@ -31,4 +34,6 @@ export function registrarRutas(app: Express): void {
   app.use(clienteRutas(casosDeUso, autorizacion));
   app.use(rutaRutas(casosDeUso, autorizacion));
   app.use(viajeRutas(casosDeUso, autorizacion));
+  app.use(taquillaRutas(casosDeUso, autorizacion));
+  app.use(encomiendaRutas(casosDeUso, autorizacion));
 }

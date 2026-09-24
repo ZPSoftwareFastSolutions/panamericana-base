@@ -14,3 +14,11 @@ export function ocultarDocumentos(venta: VentaDetalle): VentaDetalle {
     })),
   };
 }
+
+/** el mismo cuidado para un pasaje suelto (boleto publico) */
+export function ocultarDocumentoDelPasajero<T extends { pasajero: { numero_documento: string } }>(pasaje: T): T {
+  return {
+    ...pasaje,
+    pasajero: { ...pasaje.pasajero, numero_documento: enmascararDocumento(pasaje.pasajero.numero_documento) },
+  };
+}

@@ -4,6 +4,10 @@ import Link from 'next/link';
 import { useSesion } from '../hooks/useSesion';
 
 const ACCESOS = [
+  { rol: 'vendedor', titulo: 'Taquilla', texto: 'Vender en efectivo y anular pasajes', ruta: '/admin/taquilla' },
+  { rol: 'administrador', titulo: 'Taquilla', texto: 'Vender en efectivo y anular pasajes', ruta: '/admin/taquilla' },
+  { rol: 'encomiendas', titulo: 'Encomiendas', texto: 'Registrar, despachar y entregar envios', ruta: '/admin/encomiendas' },
+  { rol: 'administrador', titulo: 'Encomiendas', texto: 'Registrar, despachar y entregar envios', ruta: '/admin/encomiendas' },
   { rol: 'administrador', titulo: 'Programar viajes', texto: 'Ruta, bus, horario y tarifas', ruta: '/admin/viajes' },
   { rol: 'administrador', titulo: 'Rutas y paradas', texto: 'Recorridos que se venden por tramos', ruta: '/admin/rutas' },
   { rol: 'vendedor', titulo: 'Clientes', texto: 'Pasajeros, remitentes y destinatarios', ruta: '/admin/clientes' },

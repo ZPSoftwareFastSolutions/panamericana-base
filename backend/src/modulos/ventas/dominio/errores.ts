@@ -48,3 +48,30 @@ export class VentaNoPendienteError extends ErrorDeDominio {
     super(`La venta ya esta ${estado}: no se puede pagar otra vez`);
   }
 }
+
+export class PasajeNoEncontradoError extends ErrorDeDominio {
+  readonly codigo = 'pasaje_no_encontrado';
+  readonly estadoHttp = 404;
+
+  constructor(codigo: string) {
+    super(`No existe un pasaje con el codigo ${codigo}`);
+  }
+}
+
+export class PasajeNoAnulableError extends ErrorDeDominio {
+  readonly codigo = 'pasaje_no_anulable';
+  readonly estadoHttp = 409;
+
+  constructor(estado: string) {
+    super(`El pasaje esta ${estado}: solo se anula un pasaje pagado`);
+  }
+}
+
+export class AnulacionFueraDePlazoError extends ErrorDeDominio {
+  readonly codigo = 'anulacion_fuera_de_plazo';
+  readonly estadoHttp = 409;
+
+  constructor(horas: number) {
+    super(`Un pasaje se anula hasta ${horas} horas antes de subir al bus`);
+  }
+}

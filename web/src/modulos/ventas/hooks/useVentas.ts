@@ -5,6 +5,7 @@ import { ventasServicio } from '../servicios/ventasServicio';
 
 export const clavesVentas = {
   porCodigo: (codigo: string) => ['ventas', codigo] as const,
+  pasaje: (codigo: string) => ['pasajes', codigo] as const,
 };
 
 /** HOOK: reservar los asientos elegidos (crea la venta pendiente) */
@@ -32,5 +33,36 @@ export function usePagarVenta(codigo: string) {
     mutationFn: () => ventasServicio.pagar(codigo),
     onSuccess: (venta) => clienteQuery.setQueryData(clavesVentas.porCodigo(codigo), venta),
     onError: () => clienteQuery.invalidateQueries({ queryKey: clavesVentas.porCodigo(codigo) }),
+  });
+}
+
+/** HOOK: un pasaje por su codigo (boleto y consulta en taquilla). Sin codigo no pide nada */
+export function usePasaje(codigo: string) {
+  return useQuery({
+    queryKey: clavesVentas.pasaje(codigo),
+    queryFn: () => ventasServicio.pasaje(codigo),
+    enabled: codigo.trim().length >= 3,
+    retry: false,
+  });
+}
+
+/** HOOK (taquilla): vender y cobrar en efectivo; el croquis del viaje se vuelve a pedir */
+export function useVenderEnTaquilla() {
+  const clienteQuery = useQueryClient();
+  return useMutation({
+    mutationFn: ventasServicio.venderEnTaquilla,
+    onSettled: () => clienteQuery.invalidateQueries({ queryKey: ['viajes'] }),
+  });
+}
+
+/** HOOK (taquilla): anular un pasaje; actualiza el pasaje y los croquis */
+export function useAnularPasaje() {
+  const clienteQuery = useQueryClient();
+  return useMutation({
+    mutationFn: ventasServicio.anularPasaje,
+    onSuccess: (resultado) => {
+      clienteQuery.setQueryData(clavesVentas.pasaje(resultado.pasaje.codigo), resultado.pasaje);
+      clienteQuery.invalidateQueries({ queryKey: ['viajes'] });
+    },
   });
 }

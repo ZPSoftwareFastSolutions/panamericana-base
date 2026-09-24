@@ -13,6 +13,8 @@ import { usePathname } from 'next/navigation';
  */
 const OPCIONES = [
   { etiqueta: 'Inicio', ruta: '/admin', roles: ['administrador', 'vendedor', 'encomiendas'] },
+  { etiqueta: 'Taquilla', ruta: '/admin/taquilla', roles: ['administrador', 'vendedor'] },
+  { etiqueta: 'Encomiendas', ruta: '/admin/encomiendas', roles: ['administrador', 'encomiendas'] },
   { etiqueta: 'Viajes', ruta: '/admin/viajes', roles: ['administrador'] },
   { etiqueta: 'Rutas', ruta: '/admin/rutas', roles: ['administrador'] },
   { etiqueta: 'Buses', ruta: '/admin/buses', roles: ['administrador'] },

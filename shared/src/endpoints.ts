@@ -29,8 +29,12 @@ export const RUTAS_API = {
     /** POST generar el croquis estandar de un bus sin asientos (formato para Express) */
     generar: '/v1/buses/:id/asientos/generar',
     /** formato para la web */
+    /** PUT cambiar el tipo de un asiento (formato para Express) */
+    asiento: '/v1/buses/:id/asientos/:asientoId',
+    /** formato para la web */
     delBus: (busId: string): string => `/v1/buses/${busId}/asientos`,
     generarDelBus: (busId: string): string => `/v1/buses/${busId}/asientos/generar`,
+    asientoDelBus: (busId: string, asientoId: string): string => `/v1/buses/${busId}/asientos/${asientoId}`,
   },
 
   catalogos: {
@@ -40,6 +44,8 @@ export const RUTAS_API = {
     tiposDocumento: '/v1/catalogos/tipos-documento',
     /** GET listar los roles de usuario */
     roles: '/v1/catalogos/roles',
+    /** GET listar los tipos de asiento: normal, semicama, cama */
+    tiposAsiento: '/v1/catalogos/tipos-asiento',
   },
 
   terminales: {
@@ -71,12 +77,15 @@ export const RUTAS_API = {
     buscar: '/v1/viajes/buscar',
     /** GET asientos libres para un tramo (portal, sin sesion) — formato para Express */
     asientos: '/v1/viajes/:id/asientos',
+    /** PUT reemplazar las tarifas de un viaje programado (formato para Express) */
+    tarifas: '/v1/viajes/:id/tarifas',
     /** formato para la web */
     buscarCon: (origen: string, destino: string, fecha: string): string =>
       `/v1/viajes/buscar?origen=${encodeURIComponent(origen)}&destino=${encodeURIComponent(destino)}` +
       `&fecha=${encodeURIComponent(fecha)}`,
     asientosDelTramo: (viajeId: string, desde: number, hasta: number): string =>
       `/v1/viajes/${viajeId}/asientos?desde=${desde}&hasta=${hasta}`,
+    tarifasDelViaje: (viajeId: string): string => `/v1/viajes/${viajeId}/tarifas`,
   },
 
   ventas: {
@@ -89,6 +98,38 @@ export const RUTAS_API = {
     /** formato para la web */
     detalle: (codigo: string): string => `/v1/ventas/${encodeURIComponent(codigo)}`,
     pagarVenta: (codigo: string): string => `/v1/ventas/${encodeURIComponent(codigo)}/pagar`,
+  },
+
+  taquilla: {
+    /** POST vender en taquilla: reserva y cobra en efectivo (vendedor o administrador) */
+    ventas: '/v1/taquilla/ventas',
+  },
+
+  pasajes: {
+    /** GET ver un pasaje por su codigo: el boleto (publico) — formato para Express */
+    porCodigo: '/v1/pasajes/:codigo',
+    /** POST anular un pasaje pagado hasta 2 h antes de subir (vendedor o administrador) */
+    anular: '/v1/pasajes/:codigo/anular',
+    /** formato para la web */
+    detalle: (codigo: string): string => `/v1/pasajes/${encodeURIComponent(codigo)}`,
+    anularPasaje: (codigo: string): string => `/v1/pasajes/${encodeURIComponent(codigo)}/anular`,
+  },
+
+  encomiendas: {
+    /** GET listar (?estado=) · POST registrar y cobrar */
+    base: '/v1/encomiendas',
+    /** GET detalle con su historial (formato para Express) */
+    porCodigo: '/v1/encomiendas/:codigo',
+    /** POST cambiar el estado (formato para Express) */
+    estado: '/v1/encomiendas/:codigo/estado',
+    /** GET seguimiento publico, sin datos personales (formato para Express) */
+    seguimiento: '/v1/seguimiento/:codigo',
+    /** formato para la web */
+    listarCon: (estado?: string): string =>
+      estado ? `/v1/encomiendas?estado=${encodeURIComponent(estado)}` : '/v1/encomiendas',
+    detalle: (codigo: string): string => `/v1/encomiendas/${encodeURIComponent(codigo)}`,
+    cambiarEstado: (codigo: string): string => `/v1/encomiendas/${encodeURIComponent(codigo)}/estado`,
+    seguimientoDe: (codigo: string): string => `/v1/seguimiento/${encodeURIComponent(codigo)}`,
   },
 
   clientes: {

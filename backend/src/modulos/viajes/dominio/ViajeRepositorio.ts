@@ -59,6 +59,13 @@ export interface ViajeRepositorio {
   busOcupado(bus_id: string, salida: Date, llegada: Date): Promise<boolean>;
   guardar(viaje: NuevoViaje): Promise<void>;
 
+  /** estado, salida y tipos de asiento del bus del viaje (null si no existe) */
+  datosParaEditarTarifas(
+    viaje_id: string,
+  ): Promise<{ estado: string; fecha_salida: Date; placa: string; tipos_asiento: string[] } | null>;
+  /** reemplaza todas las tarifas del viaje en una transaccion */
+  reemplazarTarifas(viaje_id: string, tarifas: TarifaEntrada[]): Promise<void>;
+
   /** fecha en formato AAAA-MM-DD, en hora de La Paz */
   buscarCandidatos(ciudad_origen_id: string, ciudad_destino_id: string, fecha: string): Promise<CandidatoBusqueda[]>;
   buscarConParadas(viaje_id: string): Promise<ViajeConParadas | null>;

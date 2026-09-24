@@ -8,6 +8,7 @@ export const clavesCatalogos = {
   ciudades: ['catalogos', 'ciudades'] as const,
   tiposDocumento: ['catalogos', 'tipos-documento'] as const,
   roles: ['catalogos', 'roles'] as const,
+  tiposAsiento: ['catalogos', 'tipos-asiento'] as const,
 };
 
 // los catalogos casi nunca cambian: se guardan 10 minutos en cache
@@ -36,6 +37,15 @@ export function useRoles() {
   return useQuery({
     queryKey: clavesCatalogos.roles,
     queryFn: catalogosServicio.roles,
+    staleTime: DIEZ_MINUTOS,
+  });
+}
+
+/** HOOK: tipos de asiento (normal, semicama, cama) para el croquis */
+export function useTiposAsiento() {
+  return useQuery({
+    queryKey: clavesCatalogos.tiposAsiento,
+    queryFn: catalogosServicio.tiposAsiento,
     staleTime: DIEZ_MINUTOS,
   });
 }

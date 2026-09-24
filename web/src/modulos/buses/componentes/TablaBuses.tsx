@@ -1,5 +1,6 @@
 'use client';
 
+import Link from 'next/link';
 import { useBuses } from '../hooks/useBuses';
 
 export function TablaBuses() {
@@ -18,6 +19,7 @@ export function TablaBuses() {
           <th className="py-2">Modelo</th>
           <th className="py-2">Pisos</th>
           <th className="py-2">Estado</th>
+          <th className="py-2" />
         </tr>
       </thead>
       <tbody>
@@ -28,6 +30,11 @@ export function TablaBuses() {
             <td className="py-2">{bus.modelo}</td>
             <td className="py-2">{bus.numero_pisos}</td>
             <td className="py-2">{bus.estado}</td>
+            <td className="py-2">
+              <Link href={`/admin/buses/${bus.id}/croquis`} className="text-blue-700 hover:underline">
+                Croquis
+              </Link>
+            </td>
           </tr>
         ))}
       </tbody>

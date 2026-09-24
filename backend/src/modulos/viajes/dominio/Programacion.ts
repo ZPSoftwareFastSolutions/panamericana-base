@@ -22,23 +22,11 @@ export type NuevoViaje = {
 
 const PRECIO_MAXIMO = 5000;
 
-export function programarViaje(
-  datos: { ruta: RutaParaProgramar; bus: BusParaProgramar; fecha_salida: Date; tarifas: TarifaEntrada[] },
-  ahora: Date,
-): NuevoViaje {
-  const { ruta, bus, fecha_salida, tarifas } = datos;
-
-  if (!ruta.activo) throw new ViajeInvalidoError(`La ruta "${ruta.nombre}" esta inactiva`);
-  if (bus.estado !== 'activo') {
-    throw new ViajeInvalidoError(`El bus ${bus.placa} esta en estado "${bus.estado}" y no puede viajar`);
-  }
-  if (bus.tipos_asiento.length === 0) {
-    throw new ViajeInvalidoError(`El bus ${bus.placa} todavia no tiene croquis de asientos`);
-  }
-  if (Number.isNaN(fecha_salida.getTime()) || fecha_salida <= ahora) {
-    throw new ViajeInvalidoError('La fecha de salida debe ser futura');
-  }
-
+/**
+ * Tarifas de un viaje: una sola por cada tipo de asiento que tiene el bus (ni mas ni menos),
+ * mayor que 0, hasta el PRECIO_MAXIMO y con 2 decimales como maximo. La usan programar y editar.
+ */
+export function validarTarifas(tarifas: TarifaEntrada[], bus: { placa: string; tipos_asiento: string[] }): void {
   const tipos = tarifas.map((t) => t.tipo_asiento);
   if (new Set(tipos).size !== tipos.length) {
     throw new ViajeInvalidoError('Cada tipo de asiento lleva una sola tarifa');
@@ -59,6 +47,26 @@ export function programarViaje(
       );
     }
   }
+}
+
+export function programarViaje(
+  datos: { ruta: RutaParaProgramar; bus: BusParaProgramar; fecha_salida: Date; tarifas: TarifaEntrada[] },
+  ahora: Date,
+): NuevoViaje {
+  const { ruta, bus, fecha_salida, tarifas } = datos;
+
+  if (!ruta.activo) throw new ViajeInvalidoError(`La ruta "${ruta.nombre}" esta inactiva`);
+  if (bus.estado !== 'activo') {
+    throw new ViajeInvalidoError(`El bus ${bus.placa} esta en estado "${bus.estado}" y no puede viajar`);
+  }
+  if (bus.tipos_asiento.length === 0) {
+    throw new ViajeInvalidoError(`El bus ${bus.placa} todavia no tiene croquis de asientos`);
+  }
+  if (Number.isNaN(fecha_salida.getTime()) || fecha_salida <= ahora) {
+    throw new ViajeInvalidoError('La fecha de salida debe ser futura');
+  }
+
+  validarTarifas(tarifas, bus);
 
   return {
     id: crypto.randomUUID(),

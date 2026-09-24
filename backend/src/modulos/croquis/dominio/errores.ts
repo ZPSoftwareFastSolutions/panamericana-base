@@ -35,3 +35,24 @@ export class AsientoDuplicadoError extends ErrorDeDominio {
     super(motivo);
   }
 }
+
+export class AsientoNoEncontradoError extends ErrorDeDominio {
+  readonly codigo = 'asiento_no_encontrado';
+  readonly estadoHttp = 404;
+
+  constructor(id: string) {
+    super(`El bus no tiene un asiento con el id ${id}`);
+  }
+}
+
+export class CroquisEnUsoError extends ErrorDeDominio {
+  readonly codigo = 'croquis_en_uso';
+  readonly estadoHttp = 409;
+
+  constructor(placa: string, tipo: string, viajes: number) {
+    super(
+      `El bus ${placa} tiene ${viajes} viaje(s) programado(s) sin precio para "${tipo}": ` +
+        'ese asiento no se podria vender. Usa un tipo que ya tenga precio',
+    );
+  }
+}

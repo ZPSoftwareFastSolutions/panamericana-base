@@ -23,6 +23,11 @@ export type Viaje = {
   asientos_vendidos: number;
 };
 
+/** reemplaza las tarifas de un viaje programado: una por cada tipo de asiento del bus */
+export type EditarTarifasEntrada = {
+  tarifas: Tarifa[];
+};
+
 export type ProgramarViajeEntrada = {
   ruta_id: string;
   bus_id: string;

@@ -2,11 +2,13 @@ import { Router } from 'express';
 import type { RequestHandler } from 'express';
 import { z } from 'zod';
 import { RUTAS_API } from '@panamericana/shared';
+import type { ObtenerPasaje } from '../casos-de-uso/ObtenerPasaje';
 import type { ObtenerVenta } from '../casos-de-uso/ObtenerVenta';
 import type { PagarVenta } from '../casos-de-uso/PagarVenta';
 import type { ReservarAsientos } from '../casos-de-uso/ReservarAsientos';
 
-const esquemaReserva = z.object({
+/** forma de una reserva (la usa tambien la taquilla) */
+export const esquemaReserva = z.object({
   viaje_id: z.uuid(),
   orden_origen: z.number().int(),
   orden_destino: z.number().int(),
@@ -27,10 +29,16 @@ const esquemaCodigo = z.object({ codigo: z.string().min(3).max(20) });
 
 /**
  * Adaptador HTTP del modulo ventas para el PORTAL (compra como invitado, sin sesion).
- * El canal es siempre "web" y el pago simulado con "tarjeta". La taquilla tiene sus propias rutas.
+ * El canal es siempre "web" y el pago simulado con "tarjeta". La taquilla tiene sus propias
+ * rutas (taquillaRutas.ts). Tambien es publico el boleto de un pasaje.
  */
 export function ventaRutas(
-  casos: { reservarAsientos: ReservarAsientos; obtenerVenta: ObtenerVenta; pagarVenta: PagarVenta },
+  casos: {
+    reservarAsientos: ReservarAsientos;
+    obtenerVenta: ObtenerVenta;
+    pagarVenta: PagarVenta;
+    obtenerPasaje: ObtenerPasaje;
+  },
   limiteReservas: RequestHandler,
 ): Router {
   const router = Router();
@@ -50,6 +58,12 @@ export function ventaRutas(
   router.post(RUTAS_API.ventas.pagar, async (req, res) => {
     const { codigo } = esquemaCodigo.parse(req.params);
     res.json(await casos.pagarVenta.ejecutar(codigo, { metodo: 'tarjeta' }));
+  });
+
+  // publico: el boleto de un pasaje (documento oculto)
+  router.get(RUTAS_API.pasajes.porCodigo, async (req, res) => {
+    const { codigo } = esquemaCodigo.parse(req.params);
+    res.json(await casos.obtenerPasaje.ejecutar(codigo));
   });
 
   return router;

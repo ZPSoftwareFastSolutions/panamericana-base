@@ -8,6 +8,7 @@ export type { Cliente, RegistrarClienteEntrada } from './tipos/cliente';
 export type { RolInterno, SesionUsuario } from './tipos/sesion';
 export type {
   Asiento,
+  CambiarTipoAsientoEntrada,
   Croquis,
   GenerarCroquisEntrada,
   PisoCroquisEntrada,
@@ -17,6 +18,7 @@ export type { ParadaRuta, ParadaRutaEntrada, RegistrarRutaEntrada, Ruta } from '
 export type {
   AsientoDisponible,
   DisponibilidadTramo,
+  EditarTarifasEntrada,
   EstadoViaje,
   ProgramarViajeEntrada,
   PuntoDelTramo,
@@ -32,5 +34,15 @@ export type {
   PasajeDeVenta,
   PasajeroEntrada,
   ReservarEntrada,
+  VenderEnTaquillaEntrada,
   Venta,
 } from './tipos/venta';
+export type { AnulacionPasaje, Pasaje } from './tipos/pasaje';
+export type {
+  CambiarEstadoEncomiendaEntrada,
+  Encomienda,
+  EstadoEncomienda,
+  PersonaEncomiendaEntrada,
+  RegistrarEncomiendaEntrada,
+  SeguimientoEncomienda,
+} from './tipos/encomienda';

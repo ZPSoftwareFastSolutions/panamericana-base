@@ -37,3 +37,8 @@ export type RegistrarAsientoEntrada = {
   columna: number;
   tipo: string;
 };
+
+/** cambiar el tipo de un asiento desde el editor del croquis */
+export type CambiarTipoAsientoEntrada = {
+  tipo: string;
+};

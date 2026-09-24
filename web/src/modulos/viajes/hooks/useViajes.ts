@@ -1,6 +1,7 @@
 'use client';
 
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import type { EditarTarifasEntrada } from '@panamericana/shared';
 import { viajesServicio } from '../servicios/viajesServicio';
 
 export const clavesViajes = {
@@ -20,6 +21,15 @@ export function useProgramarViaje() {
   const clienteQuery = useQueryClient();
   return useMutation({
     mutationFn: viajesServicio.programar,
+    onSuccess: () => clienteQuery.invalidateQueries({ queryKey: clavesViajes.todos }),
+  });
+}
+
+/** HOOK (backoffice): cambia los precios de un viaje y refresca la lista */
+export function useEditarTarifas(viajeId: string) {
+  const clienteQuery = useQueryClient();
+  return useMutation({
+    mutationFn: (datos: EditarTarifasEntrada) => viajesServicio.editarTarifas(viajeId, datos),
     onSuccess: () => clienteQuery.invalidateQueries({ queryKey: clavesViajes.todos }),
   });
 }

@@ -3,6 +3,7 @@ import { z } from 'zod';
 import { RUTAS_API } from '@panamericana/shared';
 import type { Autorizacion } from '../../../compartido/adaptadores/http/autorizacion';
 import { ROLES_INTERNOS, SOLO_ADMINISTRADOR } from '../../../compartido/adaptadores/http/autorizacion';
+import type { CambiarTipoAsiento } from '../casos-de-uso/CambiarTipoAsiento';
 import type { GenerarCroquis } from '../casos-de-uso/GenerarCroquis';
 import type { ObtenerCroquis } from '../casos-de-uso/ObtenerCroquis';
 import type { RegistrarAsiento } from '../casos-de-uso/RegistrarAsiento';
@@ -22,6 +23,9 @@ const esquemaGenerar = z.object({
     .min(1),
 });
 
+const esquemaAsientoDelBus = z.object({ id: z.uuid(), asientoId: z.uuid() });
+const esquemaTipo = z.object({ tipo: z.string().min(1) });
+
 const esquemaAsiento = z.object({
   numero: z.number().int(),
   piso: z.number().int(),
@@ -32,7 +36,12 @@ const esquemaAsiento = z.object({
 
 /** Adaptador HTTP del modulo croquis: los asientos de un bus */
 export function croquisRutas(
-  casos: { obtenerCroquis: ObtenerCroquis; generarCroquis: GenerarCroquis; registrarAsiento: RegistrarAsiento },
+  casos: {
+    obtenerCroquis: ObtenerCroquis;
+    generarCroquis: GenerarCroquis;
+    registrarAsiento: RegistrarAsiento;
+    cambiarTipoAsiento: CambiarTipoAsiento;
+  },
   autorizacion: Autorizacion,
 ): Router {
   const router = Router();
@@ -52,6 +61,12 @@ export function croquisRutas(
     const { id } = esquemaBus.parse(req.params);
     const asiento = esquemaAsiento.parse(req.body);
     res.status(201).json(await casos.registrarAsiento.ejecutar(id, asiento));
+  });
+
+  router.put(RUTAS_API.croquis.asiento, autorizacion.requiere(...SOLO_ADMINISTRADOR), async (req, res) => {
+    const { id, asientoId } = esquemaAsientoDelBus.parse(req.params);
+    const { tipo } = esquemaTipo.parse(req.body);
+    res.json(await casos.cambiarTipoAsiento.ejecutar(id, asientoId, tipo));
   });
 
   return router;

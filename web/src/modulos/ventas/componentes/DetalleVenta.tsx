@@ -1,3 +1,4 @@
+import Link from 'next/link';
 import type { Venta } from '@panamericana/shared';
 import { formatearBs } from '@/compartido/utilidades/dinero';
 import { fechaHoraEnBolivia, horaEnBolivia } from '@/compartido/utilidades/fechas';
@@ -31,7 +32,14 @@ export function DetalleVenta({ venta }: { venta: Venta }) {
                 {pasaje.pasajero.tipo_documento.toUpperCase()} {pasaje.pasajero.numero_documento} · pasaje {pasaje.codigo}
               </span>
             </span>
-            <span className="whitespace-nowrap">{formatearBs(pasaje.precio)}</span>
+            <span className="flex flex-col items-end whitespace-nowrap">
+              {formatearBs(pasaje.precio)}
+              {pasaje.estado === 'pagado' && (
+                <Link href={`/boleto/${pasaje.codigo}`} className="text-xs text-blue-700 underline">
+                  Ver boleto
+                </Link>
+              )}
+            </span>
           </li>
         ))}
       </ul>

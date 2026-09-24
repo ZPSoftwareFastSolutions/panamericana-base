@@ -4,9 +4,12 @@ import type { CroquisRepositorio } from '../dominio/CroquisRepositorio';
 import {
   AsientoDuplicadoError,
   AsientoInvalidoError,
+  AsientoNoEncontradoError,
   BusNoEncontradoError,
+  CroquisEnUsoError,
   CroquisExistenteError,
 } from '../dominio/errores';
+import { CambiarTipoAsiento } from './CambiarTipoAsiento';
 import { GenerarCroquis } from './GenerarCroquis';
 import { RegistrarAsiento } from './RegistrarAsiento';
 
@@ -26,6 +29,12 @@ class CroquisEnMemoria implements CroquisRepositorio {
   }
   async guardarAsientos(_bus_id: string, asientos: DatosAsiento[]) {
     this.asientos.push(...asientos.map((a) => ({ ...a, id: `a-${a.numero}` })));
+  }
+  sinTarifa = 0;
+  async cambiarTipo(_bus_id: string, asiento_id: string, tipo: string) {
+    if (this.sinTarifa > 0) return { viajesSinPrecio: this.sinTarifa };
+    this.asientos = this.asientos.map((a) => (a.id === asiento_id ? { ...a, tipo } : a));
+    return { viajesSinPrecio: 0 };
   }
 }
 
@@ -94,5 +103,37 @@ describe('RegistrarAsiento', () => {
       registrar.ejecutar(BUS.id, { numero: 2, piso: 1, fila: 1, columna: 1, tipo: 'normal' }),
     ).rejects.toThrow(AsientoDuplicadoError);
     expect(repositorio.asientos).toHaveLength(1);
+  });
+});
+
+describe('CambiarTipoAsiento', () => {
+  async function busConCroquis() {
+    const repositorio = new CroquisEnMemoria();
+    await new GenerarCroquis(repositorio).ejecutar(BUS.id, [{ piso: 1, filas: 1, asientos_por_fila: 4, tipo: 'semicama' }]);
+    return { repositorio, cambiar: new CambiarTipoAsiento(repositorio) };
+  }
+
+  it('cambia el tipo de un asiento y devuelve el croquis actualizado', async () => {
+    const { cambiar } = await busConCroquis();
+
+    const croquis = await cambiar.ejecutar(BUS.id, 'a-2', 'cama');
+
+    expect(croquis.asientos.map((a) => a.tipo)).toEqual(['semicama', 'cama', 'semicama', 'semicama']);
+  });
+
+  it('no deja un asiento sin precio en los viajes ya programados del bus', async () => {
+    const { cambiar, repositorio } = await busConCroquis();
+    repositorio.sinTarifa = 2;
+
+    await expect(cambiar.ejecutar(BUS.id, 'a-1', 'cama')).rejects.toThrow(CroquisEnUsoError);
+    expect(repositorio.asientos[0]?.tipo).toBe('semicama');
+  });
+
+  it('tipo fuera del catalogo -> 400; asiento o bus inexistente -> 404', async () => {
+    const { cambiar } = await busConCroquis();
+
+    await expect(cambiar.ejecutar(BUS.id, 'a-1', 'ejecutivo')).rejects.toThrow(AsientoInvalidoError);
+    await expect(cambiar.ejecutar(BUS.id, 'a-99', 'cama')).rejects.toThrow(AsientoNoEncontradoError);
+    await expect(cambiar.ejecutar('otro-bus', 'a-1', 'cama')).rejects.toThrow(BusNoEncontradoError);
   });
 });

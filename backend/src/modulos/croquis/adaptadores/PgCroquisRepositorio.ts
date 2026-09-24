@@ -35,6 +35,25 @@ export class PgCroquisRepositorio implements CroquisRepositorio {
     return resultado.rows.map((fila) => fila.codigo);
   }
 
+  async cambiarTipo(bus_id: string, asiento_id: string, tipo: string): Promise<{ viajesSinPrecio: number }> {
+    return enTransaccion(this.db, async (conexion) => {
+      // turno por bus: nadie programa un viaje de este bus mientras se revisa y se cambia
+      await conexion.query('select id from buses where id = $1 for update', [bus_id]);
+      const sinPrecio = await conexion.query<{ n: number }>(
+        `select count(*)::int as n
+           from viajes v
+          where v.bus_id = $1 and v.estado = 'programado' and v.fecha_salida > now()
+            and not exists (select 1 from tarifas t where t.viaje_id = v.id and t.tipo_asiento = $2)`,
+        [bus_id, tipo],
+      );
+      const viajesSinPrecio = sinPrecio.rows[0]?.n ?? 0;
+      if (viajesSinPrecio === 0) {
+        await conexion.query('update asientos set tipo = $3 where id = $1 and bus_id = $2', [asiento_id, bus_id, tipo]);
+      }
+      return { viajesSinPrecio };
+    });
+  }
+
   async guardarAsientos(bus_id: string, asientos: DatosAsiento[]): Promise<void> {
     try {
       await enTransaccion(this.db, async (conexion) => {

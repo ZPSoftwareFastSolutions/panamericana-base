@@ -41,3 +41,18 @@ export async function guardarPersona(conexion: PoolClient, persona: Persona): Pr
   }
   return fila.id;
 }
+
+/**
+ * Guarda la persona y la deja registrada como CLIENTE (pasajero, remitente o destinatario).
+ * Si ya era cliente, se reutiliza. Devuelve el id del cliente.
+ */
+export async function guardarCliente(conexion: PoolClient, persona: Persona): Promise<string> {
+  const persona_id = await guardarPersona(conexion, persona);
+  const cliente = await conexion.query<{ id: string }>(
+    `insert into clientes (persona_id) values ($1)
+     on conflict (persona_id) do update set persona_id = excluded.persona_id
+     returning id`,
+    [persona_id],
+  );
+  return cliente.rows[0]!.id;
+}

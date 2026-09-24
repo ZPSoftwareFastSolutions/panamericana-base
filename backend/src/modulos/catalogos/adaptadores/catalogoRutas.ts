@@ -2,6 +2,7 @@ import { Router } from 'express';
 import { RUTAS_API } from '@panamericana/shared';
 import type { ListarCiudades } from '../casos-de-uso/ListarCiudades';
 import type { ListarRoles } from '../casos-de-uso/ListarRoles';
+import type { ListarTiposAsiento } from '../casos-de-uso/ListarTiposAsiento';
 import type { ListarTiposDocumento } from '../casos-de-uso/ListarTiposDocumento';
 
 /** Adaptador HTTP del modulo catalogos: solo consultas GET, sin datos de entrada */
@@ -9,6 +10,7 @@ export function catalogoRutas(casos: {
   listarCiudades: ListarCiudades;
   listarTiposDocumento: ListarTiposDocumento;
   listarRoles: ListarRoles;
+  listarTiposAsiento: ListarTiposAsiento;
 }): Router {
   const router = Router();
 
@@ -22,6 +24,10 @@ export function catalogoRutas(casos: {
 
   router.get(RUTAS_API.catalogos.roles, async (_req, res) => {
     res.json(await casos.listarRoles.ejecutar());
+  });
+
+  router.get(RUTAS_API.catalogos.tiposAsiento, async (_req, res) => {
+    res.json(await casos.listarTiposAsiento.ejecutar());
   });
 
   return router;

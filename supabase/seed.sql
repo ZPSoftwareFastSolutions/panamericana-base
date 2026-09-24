@@ -109,9 +109,11 @@ insert into viajes_choferes (viaje_id, chofer_id, rol) values
   ('00000000-0000-4000-8000-000000000701', '00000000-0000-4000-8000-000000000501', 'conductor')
 on conflict (viaje_id, chofer_id) do nothing;
 
--- precios del recorrido completo por tipo de asiento (en bolivianos)
+-- precios del recorrido completo: una tarifa por cada tipo de asiento que tiene el bus (en bolivianos)
+-- el bus 2045KLP solo tiene cama y semicama; versiones anteriores tenian tambien 'normal'
+delete from tarifas where viaje_id = '00000000-0000-4000-8000-000000000701' and tipo_asiento = 'normal';
+
 insert into tarifas (viaje_id, tipo_asiento, precio) values
-  ('00000000-0000-4000-8000-000000000701', 'normal', 80.00),
   ('00000000-0000-4000-8000-000000000701', 'semicama', 95.00),
   ('00000000-0000-4000-8000-000000000701', 'cama', 120.00)
 on conflict (viaje_id, tipo_asiento) do nothing;

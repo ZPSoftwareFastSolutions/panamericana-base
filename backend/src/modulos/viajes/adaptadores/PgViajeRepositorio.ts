@@ -132,6 +132,32 @@ export class PgViajeRepositorio implements ViajeRepositorio {
     });
   }
 
+  async datosParaEditarTarifas(viaje_id: string) {
+    const resultado = await this.db.query<{ estado: string; fecha_salida: Date; placa: string; tipos_asiento: string[] }>(
+      `select v.estado, v.fecha_salida, b.placa,
+              array(select distinct a.tipo from asientos a where a.bus_id = b.id) as tipos_asiento
+         from viajes v join buses b on b.id = v.bus_id
+        where v.id = $1`,
+      [viaje_id],
+    );
+    return resultado.rows[0] ?? null;
+  }
+
+  async reemplazarTarifas(viaje_id: string, tarifas: TarifaEntrada[]): Promise<void> {
+    await enTransaccion(this.db, async (conexion) => {
+      // el viaje se bloquea para que dos cambios de precio no se mezclen
+      await conexion.query('select id from viajes where id = $1 for update', [viaje_id]);
+      await conexion.query('delete from tarifas where viaje_id = $1', [viaje_id]);
+      for (const tarifa of tarifas) {
+        await conexion.query('insert into tarifas (viaje_id, tipo_asiento, precio) values ($1, $2, $3)', [
+          viaje_id,
+          tarifa.tipo_asiento,
+          tarifa.precio,
+        ]);
+      }
+    });
+  }
+
   async buscarCandidatos(origen: string, destino: string, fecha: string): Promise<CandidatoBusqueda[]> {
     // po = parada donde sube (en la ciudad de origen) · pd = parada donde baja (posterior, en la de destino)
     const resultado = await this.db.query<CandidatoBusqueda>(

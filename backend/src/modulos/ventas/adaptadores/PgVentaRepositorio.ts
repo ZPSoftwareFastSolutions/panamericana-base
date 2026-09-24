@@ -1,6 +1,6 @@
 import type { Pool, PoolClient } from 'pg';
 import { CODIGOS_PG, codigoPg } from '../../../compartido/adaptadores/pg/erroresPg';
-import { guardarPersona } from '../../../compartido/adaptadores/pg/personasSql';
+import { guardarCliente } from '../../../compartido/adaptadores/pg/personasSql';
 import { PASAJE_ACTIVO, liberarReservasVencidas } from '../../../compartido/adaptadores/pg/reservasSql';
 import { enTransaccion } from '../../../compartido/adaptadores/pg/transaccion';
 import type { AsientoParaReservar, VentaNueva, ViajeParaReservar } from '../dominio/Venta';
@@ -84,14 +84,7 @@ export class PgVentaRepositorio implements VentaRepositorio {
         // cada pasajero es un cliente; si ya existia por su documento, se reutiliza
         const clientes: string[] = [];
         for (const pasaje of venta.pasajes) {
-          const persona_id = await guardarPersona(conexion, pasaje.pasajero);
-          const cliente = await conexion.query<{ id: string }>(
-            `insert into clientes (persona_id) values ($1)
-             on conflict (persona_id) do update set persona_id = excluded.persona_id
-             returning id`,
-            [persona_id],
-          );
-          clientes.push(cliente.rows[0]!.id);
+          clientes.push(await guardarCliente(conexion, pasaje.pasajero));
         }
 
         await conexion.query(

@@ -23,6 +23,9 @@ export type ReservarEntrada = {
   pasajeros: PasajeroEntrada[];
 };
 
+/** venta presencial: reserva y cobra en efectivo en un solo paso (mismo inventario que la web) */
+export type VenderEnTaquillaEntrada = ReservarEntrada;
+
 /** pago simulado: la web paga con tarjeta; la taquilla, en efectivo */
 export type PagarVentaEntrada = {
   metodo?: 'tarjeta' | 'efectivo';

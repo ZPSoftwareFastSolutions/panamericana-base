@@ -26,6 +26,16 @@ export class PgCatalogoRepositorio implements CatalogoRepositorio {
     return resultado.rows;
   }
 
+  async listarTiposAsiento(): Promise<ElementoCatalogo[]> {
+    const resultado = await this.db.query<ElementoCatalogo>(
+      `select codigo, nombre
+         from tipos_asiento
+        where activo
+        order by orden`,
+    );
+    return resultado.rows;
+  }
+
   async listarRoles(): Promise<ElementoCatalogo[]> {
     const resultado = await this.db.query<ElementoCatalogo>(
       `select codigo, nombre

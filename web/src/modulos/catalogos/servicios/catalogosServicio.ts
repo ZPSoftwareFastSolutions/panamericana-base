@@ -10,4 +10,5 @@ export const catalogosServicio = {
   ciudades: () => clienteHttp.get<Ciudad[]>(RUTAS_API.catalogos.ciudades),
   tiposDocumento: () => clienteHttp.get<ElementoCatalogo[]>(RUTAS_API.catalogos.tiposDocumento),
   roles: () => clienteHttp.get<ElementoCatalogo[]>(RUTAS_API.catalogos.roles),
+  tiposAsiento: () => clienteHttp.get<ElementoCatalogo[]>(RUTAS_API.catalogos.tiposAsiento),
 };

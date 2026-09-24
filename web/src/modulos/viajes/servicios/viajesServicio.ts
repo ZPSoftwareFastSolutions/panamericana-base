@@ -1,5 +1,11 @@
 import { RUTAS_API } from '@panamericana/shared';
-import type { DisponibilidadTramo, ProgramarViajeEntrada, ResultadoBusqueda, Viaje } from '@panamericana/shared';
+import type {
+  DisponibilidadTramo,
+  EditarTarifasEntrada,
+  ProgramarViajeEntrada,
+  ResultadoBusqueda,
+  Viaje,
+} from '@panamericana/shared';
 import { clienteHttp } from '@/compartido/servicios/clienteHttp';
 
 /**
@@ -10,6 +16,8 @@ import { clienteHttp } from '@/compartido/servicios/clienteHttp';
 export const viajesServicio = {
   listar: () => clienteHttp.get<Viaje[]>(RUTAS_API.viajes.base),
   programar: (datos: ProgramarViajeEntrada) => clienteHttp.post<Viaje>(RUTAS_API.viajes.base, datos),
+  editarTarifas: (viajeId: string, datos: EditarTarifasEntrada) =>
+    clienteHttp.put<Viaje>(RUTAS_API.viajes.tarifasDelViaje(viajeId), datos),
   buscar: (origen: string, destino: string, fecha: string) =>
     clienteHttp.get<ResultadoBusqueda[]>(RUTAS_API.viajes.buscarCon(origen, destino, fecha)),
   disponibilidad: (viajeId: string, desde: number, hasta: number) =>

@@ -5,6 +5,7 @@ import type { Autorizacion } from '../../../compartido/adaptadores/http/autoriza
 import { ROLES_INTERNOS, SOLO_ADMINISTRADOR } from '../../../compartido/adaptadores/http/autorizacion';
 import type { BuscarViajes } from '../casos-de-uso/BuscarViajes';
 import type { ConsultarDisponibilidad } from '../casos-de-uso/ConsultarDisponibilidad';
+import type { EditarTarifas } from '../casos-de-uso/EditarTarifas';
 import type { ListarViajes } from '../casos-de-uso/ListarViajes';
 import type { ProgramarViaje } from '../casos-de-uso/ProgramarViaje';
 
@@ -12,6 +13,10 @@ const esquemaProgramar = z.object({
   ruta_id: z.uuid(),
   bus_id: z.uuid(),
   fecha_salida: z.iso.datetime({ offset: true }),
+  tarifas: z.array(z.object({ tipo_asiento: z.string().min(1), precio: z.number() })).min(1),
+});
+
+const esquemaTarifas = z.object({
   tarifas: z.array(z.object({ tipo_asiento: z.string().min(1), precio: z.number() })).min(1),
 });
 
@@ -38,6 +43,7 @@ export function viajeRutas(
     programarViaje: ProgramarViaje;
     buscarViajes: BuscarViajes;
     consultarDisponibilidad: ConsultarDisponibilidad;
+    editarTarifas: EditarTarifas;
   },
   autorizacion: Autorizacion,
 ): Router {
@@ -64,6 +70,12 @@ export function viajeRutas(
   router.post(RUTAS_API.viajes.base, autorizacion.requiere(...SOLO_ADMINISTRADOR), async (req, res) => {
     const entrada = esquemaProgramar.parse(req.body);
     res.status(201).json(await casos.programarViaje.ejecutar(entrada));
+  });
+
+  router.put(RUTAS_API.viajes.tarifas, autorizacion.requiere(...SOLO_ADMINISTRADOR), async (req, res) => {
+    const id = z.uuid().parse(req.params.id);
+    const { tarifas } = esquemaTarifas.parse(req.body);
+    res.json(await casos.editarTarifas.ejecutar(id, tarifas));
   });
 
   return router;
