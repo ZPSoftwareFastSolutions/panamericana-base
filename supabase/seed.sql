@@ -72,6 +72,20 @@ insert into asientos (id, bus_id, numero, piso, fila, columna, tipo) values
   ('00000000-0000-4000-8000-000000000404', '00000000-0000-4000-8000-000000000301', 4, 1, 2, 2, 'semicama')
 on conflict (id) do nothing;
 
+-- piso 2 del bus 2045KLP: 8 filas de 4 asientos semicama (columnas 1 2 | 4 5; la 3 es el pasillo)
+insert into asientos (bus_id, numero, piso, fila, columna, tipo)
+select '00000000-0000-4000-8000-000000000301', 4 + (f - 1) * 4 + c.i, 2, f, c.columna, 'semicama'
+  from generate_series(1, 8) as f
+ cross join (values (1, 1), (2, 2), (3, 4), (4, 5)) as c(i, columna)
+on conflict (bus_id, numero) do nothing;
+
+-- croquis estandar del bus 3187HTR: 10 filas de 4 asientos semicama en un solo piso
+insert into asientos (bus_id, numero, piso, fila, columna, tipo)
+select '00000000-0000-4000-8000-000000000302', (f - 1) * 4 + c.i, 1, f, c.columna, 'semicama'
+  from generate_series(1, 10) as f
+ cross join (values (1, 1), (2, 2), (3, 4), (4, 5)) as c(i, columna)
+on conflict (bus_id, numero) do nothing;
+
 -- ruta con una parada intermedia: la paz (1) -> oruro (2) -> cochabamba (3)
 -- la duracion y la distancia ya no se guardan aqui: se calculan con la vista rutas_resumen
 insert into rutas (id, nombre) values
@@ -84,10 +98,11 @@ insert into rutas_paradas (ruta_id, terminal_id, orden, minutos_desde_origen, km
   ('00000000-0000-4000-8000-000000000601', '00000000-0000-4000-8000-000000000203', 3, 420, 380.00)
 on conflict (ruta_id, orden) do nothing;
 
--- viaje programado (la llegada estimada se calcula con la vista viajes_horarios)
+-- viaje programado: 1 de octubre a las 08:00 de La Paz (12:00 UTC)
+-- la llegada estimada se calcula con la vista viajes_horarios
 insert into viajes (id, ruta_id, bus_id, fecha_salida) values
   ('00000000-0000-4000-8000-000000000701', '00000000-0000-4000-8000-000000000601',
-   '00000000-0000-4000-8000-000000000301', '2026-10-01T08:00:00Z')
+   '00000000-0000-4000-8000-000000000301', '2026-10-01T12:00:00Z')
 on conflict (id) do nothing;
 
 insert into viajes_choferes (viaje_id, chofer_id, rol) values

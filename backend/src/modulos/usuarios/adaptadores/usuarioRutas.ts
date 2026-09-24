@@ -1,6 +1,8 @@
 import { Router } from 'express';
 import { z } from 'zod';
 import { RUTAS_API } from '@panamericana/shared';
+import type { Autorizacion } from '../../../compartido/adaptadores/http/autorizacion';
+import { SOLO_ADMINISTRADOR } from '../../../compartido/adaptadores/http/autorizacion';
 import type { ListarUsuarios } from '../casos-de-uso/ListarUsuarios';
 import type { RegistrarUsuario } from '../casos-de-uso/RegistrarUsuario';
 
@@ -19,17 +21,17 @@ const esquemaRegistrarUsuario = z.object({
   telefono: z.string().nullable().optional(),
 });
 
-export function usuarioRutas(casos: {
-  listarUsuarios: ListarUsuarios;
-  registrarUsuario: RegistrarUsuario;
-}): Router {
+export function usuarioRutas(
+  casos: { listarUsuarios: ListarUsuarios; registrarUsuario: RegistrarUsuario },
+  autorizacion: Autorizacion,
+): Router {
   const router = Router();
 
-  router.get(RUTAS_API.usuarios.base, async (_req, res) => {
+  router.get(RUTAS_API.usuarios.base, autorizacion.requiere(...SOLO_ADMINISTRADOR), async (_req, res) => {
     res.json(await casos.listarUsuarios.ejecutar());
   });
 
-  router.post(RUTAS_API.usuarios.base, async (req, res) => {
+  router.post(RUTAS_API.usuarios.base, autorizacion.requiere(...SOLO_ADMINISTRADOR), async (req, res) => {
     const entrada = esquemaRegistrarUsuario.parse(req.body);
     const usuario = await casos.registrarUsuario.ejecutar(entrada);
     res.status(201).json(usuario);

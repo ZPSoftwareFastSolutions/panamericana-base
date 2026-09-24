@@ -22,7 +22,7 @@ export default function LayoutPublico({ children }: { children: React.ReactNode 
       <footer className="border-t border-slate-200 bg-white">
         <div className="mx-auto flex max-w-5xl flex-col gap-2 px-4 py-6 text-sm text-slate-500 sm:flex-row sm:justify-between">
           <p>© 2026 Panamericana · La Paz, Bolivia</p>
-          <Link href="/admin/buses" className="hover:underline">
+          <Link href="/login" className="hover:underline">
             Acceso del personal
           </Link>
         </div>

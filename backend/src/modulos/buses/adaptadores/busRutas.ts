@@ -1,6 +1,8 @@
 import { Router } from 'express';
 import { z } from 'zod';
 import { RUTAS_API } from '@panamericana/shared';
+import type { Autorizacion } from '../../../compartido/adaptadores/http/autorizacion';
+import { ROLES_INTERNOS, SOLO_ADMINISTRADOR } from '../../../compartido/adaptadores/http/autorizacion';
 import type { ListarBuses } from '../casos-de-uso/ListarBuses';
 import type { RegistrarBus } from '../casos-de-uso/RegistrarBus';
 
@@ -16,18 +18,18 @@ const esquemaRegistrarBus = z.object({
   numero_pisos: z.number().int(),
 });
 
-export function busRutas(casos: {
-  listarBuses: ListarBuses;
-  registrarBus: RegistrarBus;
-}): Router {
+export function busRutas(
+  casos: { listarBuses: ListarBuses; registrarBus: RegistrarBus },
+  autorizacion: Autorizacion,
+): Router {
   const router = Router();
 
-  router.get(RUTAS_API.buses.base, async (_req, res) => {
+  router.get(RUTAS_API.buses.base, autorizacion.requiere(...ROLES_INTERNOS), async (_req, res) => {
     const buses = await casos.listarBuses.ejecutar();
     res.json(buses);
   });
 
-  router.post(RUTAS_API.buses.base, async (req, res) => {
+  router.post(RUTAS_API.buses.base, autorizacion.requiere(...SOLO_ADMINISTRADOR), async (req, res) => {
     const entrada = esquemaRegistrarBus.parse(req.body);
     const bus = await casos.registrarBus.ejecutar(entrada);
     res.status(201).json(bus);

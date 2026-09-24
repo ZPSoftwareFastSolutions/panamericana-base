@@ -1,6 +1,8 @@
 import { Router } from 'express';
 import { z } from 'zod';
 import { RUTAS_API } from '@panamericana/shared';
+import type { Autorizacion } from '../../../compartido/adaptadores/http/autorizacion';
+import { ROLES_INTERNOS } from '../../../compartido/adaptadores/http/autorizacion';
 import type { BuscarClientePorDocumento } from '../casos-de-uso/BuscarClientePorDocumento';
 import type { ListarClientes } from '../casos-de-uso/ListarClientes';
 import type { RegistrarCliente } from '../casos-de-uso/RegistrarCliente';
@@ -25,23 +27,26 @@ const esquemaBuscar = z.object({
   numero_documento: z.string().min(1),
 });
 
-export function clienteRutas(casos: {
-  listarClientes: ListarClientes;
-  buscarClientePorDocumento: BuscarClientePorDocumento;
-  registrarCliente: RegistrarCliente;
-}): Router {
+export function clienteRutas(
+  casos: {
+    listarClientes: ListarClientes;
+    buscarClientePorDocumento: BuscarClientePorDocumento;
+    registrarCliente: RegistrarCliente;
+  },
+  autorizacion: Autorizacion,
+): Router {
   const router = Router();
 
-  router.get(RUTAS_API.clientes.base, async (_req, res) => {
+  router.get(RUTAS_API.clientes.base, autorizacion.requiere(...ROLES_INTERNOS), async (_req, res) => {
     res.json(await casos.listarClientes.ejecutar());
   });
 
-  router.get(RUTAS_API.clientes.buscar, async (req, res) => {
+  router.get(RUTAS_API.clientes.buscar, autorizacion.requiere(...ROLES_INTERNOS), async (req, res) => {
     const filtro = esquemaBuscar.parse(req.query);
     res.json(await casos.buscarClientePorDocumento.ejecutar(filtro));
   });
 
-  router.post(RUTAS_API.clientes.base, async (req, res) => {
+  router.post(RUTAS_API.clientes.base, autorizacion.requiere(...ROLES_INTERNOS), async (req, res) => {
     const entrada = esquemaRegistrarCliente.parse(req.body);
     const cliente = await casos.registrarCliente.ejecutar(entrada);
     res.status(201).json(cliente);

@@ -14,13 +14,16 @@
     "test:watch": "vitest",
     "lint": "eslint src --no-error-on-unmatched-pattern",
     "format": "prettier --write \"src/**/*.ts\"",
-    "db:verificar": "tsx src/infraestructura/verificarConexion.ts"
+    "db:verificar": "tsx src/infraestructura/verificarConexion.ts",
+    "db:semilla": "tsx src/infraestructura/ejecutarSql.ts seed.sql",
+    "db:demo": "tsx src/infraestructura/ejecutarSql.ts demo.sql"
   },
   "dependencies": {
     "@panamericana/shared": "*",
     "cors": "^2.8.5",
     "dotenv": "^17.2.0",
     "express": "^5.1.0",
+    "jose": "^6.2.12",
     "pg": "^8.16.0",
     "zod": "^4.1.0"
   },

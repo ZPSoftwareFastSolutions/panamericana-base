@@ -18,6 +18,8 @@
     "build": "npm run build:shared && npm run build --workspace backend && npm run build --workspace web",
     "lint": "npm run lint --workspace backend && npm run lint --workspace web",
     "test": "npm run test --workspace backend",
-    "db:verificar": "npm run db:verificar --workspace backend"
+    "db:verificar": "npm run db:verificar --workspace backend",
+    "db:semilla": "npm run db:semilla --workspace backend",
+    "db:demo": "npm run db:demo --workspace backend"
   }
 }
