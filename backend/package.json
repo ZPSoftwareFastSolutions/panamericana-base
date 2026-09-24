@@ -16,7 +16,11 @@
     "format": "prettier --write \"src/**/*.ts\"",
     "db:verificar": "tsx src/infraestructura/verificarConexion.ts",
     "db:semilla": "tsx src/infraestructura/ejecutarSql.ts seed.sql",
-    "db:demo": "tsx src/infraestructura/ejecutarSql.ts demo.sql"
+    "db:demo": "tsx src/infraestructura/ejecutarSql.ts demo.sql",
+    "ml:entrenar": "tsx src/modulos/prediccion/entrenamiento/entrenar.ts",
+    "test:integracion": "vitest run --config vitest.integracion.config.ts",
+    "prueba:humo": "tsx src/infraestructura/pruebaHumo.ts",
+    "prueba:seguridad": "tsx src/infraestructura/revisionSeguridad.ts"
   },
   "dependencies": {
     "@panamericana/shared": "*",

@@ -9,6 +9,13 @@ import { config } from './config';
 export function crearServidor(): Express {
   const app = express();
 
+  // no anunciar la tecnologia del servidor y no dejar que el navegador adivine tipos de archivo
+  app.disable('x-powered-by');
+  app.use((_req, res, next) => {
+    res.setHeader('X-Content-Type-Options', 'nosniff');
+    next();
+  });
+
   // permite que la web (otro puerto) llame a esta API
   app.use(cors({ origin: config.ALLOWED_ORIGINS.length > 0 ? config.ALLOWED_ORIGINS : true }));
   app.use(express.json());

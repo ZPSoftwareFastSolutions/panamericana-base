@@ -1,0 +1,46 @@
+{
+  "tipo": "regresion lineal multiple (minimos cuadrados)",
+  "version": "1.0",
+  "entrenado_en": "2026-09-24",
+  "datos": "sinteticos: 3 rutas, 2024-09-01 a 2026-08-31",
+  "inicio_serie": "2024-09-01",
+  "caracteristicas": [
+    "intercepto",
+    "lunes",
+    "martes",
+    "miercoles",
+    "jueves",
+    "viernes",
+    "sabado",
+    "feriado",
+    "vispera_feriado",
+    "temporada_alta",
+    "tendencia_anios"
+  ],
+  "coeficientes": [
+    1.099257,
+    -0.196844,
+    -0.247423,
+    -0.225093,
+    -0.141319,
+    0.158602,
+    0.056427,
+    0.292842,
+    0.322848,
+    0.181866,
+    0.056241
+  ],
+  "metricas": {
+    "mae": 4.27,
+    "rmse": 5.43,
+    "r2": 0.947,
+    "n_entrenamiento": 1752,
+    "n_prueba": 438
+  },
+  "base_por_ruta": {
+    "La Paz - Cochabamba": 70,
+    "La Paz - Oruro": 45,
+    "La Paz - Santa Cruz": 85
+  },
+  "base_por_defecto": 67
+}

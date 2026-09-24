@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { useSesion } from '../hooks/useSesion';
 
 const ACCESOS = [
+  { rol: 'administrador', titulo: 'Panel de indicadores', texto: 'Ventas, ocupacion y demanda estimada', ruta: '/admin/panel' },
   { rol: 'vendedor', titulo: 'Taquilla', texto: 'Vender en efectivo y anular pasajes', ruta: '/admin/taquilla' },
   { rol: 'administrador', titulo: 'Taquilla', texto: 'Vender en efectivo y anular pasajes', ruta: '/admin/taquilla' },
   { rol: 'encomiendas', titulo: 'Encomiendas', texto: 'Registrar, despachar y entregar envios', ruta: '/admin/encomiendas' },

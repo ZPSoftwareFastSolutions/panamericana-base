@@ -32,6 +32,11 @@ import { ListarEncomiendas } from './modulos/encomiendas/casos-de-uso/ListarEnco
 import { ObtenerEncomienda } from './modulos/encomiendas/casos-de-uso/ObtenerEncomienda';
 import { RegistrarEncomienda } from './modulos/encomiendas/casos-de-uso/RegistrarEncomienda';
 import { SeguirEncomienda } from './modulos/encomiendas/casos-de-uso/SeguirEncomienda';
+import { PgPanelRepositorio } from './modulos/panel/adaptadores/PgPanelRepositorio';
+import { ObtenerIndicadores } from './modulos/panel/casos-de-uso/ObtenerIndicadores';
+import { ArchivoModeloDemanda } from './modulos/prediccion/adaptadores/ArchivoModeloDemanda';
+import { PgPrediccionRepositorio } from './modulos/prediccion/adaptadores/PgPrediccionRepositorio';
+import { PredecirDemanda } from './modulos/prediccion/casos-de-uso/PredecirDemanda';
 import { PgRutaRepositorio } from './modulos/rutas/adaptadores/PgRutaRepositorio';
 import { ListarRutas } from './modulos/rutas/casos-de-uso/ListarRutas';
 import { ObtenerRuta } from './modulos/rutas/casos-de-uso/ObtenerRuta';
@@ -76,6 +81,8 @@ const viajeRepositorio = new PgViajeRepositorio(pool);
 const ventaRepositorio = new PgVentaRepositorio(pool);
 const pasajeRepositorio = new PgPasajeRepositorio(pool);
 const encomiendaRepositorio = new PgEncomiendaRepositorio(pool);
+const panelRepositorio = new PgPanelRepositorio(pool);
+const prediccionRepositorio = new PgPrediccionRepositorio(pool);
 
 // sesion: el token se verifica con el JWKS de Supabase y los roles salen de la base
 const identificarUsuario = new IdentificarUsuario(
@@ -153,4 +160,10 @@ export const casosDeUso = {
   obtenerEncomienda: new ObtenerEncomienda(encomiendaRepositorio),
   cambiarEstadoEncomienda: new CambiarEstadoEncomienda(encomiendaRepositorio),
   seguirEncomienda: new SeguirEncomienda(encomiendaRepositorio),
+
+  // modulo: panel
+  obtenerIndicadores: new ObtenerIndicadores(panelRepositorio, hoyEnBolivia),
+
+  // modulo: prediccion (el modelo entrenado se lee de un JSON; la API no entrena)
+  predecirDemanda: new PredecirDemanda(new ArchivoModeloDemanda(), prediccionRepositorio, hoyEnBolivia),
 };

@@ -46,3 +46,10 @@ export type {
   RegistrarEncomiendaEntrada,
   SeguimientoEncomienda,
 } from './tipos/encomienda';
+export type {
+  AlertaDemanda,
+  DemandaDelDia,
+  FiltroIndicadores,
+  Indicadores,
+  PrediccionDemanda,
+} from './tipos/panel';

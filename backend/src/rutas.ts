@@ -11,6 +11,8 @@ import { catalogoRutas } from './modulos/catalogos/adaptadores/catalogoRutas';
 import { clienteRutas } from './modulos/clientes/adaptadores/clienteRutas';
 import { croquisRutas } from './modulos/croquis/adaptadores/croquisRutas';
 import { encomiendaRutas } from './modulos/encomiendas/adaptadores/encomiendaRutas';
+import { panelRutas } from './modulos/panel/adaptadores/panelRutas';
+import { prediccionRutas } from './modulos/prediccion/adaptadores/prediccionRutas';
 import { rutaRutas } from './modulos/rutas/adaptadores/rutaRutas';
 import { sesionRutas } from './modulos/sesion/adaptadores/sesionRutas';
 import { terminalRutas } from './modulos/terminales/adaptadores/terminalRutas';
@@ -36,4 +38,6 @@ export function registrarRutas(app: Express): void {
   app.use(viajeRutas(casosDeUso, autorizacion));
   app.use(taquillaRutas(casosDeUso, autorizacion));
   app.use(encomiendaRutas(casosDeUso, autorizacion));
+  app.use(panelRutas(casosDeUso, autorizacion));
+  app.use(prediccionRutas(casosDeUso, autorizacion));
 }

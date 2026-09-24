@@ -132,6 +132,21 @@ export const RUTAS_API = {
     seguimientoDe: (codigo: string): string => `/v1/seguimiento/${encodeURIComponent(codigo)}`,
   },
 
+  panel: {
+    /** GET indicadores de ventas, ingresos, ocupacion y encomiendas (?desde=&hasta=&ruta_id=) */
+    indicadores: '/v1/panel/indicadores',
+    /** GET demanda estimada de los proximos dias por ruta (?dias=7) */
+    prediccion: '/v1/panel/prediccion',
+    /** formato para la web */
+    indicadoresCon: (filtro: { desde?: string; hasta?: string; ruta_id?: string }): string => {
+      const parametros = new URLSearchParams();
+      for (const [clave, valor] of Object.entries(filtro)) if (valor) parametros.set(clave, valor);
+      const consulta = parametros.toString();
+      return consulta ? `/v1/panel/indicadores?${consulta}` : '/v1/panel/indicadores';
+    },
+    prediccionDe: (dias: number): string => `/v1/panel/prediccion?dias=${dias}`,
+  },
+
   clientes: {
     /** GET listar · POST registrar */
     base: '/v1/clientes',
