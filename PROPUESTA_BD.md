@@ -11,7 +11,7 @@
 | Proyecto Supabase | `panamericana` (ref `tvyhpwpyxmbdfxogopnl`) |
 | Tablas creadas | **26**, todas con RLS activado y sin políticas públicas |
 | Vistas | **4** (`rutas_resumen`, `viajes_horarios`, `ventas_totales`, `encomiendas_estado_actual`), con `security_invoker` y sin acceso para `anon` |
-| Datos de prueba | `supabase/seed.sql`: 5 personas, 2 usuarios con rol, 2 clientes, 1 chofer, 3 terminales, 2 buses con croquis completo (`2045KLP`: 4 cama + 32 semicama en 2 pisos; `3187HTR`: 40 semicama), 1 ruta con 3 paradas, 1 viaje, 3 tarifas, 1 venta con pasaje y pago |
+| Datos de prueba | `supabase/seed.sql`: 5 personas, 2 usuarios con rol, 2 clientes, 1 chofer, 3 terminales, 2 buses con croquis completo (`2045KLP`: 2 cama + 34 semicama en 2 pisos; `3187HTR`: 40 semicama), 1 ruta con 3 paradas, 1 viaje, 2 tarifas (una por tipo de asiento del bus), 1 venta con pasaje y pago |
 | Datos de demostración | `supabase/demo.sql` (`npm run db:demo`): viajes de hoy a 6 días con tarifas; idempotente y sin cruces de horario |
 | Cuentas de acceso | Supabase Auth: Ana (administradora) y Luis (vendedor), con el **mismo id** que en `usuarios`. La contraseña no se versiona |
 | Migraciones | `supabase/migrations/` (11 archivos, aplicados) |

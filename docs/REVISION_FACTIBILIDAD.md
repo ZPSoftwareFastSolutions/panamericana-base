@@ -55,7 +55,7 @@ gitGraph
 |---|---|---|---|
 | `sprint01` | **Base operativa:** catálogos, terminales, usuarios, clientes, menú y portal | PAN-01 a PAN-08, PAN-41, PAN-42 | `docs/repo2/REPLICACION_SPRINT_01.md` |
 | `sprint02` | **MVP 1 — Venta web por tramos:** login y roles, croquis, rutas con paradas, viajes con tarifas, búsqueda, disponibilidad por tramo, reserva con control de concurrencia y compra con pago simulado | PAN-10 a PAN-23 | `REPLICACION_SPRINT_02.md` |
-| `sprint03` | **MVP 2 — Operación multicanal:** taquilla sobre el mismo inventario, anulación, encomiendas con seguimiento, boleto con QR, tarifas y editor de croquis | PAN-30 a PAN-38 | `REPLICACION_SPRINT_03.md` |
+| `sprint03` | **MVP 2 — Operación multicanal:** taquilla sobre el mismo inventario, anulación, encomiendas con seguimiento, boleto con QR, tarifas y editor de croquis | PAN-30 a PAN-38 (sin PAN-36) y PAN-43 | `REPLICACION_SPRINT_03.md` |
 | `sprint04` | **Cierre del MVP:** predicción de demanda (ML), panel de indicadores, PWA, prueba automatizada de compras simultáneas, pruebas de humo y checklist de seguridad | PAN-25 a PAN-29, PAN-39, PAN-40 | `REPLICACION_SPRINT_04.md` |
 
 ---

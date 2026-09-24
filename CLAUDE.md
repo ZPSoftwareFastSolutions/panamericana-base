@@ -1,6 +1,6 @@
 # CLAUDE.md — panamericana-base
 
-> **Punto de entrada para cualquier sesión.** Léelo completo antes de actuar. Última actualización: **23/09/2026**.
+> **Punto de entrada para cualquier sesión.** Léelo completo antes de actuar. Última actualización: **24/09/2026**.
 > Idioma de trabajo: **español** (documentos, respuestas, commits y comentarios del código).
 
 ---
@@ -51,7 +51,7 @@
 
 ---
 
-## 4. Estado actual (23/09/2026)
+## 4. Estado actual (24/09/2026)
 
 **Hecho**
 - Stack base con el módulo **`buses`** de punta a punta: BD → API → pantalla (11–12/09).
@@ -65,17 +65,18 @@
 - **Guía de desarrollo del equipo** (`docs/equipo/GUIA_DESARROLLO.md`, **v1.3 del 23/09**): cómo crear y llamar endpoints, `shared`, servicios, hooks, componentes `.tsx`, páginas, reglas, git y uso de asistentes de IA. Desde la v1.3 enseña las rutas protegidas por rol, cómo pedir un token para probar con `curl` y los `.env` del Sprint 2. Su ejemplo, el módulo `choferes`, se **extrajo, compiló junto al Sprint 2 (lint, 13 archivos de prueba, build) y probó contra la base real con token (11 casos, incluidos 401 y 403)** y luego se retiró del stack. La copia con el `.env` completo y la contraseña de las cuentas de prueba está en `compartir/GUIA_DESARROLLO_PANAMERICANA.md`, ignorada por git.
 - **Revisión de factibilidad y ramas (23/09):** `docs/REVISION_FACTIBILIDAD.md` (ajustes A1–A7, 4 ramas `sprint01`…`sprint04`, protocolo de validación). La rama `sprint01` está subida.
 - **Sprint 2 construido y validado aquí (23/09, rama `sprint02`, commit `399a8cb`)**: sesión y roles (JWKS ES256), croquis, rutas con paradas, viajes con tarifas, búsqueda por tramo, disponibilidad, reserva de 10 min con tres defensas contra la doble venta, pago simulado y portal de compra. 78 pruebas unitarias, **60 casos de aceptación contra la base real** (8 reservas simultáneas: gana 1), revisión en el navegador y revisión de código (9 hallazgos corregidos, entre ellos un límite de reservas por IP). Migración nueva `rutas_nombre_unico`. Cuentas de prueba en Supabase Auth (Ana y Luis; contraseña fuera de los archivos versionados). Guía para Ángel: `docs/repo2/REPLICACION_SPRINT_02.md`; prueba automatizada: `docs/pruebas/aceptacion_sprint02.mjs`.
+- **Sprint 3 construido y validado aquí (24/09, rama `sprint03`, commit `f6f2b97`)**: taquilla sobre el mismo inventario (reutiliza reservar y pagar), boleto con QR, anulación con reembolso (hasta 2 h antes de subir), encomiendas cobradas en origen con máquina de estados, historial y seguimiento público, edición de tarifas y editor de croquis. 101 pruebas unitarias, **52 casos de aceptación** (web y taquilla por el mismo asiento, 5 anulaciones y 4 despachos simultáneos), regresión 60/60, navegador en computadora y 375 px, revisión de código (7 de 8 hallazgos corregidos). Sin migraciones; se quitó de la semilla la tarifa `normal` del viaje 701. Tarjeta nueva **PAN-43**. Guía: `docs/repo2/REPLICACION_SPRINT_03.md`; prueba: `docs/pruebas/aceptacion_sprint03.mjs`.
 
 **En curso:** Sprint 2 (22/09 → 03/10). El Sprint 1 cerró el 19/09 sin sus módulos: sus tarjetas se completan **al inicio del Sprint 2** en el repositorio del equipo, guiadas por `REPLICACION_SPRINT_01.md`. Agenda apretada: las fechas de vencimiento de Trello no se usan.
 
 **Próximos pasos (en orden)**
-0. **El usuario sube la rama `sprint02`** (`git push -u origin sprint02`: el `push` desde Claude quedó bloqueado) y luego se avanza `main` hasta ella.
+0. **El usuario sube las ramas `sprint02` y `sprint03`** (`git push -u origin sprint02` y `sprint03`: el `push` desde Claude quedó bloqueado) y luego se avanza `main` hasta la última.
 0. **Ángel ejecuta `REPLICACION_SPRINT_01.md`**: contrato `shared/` el día 1, luego PAN-41 y PAN-08 A, PAN-42, PAN-03/04 y PAN-06/07/08 B; cierre con la prueba de aceptación y la comparación entre repositorios. Asignar a mano a John en PAN-41 y a Grisel en PAN-42.
 1. **Compartir la guía actualizada (v1.2)** con el equipo: `compartir/GUIA_DESARROLLO_PANAMERICANA.md` por un canal privado. **No** se sube al repositorio 2 (regla: sin `.md`).
 2. Cuando el equipo termine el Sprint 1: registrar el resultado en el backlog (✅ y velocidad real) y recalibrar la capacidad.
 3. **PAN-02 (Ángel):** colaboradores en GitHub, protección de `main` y ramas `dev/*`.
 4. **Sprint 2 en el equipo:** Ángel ejecuta `REPLICACION_SPRINT_02.md` cuando cierre el Sprint 1. Las tarjetas PAN-10 a PAN-23 están redactadas en su §1.2; **se cargan en Trello solo si el usuario lo pide** (hoy en Trello solo existe el Sprint 1).
-4b. **Referencias siguientes en este repositorio:** rama `sprint03` (taquilla, anulación, encomiendas, boleto QR, editar tarifas, editor de croquis) y `sprint04` (predicción de demanda en TypeScript, panel, PWA, prueba de concurrencia, humo y seguridad), cada una con su `REPLICACION_SPRINT_NN.md`.
+4b. **Referencias siguientes en este repositorio:** `sprint03` ✅ (24/09) y `sprint04` (predicción de demanda en TypeScript, panel, PWA, prueba de concurrencia, humo y seguridad), cada una con su `REPLICACION_SPRINT_NN.md`.
 5. En la Review del Sprint 2 (03/10): **agendar la fase final de despliegue** (PAN-09 y PAN-24).
 6. Con el login ya validado por JWKS (PAN-10): desactivar las claves *legacy* y recién entonces revocar la clave HS256 (§8).
 7. Confirmar con el docente si existe el Sprint 3 (si no, aplicar la contingencia del backlog §7.1).
@@ -88,7 +89,7 @@
 |---|---|---|---|
 | Sprint 1 — Base operativa | 08/09 → 19/09 | ✅ Referencia lista (23/09) · el equipo lo completa al inicio del Sprint 2 | Entorno local, terminales, usuarios, clientes y maqueta del portal |
 | Sprint 2 — MVP 1 | 22/09 → 03/10 | 🔄 En curso · referencia lista (`sprint02`, 23/09) | Venta web por tramos con control de concurrencia y login del backoffice |
-| Sprint 3 — MVP 2 | 06/10 → 17/10 | ⚠️ Sin confirmar | Taquilla, anulación, encomiendas, boleto QR, panel con predicción de demanda y PWA |
+| Sprint 3 — MVP 2 | 06/10 → 17/10 | ⚠️ Sin confirmar · referencia lista (`sprint03`, 24/09) | Taquilla, anulación, encomiendas, boleto QR, panel con predicción de demanda y PWA |
 | Fase final — Nube | Fecha a definir | ⏳ | Despliegue en Vercel + Supabase (obligatorio: sostiene *cloud computing*) |
 
 - **No existen** el Sprint 0 ni los Sprints 4–6 (calendarios anteriores anulados).
@@ -149,7 +150,7 @@ npm run db:verificar   # prueba la conexión y lista las tablas
   3. Guardar el archivo como `supabase/migrations/<version>_<nombre>.sql` con el mismo SQL.
   4. Actualizar `PROPUESTA_BD.md`.
   5. Si el cambio va al equipo, registrarlo en `docs/repo2/CORRECCIONES_NN.md`.
-- **Datos de prueba** (`supabase/seed.sql`, IDs fijos `00000000-0000-4000-8000-000000000xxx`, personas `...a0xx`): 5 personas, 2 usuarios con rol, 2 clientes, 1 chofer, terminales La Paz, Oruro y Cochabamba, buses `2045KLP` y `3187HTR`, 4 asientos, ruta La Paz → Oruro → Cochabamba, 1 viaje, 3 tarifas, 1 venta con pasaje (tramo 1→2) y pago. Desde el Sprint 2 los dos buses traen su croquis completo (36 y 40 asientos). El archivo es **idempotente**. `supabase/demo.sql` (`npm run db:demo`) crea viajes de hoy a 6 días; también idempotente. Si se prueban inserciones, **borrar lo creado** al terminar.
+- **Datos de prueba** (`supabase/seed.sql`, IDs fijos `00000000-0000-4000-8000-000000000xxx`, personas `...a0xx`): 5 personas, 2 usuarios con rol, 2 clientes, 1 chofer, terminales La Paz, Oruro y Cochabamba, buses `2045KLP` y `3187HTR`, ruta La Paz → Oruro → Cochabamba, 1 viaje, 2 tarifas (una por tipo de asiento del bus), 1 venta con pasaje (tramo 1→2) y pago. Desde el Sprint 2 los dos buses traen su croquis completo (36 y 40 asientos). El archivo es **idempotente**. `supabase/demo.sql` (`npm run db:demo`) crea viajes de hoy a 6 días; también idempotente. Si se prueban inserciones, **borrar lo creado** al terminar.
 - **Cuentas de prueba (Supabase Auth):** `ana.quispe@panamericana.test` (administradora) y `luis.rojas@panamericana.test` (vendedor), con el mismo id que en `usuarios`. La contraseña **no** va en archivos versionados; se comparte por canal privado (y va en la copia de `compartir/`).
 - **Autenticación:** Supabase firma los tokens con **ECC P-256** (clave actual `4190b38b-…`). La API los valida con el JWKS `https://tvyhpwpyxmbdfxogopnl.supabase.co/auth/v1/.well-known/jwks.json` (`ES256`, audiencia `authenticated`). `SUPABASE_JWT_SECRET` **no se usa**. La web usará la clave publicable `sb_publishable_…`. **No revocar** la clave anterior Legacy HS256 hasta desactivar las claves *legacy* `anon` y `service_role`.
 
@@ -247,4 +248,5 @@ npm run db:verificar   # prueba la conexión y lista las tablas
 | 23/09 | Tarjetas nuevas PAN-41 (núcleo de personas, John) y PAN-42 (catálogos, Grisel): las piezas que usan varios módulos tienen dueño |
 | 23/09 | Núcleo compartido `compartido/` para reglas de persona y transacciones; JSON aplanado para personas y anidado para referencias |
 | 23/09 | Revisión de factibilidad: MVP en **4 ramas** (`sprint01`…`sprint04`); PAN-15 crea las tarifas (A1); ML en TypeScript porque no hay Python (A4); encomiendas pagadas en origen (A6) |
+| 24/09 | Sprint 3: la taquilla reutiliza los casos de uso de la web; anular bloquea venta → pasaje (mismo orden que el pago); la web muestra los pasos de una encomienda que manda la API (`siguientes`); PAN-43 para el editor de croquis |
 | 23/09 | Sprint 2: rutas del panel protegidas por rol (`autorizacion.requiere`), portal público con límite de reservas por IP, contrato web (servicios y hooks) en el PR del día 1 para evitar conflictos |

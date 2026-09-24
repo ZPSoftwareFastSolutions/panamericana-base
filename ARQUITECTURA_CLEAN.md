@@ -147,7 +147,7 @@ panamericana/
 │       │   │   └── Codigo.ts               códigos V-/P- y documentos ocultos
 │       │   └── adaptadores/
 │       │       ├── http/                      manejadorErrores.ts · autorizacion.ts (roles) · limiteDePeticiones.ts
-│       │       └── pg/                        transaccion.ts · personasSql.ts · erroresPg.ts · reservasSql.ts
+│       │       └── pg/                        transaccion.ts · personasSql.ts (guardarPersona, guardarCliente) · erroresPg.ts · reservasSql.ts
 │       ├── infraestructura/
 │       │   ├── config.ts        lee el .env
 │       │   ├── baseDeDatos.ts   conexión a Supabase
@@ -174,7 +174,7 @@ panamericana/
 │       │       └── servicios/                llamadas a la API
 │       └── compartido/
 │           ├── servicios/clienteHttp.ts      único lugar con fetch
-│           ├── componentes/                  Boton, Campo, CampoSeleccion, MenuLateral, PlanoAsientos, CuentaRegresiva
+│           ├── componentes/                  Boton, Campo, CampoSeleccion, MenuLateral, PlanoAsientos, CuentaRegresiva, CodigoQR, ConsultaPorCodigo
 │           └── utilidades/                   fechas.ts (hora de La Paz) · dinero.ts (formatearBs)
 │
 ├── supabase/
@@ -480,6 +480,13 @@ npx supabase db push
 
 - **Públicos** (sin sesión): catálogos, búsqueda de viajes, asientos del tramo y la compra del portal (con límite de reservas por conexión).
 - El menú de la web (`MenuLateral`, arreglo `OPCIONES` con roles) **solo oculta** opciones; la protección real es la API.
+
+### 9.6 Una regla, un lugar (desde el Sprint 3)
+
+- **Un canal nuevo reutiliza los casos de uso existentes.** La taquilla (`VenderEnTaquilla`) compone `ReservarAsientos` y `PagarVenta`: así la web y la taquilla comparten el inventario y las defensas contra la doble venta.
+- **La web no copia reglas del backend.** Si la pantalla necesita saber qué se puede hacer, la API lo informa (por ejemplo `encomienda.siguientes`) o lo lee de un catálogo (`/v1/catalogos/tipos-asiento`).
+- **Todo movimiento de dinero queda en `pagos`** (`aprobado` al cobrar, `reembolsado` al devolver), en la misma transacción que el cambio de estado.
+- **Orden de bloqueos:** cuando una transacción bloquea varias filas, lo hace siempre en el mismo orden (venta → pasajes; bus → viajes) para no trabarse con otra.
 
 ---
 

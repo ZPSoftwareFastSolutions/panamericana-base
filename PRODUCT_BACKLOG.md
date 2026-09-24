@@ -188,7 +188,7 @@ Estas decisiones responden de forma **provisional** las preguntas abiertas de `P
 - No se repite `numero` ni la posición (`piso`, `fila`, `columna`) en el mismo bus (409).
 - *Sprint 3:* editor visual que cambia el tipo de cada asiento (`normal`, `semicama`, `cama`).
 
-**Must · 4 pts · Sprints 2–3 · PAN-12 (S2), PAN-37 (S3) · ⏳**
+**Must · 4 pts · Sprints 2–3 · PAN-12 (S2), PAN-37 (S3) · 🔄 referencia lista (`sprint03`)**
 
 #### HU-013 · Choferes y tripulación
 **Como** administrador **quiero** registrar choferes y asignarlos a viajes **para** que ningún viaje salga sin conductor habilitado.
@@ -220,7 +220,7 @@ Estas decisiones responden de forma **provisional** las preguntas abiertas de `P
 - Cada viaje debe tener tarifa para **cada tipo de asiento que tenga su bus** (ya no existe `precio_base`).
 - El croquis y el checkout muestran el precio del asiento, calculado por tramo (decisión P17).
 
-**Should · 5 pts · Sprint 3 · PAN-35, PAN-36 · ⏳**
+**Should · 5 pts · Sprint 3 · PAN-35, PAN-36 · 🔄 referencia lista (`sprint03`)**
 
 ### E5 — Venta web con control de concurrencia
 
@@ -284,7 +284,7 @@ Estas decisiones responden de forma **provisional** las preguntas abiertas de `P
 - Cada cambio guarda una fila en `historial_encomiendas` con usuario y observación.
 - Consulta pública por código de seguimiento que muestra estado e historial.
 
-**Should · 8 pts · Sprint 3 · PAN-33, PAN-34 · ⏳**
+**Should · 8 pts · Sprint 3 · PAN-33, PAN-34 · 🔄 referencia lista (`sprint03`)**
 
 ### E7 — Taquilla
 
@@ -294,7 +294,7 @@ Estas decisiones responden de forma **provisional** las preguntas abiertas de `P
 - La pantalla reutiliza el croquis y maneja el 409 igual que la web.
 - Solo el rol `vendedor` o `administrador` accede.
 
-**Must · 7 pts · Sprint 3 · PAN-30, PAN-31 · ⏳**
+**Must · 7 pts · Sprint 3 · PAN-30, PAN-31 · 🔄 referencia lista (`sprint03`)**
 
 #### HU-025 · Anular pasajes
 **Como** vendedor **quiero** anular un pasaje por su código **para** liberar el asiento cuando el pasajero no viaja.
@@ -302,7 +302,7 @@ Estas decisiones responden de forma **provisional** las preguntas abiertas de `P
 - El pasaje pasa a `anulado`, el asiento queda libre y el pago se marca `reembolsado`.
 - Incluye la consulta de un pasaje por código (la usa también HU-028).
 
-**Should · 3 pts · Sprint 3 · PAN-32 · ⏳**
+**Should · 3 pts · Sprint 3 · PAN-32 · 🔄 referencia lista (`sprint03`)**
 
 ### E8 — Canal móvil
 
@@ -324,7 +324,7 @@ Estas decisiones responden de forma **provisional** las preguntas abiertas de `P
 - Vista imprimible.
 - Consulta pública del pasaje ingresando su código.
 
-**Should · 3 pts · Sprint 3 · PAN-38 · ⏳**
+**Should · 3 pts · Sprint 3 · PAN-38 · 🔄 referencia lista (`sprint03`)**
 
 #### HU-029 · Panel de indicadores
 **Como** administrador **quiero** ver ventas, ingresos y ocupación por viaje y por ruta **para** tomar decisiones con datos.
@@ -430,15 +430,12 @@ Decisión del 15/09: hasta esta fase **todo corre en local**. Es obligatoria por
 
 > Se agenda en la Review del Sprint 2. Si entra en el Sprint 3, hay que liberar 4 puntos de tarjetas *Should* de John y Ángel.
 
-### 5.4 Sprint 3 — 06/10 → 17/10 (tentativo) · MVP 2
+### 5.4 Sprint 3 — 06/10 → 17/10 (tentativo) · MVP 2 · rama `sprint03`
+
+**Estado al 24/09:** en `panamericana-base` el sprint está **construido y validado** (rama `sprint03`, commit `f6f2b97`: 101 pruebas unitarias, 52 casos de aceptación contra la base real y regresión del Sprint 2 en verde). Replicación y textos de Trello: `docs/repo2/REPLICACION_SPRINT_03.md`. Tarjeta nueva **PAN-43** (Grisel, 1 pt): cambiar el tipo de un asiento y catálogo `tipos_asiento`, que necesita el editor de croquis. Las tarjetas de IA, panel, PWA y calidad pasan al incremento 4 (§5.5).
 
 | Tarjeta | Responsable | Trabajo | HU | Pts | Depende de |
 |---|---|---|---|---|---|
-| PAN-25 | John | Prueba automatizada de compras simultáneas | HU-022 | 3 | PAN-21 |
-| PAN-26 | Ángel | Dataset histórico y entrenamiento del modelo de regresión (notebook + JSON) | HU-033 | 3 | — (**entregar en la semana 1**) |
-| PAN-27 | John | Caso de uso y endpoint de predicción de demanda | HU-033 | 3 | PAN-26 |
-| PAN-28 | Brisa | Panel de indicadores con gráfico de predicción | HU-029 | 3 | PAN-27, PAN-29 (contrato) |
-| PAN-29 | Grisel | Métricas del panel: ventas, ingresos y ocupación (API) | HU-029 | 2 | PAN-22 |
 | PAN-30 | John | Venta en taquilla (API) | HU-024 | 2 | PAN-22 |
 | PAN-31 | Brisa | Pantalla de taquilla con croquis y botón de anulación | HU-024 | 5 | PAN-30, PAN-32 (contrato) |
 | PAN-32 | John | Consultar y anular pasaje por código (API) | HU-025 | 3 | PAN-22 |
@@ -448,8 +445,21 @@ Decisión del 15/09: hasta esta fase **todo corre en local**. Es obligatoria por
 | ~~PAN-36~~ | — | *Absorbida por PAN-20 y PAN-23 (Sprint 2): el croquis y el checkout ya muestran el precio por tipo de asiento* | HU-016 | 0 | — |
 | PAN-37 | Brisa | Editor de croquis de asientos | HU-012 | 2 | PAN-12 |
 | PAN-38 | Karime | Boleto electrónico con QR y consulta por código | HU-028 | 3 | PAN-32 (contrato) |
+| PAN-43 | Grisel | Cambiar el tipo de un asiento y catálogo de tipos (API) | HU-012 | 1 | PAN-12 |
+
+### 5.5 Incremento 4 — cierre del MVP · rama `sprint04`
+
+Si el docente no amplía el calendario, entra en la **fase final** junto al despliegue (ver `docs/REVISION_FACTIBILIDAD.md`, ajuste A5). El modelo se entrena en **TypeScript** (ajuste A4: no hay Python en la computadora de trabajo).
+
+| Tarjeta | Responsable | Trabajo | HU | Pts | Depende de |
+|---|---|---|---|---|---|
+| PAN-25 | John | Prueba automatizada de compras simultáneas | HU-022 | 3 | PAN-21 |
+| PAN-26 | Ángel | Dataset histórico y entrenamiento del modelo de regresión (script + JSON) | HU-033 | 3 | — |
+| PAN-27 | John | Caso de uso y endpoint de predicción de demanda | HU-033 | 3 | PAN-26 |
+| PAN-28 | Brisa | Panel de indicadores con gráfico de predicción | HU-029 | 3 | PAN-27, PAN-29 (contrato) |
+| PAN-29 | Grisel | Métricas del panel: ventas, ingresos y ocupación (API) | HU-029 | 2 | PAN-22 |
 | PAN-39 | Karime | Portal instalable como aplicación (PWA) | HU-026 | 2 | — |
-| PAN-40 | Karime | Pruebas de humo en staging y checklist de seguridad | HU-030 | 3 | Todas (últimos días) |
+| PAN-40 | Karime | Pruebas de humo y checklist de seguridad | HU-030 | 3 | Todas (últimos días) |
 
 ---
 
