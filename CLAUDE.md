@@ -62,18 +62,22 @@
 - **Sprint 1 construido y validado aquí (23/09, commit `04677cb`)**: núcleo compartido de personas, módulos `catalogos`, `terminales`, `usuarios` y `clientes` (API), pantallas de terminales y clientes, `MenuLateral` con opción activa, componentes `Boton`/`Campo` y portal público con buscador. 32 pruebas unitarias, **31 casos de aceptación contra la base real** y revisión visual en computadora y celular. Sin migraciones nuevas.
 - **Replicación al equipo:** `docs/repo2/REPLICACION_SPRINT_01.md` (orden de PR en 5 días, archivos por tarjeta, revisión, modo rescate, comparación entre repositorios y prueba de aceptación).
 - `docs/repo2/CORRECCIONES_02.md` (modelo v2.0) **aplicada** por Ángel.
-- **Guía de desarrollo del equipo** (`docs/equipo/GUIA_DESARROLLO.md`, v1.2 del 23/09): cómo crear y llamar endpoints, `shared`, servicios, hooks, componentes `.tsx`, páginas, reglas, git y uso de asistentes de IA. Su ejemplo, el módulo `choferes`, se **extrajo, compiló junto al Sprint 1 (lint, 36 pruebas, build) y probó contra la base real (13 casos)** y luego se retiró del stack. La copia con el `.env` completo está en `compartir/GUIA_DESARROLLO_PANAMERICANA.md`, ignorada por git.
+- **Guía de desarrollo del equipo** (`docs/equipo/GUIA_DESARROLLO.md`, **v1.3 del 23/09**): cómo crear y llamar endpoints, `shared`, servicios, hooks, componentes `.tsx`, páginas, reglas, git y uso de asistentes de IA. Desde la v1.3 enseña las rutas protegidas por rol, cómo pedir un token para probar con `curl` y los `.env` del Sprint 2. Su ejemplo, el módulo `choferes`, se **extrajo, compiló junto al Sprint 2 (lint, 13 archivos de prueba, build) y probó contra la base real con token (11 casos, incluidos 401 y 403)** y luego se retiró del stack. La copia con el `.env` completo y la contraseña de las cuentas de prueba está en `compartir/GUIA_DESARROLLO_PANAMERICANA.md`, ignorada por git.
+- **Revisión de factibilidad y ramas (23/09):** `docs/REVISION_FACTIBILIDAD.md` (ajustes A1–A7, 4 ramas `sprint01`…`sprint04`, protocolo de validación). La rama `sprint01` está subida.
+- **Sprint 2 construido y validado aquí (23/09, rama `sprint02`, commit `399a8cb`)**: sesión y roles (JWKS ES256), croquis, rutas con paradas, viajes con tarifas, búsqueda por tramo, disponibilidad, reserva de 10 min con tres defensas contra la doble venta, pago simulado y portal de compra. 78 pruebas unitarias, **60 casos de aceptación contra la base real** (8 reservas simultáneas: gana 1), revisión en el navegador y revisión de código (9 hallazgos corregidos, entre ellos un límite de reservas por IP). Migración nueva `rutas_nombre_unico`. Cuentas de prueba en Supabase Auth (Ana y Luis; contraseña fuera de los archivos versionados). Guía para Ángel: `docs/repo2/REPLICACION_SPRINT_02.md`; prueba automatizada: `docs/pruebas/aceptacion_sprint02.mjs`.
 
 **En curso:** Sprint 2 (22/09 → 03/10). El Sprint 1 cerró el 19/09 sin sus módulos: sus tarjetas se completan **al inicio del Sprint 2** en el repositorio del equipo, guiadas por `REPLICACION_SPRINT_01.md`. Agenda apretada: las fechas de vencimiento de Trello no se usan.
 
 **Próximos pasos (en orden)**
+0. **El usuario sube la rama `sprint02`** (`git push -u origin sprint02`: el `push` desde Claude quedó bloqueado) y luego se avanza `main` hasta ella.
 0. **Ángel ejecuta `REPLICACION_SPRINT_01.md`**: contrato `shared/` el día 1, luego PAN-41 y PAN-08 A, PAN-42, PAN-03/04 y PAN-06/07/08 B; cierre con la prueba de aceptación y la comparación entre repositorios. Asignar a mano a John en PAN-41 y a Grisel en PAN-42.
 1. **Compartir la guía actualizada (v1.2)** con el equipo: `compartir/GUIA_DESARROLLO_PANAMERICANA.md` por un canal privado. **No** se sube al repositorio 2 (regla: sin `.md`).
 2. Cuando el equipo termine el Sprint 1: registrar el resultado en el backlog (✅ y velocidad real) y recalibrar la capacidad.
 3. **PAN-02 (Ángel):** colaboradores en GitHub, protección de `main` y ramas `dev/*`.
-4. **Solo si el usuario lo pide:** construir aquí el Sprint 2 como referencia, escribir `docs/guias-sprint/GUIA_SPRINT_02.md` / `REPLICACION_SPRINT_02.md` y cargar en Trello las tarjetas PAN-10 a PAN-23. Hasta entonces, **en Trello solo existe el Sprint 1** (PAN-01 a PAN-08, PAN-41 y PAN-42).
+4. **Sprint 2 en el equipo:** Ángel ejecuta `REPLICACION_SPRINT_02.md` cuando cierre el Sprint 1. Las tarjetas PAN-10 a PAN-23 están redactadas en su §1.2; **se cargan en Trello solo si el usuario lo pide** (hoy en Trello solo existe el Sprint 1).
+4b. **Referencias siguientes en este repositorio:** rama `sprint03` (taquilla, anulación, encomiendas, boleto QR, editar tarifas, editor de croquis) y `sprint04` (predicción de demanda en TypeScript, panel, PWA, prueba de concurrencia, humo y seguridad), cada una con su `REPLICACION_SPRINT_NN.md`.
 5. En la Review del Sprint 2 (03/10): **agendar la fase final de despliegue** (PAN-09 y PAN-24).
-6. PAN-10 (Sprint 2): login con validación por JWKS. Después, desactivar las claves *legacy* y recién entonces revocar la clave HS256 (§8).
+6. Con el login ya validado por JWKS (PAN-10): desactivar las claves *legacy* y recién entonces revocar la clave HS256 (§8).
 7. Confirmar con el docente si existe el Sprint 3 (si no, aplicar la contingencia del backlog §7.1).
 
 ---
@@ -83,7 +87,7 @@
 | Etapa | Fechas | Estado | Incremento |
 |---|---|---|---|
 | Sprint 1 — Base operativa | 08/09 → 19/09 | ✅ Referencia lista (23/09) · el equipo lo completa al inicio del Sprint 2 | Entorno local, terminales, usuarios, clientes y maqueta del portal |
-| Sprint 2 — MVP 1 | 22/09 → 03/10 | 🔄 En curso | Venta web por tramos con control de concurrencia y login del backoffice |
+| Sprint 2 — MVP 1 | 22/09 → 03/10 | 🔄 En curso · referencia lista (`sprint02`, 23/09) | Venta web por tramos con control de concurrencia y login del backoffice |
 | Sprint 3 — MVP 2 | 06/10 → 17/10 | ⚠️ Sin confirmar | Taquilla, anulación, encomiendas, boleto QR, panel con predicción de demanda y PWA |
 | Fase final — Nube | Fecha a definir | ⏳ | Despliegue en Vercel + Supabase (obligatorio: sostiene *cloud computing*) |
 
@@ -138,14 +142,15 @@ npm run db:verificar   # prueba la conexión y lista las tablas
   - La contraseña vive **solo** en `backend/.env` (ignorado por git). Nunca va a archivos versionados, documentos, Trello ni commits.
 - **Reglas:** SQL con palabras reservadas en minúsculas · nombres de tablas y campos **congelados** (modelo v2.0, recongelados el 22/09) · cambios solo con **migraciones nuevas**, hacia adelante · toda tabla con RLS activado y sin políticas públicas (datos solo por la API) · **un dato que se puede calcular no se guarda**: va en una vista.
 - **Modelo v2.0 (22/09), normalizado hasta 5FN** (`docs/bd/ANALISIS_NORMALIZACION.md`): `personas` única + `usuarios`/`clientes`/`choferes` como roles · `usuarios_roles` · 8 catálogos con el código como clave (`tipos_documento`, `tipos_asiento`, `roles`, `canales_venta`, `metodos_pago`, `categorias_licencia`, `departamentos`, `ciudades`) · 4 vistas para los datos calculados · claves naturales en `rutas_paradas`, `viajes_choferes` y `tarifas` · claves foráneas compuestas que garantizan el tramo en `pasajes`.
-- **Migraciones aplicadas (10):** `buses` · `funciones_y_personas` · `flota_y_rutas` · `ventas_pasajes_pagos` (restricción de exclusión por tramo `pasajes_asiento_sin_traslape`, `btree_gist`) · `encomiendas` · `documentos_bolivia` · `catalogos` · `personas` · `derivados_y_vistas` · `integridad_y_claves`.
+- **Migraciones aplicadas (11):** `buses` · `funciones_y_personas` · `flota_y_rutas` · `ventas_pasajes_pagos` (restricción de exclusión por tramo `pasajes_asiento_sin_traslape`, `btree_gist`) · `encomiendas` · `documentos_bolivia` · `catalogos` · `personas` · `derivados_y_vistas` · `integridad_y_claves` · `rutas_nombre_unico` (23/09, índice único `lower(nombre)`).
 - **Flujo para una migración nueva desde Claude:**
   1. Aplicarla con el MCP de Supabase (`apply_migration`).
   2. Leer la versión asignada con `list_migrations`.
   3. Guardar el archivo como `supabase/migrations/<version>_<nombre>.sql` con el mismo SQL.
   4. Actualizar `PROPUESTA_BD.md`.
   5. Si el cambio va al equipo, registrarlo en `docs/repo2/CORRECCIONES_NN.md`.
-- **Datos de prueba** (`supabase/seed.sql`, IDs fijos `00000000-0000-4000-8000-000000000xxx`, personas `...a0xx`): 5 personas, 2 usuarios con rol, 2 clientes, 1 chofer, terminales La Paz, Oruro y Cochabamba, buses `2045KLP` y `3187HTR`, 4 asientos, ruta La Paz → Oruro → Cochabamba, 1 viaje, 3 tarifas, 1 venta con pasaje (tramo 1→2) y pago. El archivo es **idempotente**. Si se prueban inserciones, **borrar lo creado** al terminar.
+- **Datos de prueba** (`supabase/seed.sql`, IDs fijos `00000000-0000-4000-8000-000000000xxx`, personas `...a0xx`): 5 personas, 2 usuarios con rol, 2 clientes, 1 chofer, terminales La Paz, Oruro y Cochabamba, buses `2045KLP` y `3187HTR`, 4 asientos, ruta La Paz → Oruro → Cochabamba, 1 viaje, 3 tarifas, 1 venta con pasaje (tramo 1→2) y pago. Desde el Sprint 2 los dos buses traen su croquis completo (36 y 40 asientos). El archivo es **idempotente**. `supabase/demo.sql` (`npm run db:demo`) crea viajes de hoy a 6 días; también idempotente. Si se prueban inserciones, **borrar lo creado** al terminar.
+- **Cuentas de prueba (Supabase Auth):** `ana.quispe@panamericana.test` (administradora) y `luis.rojas@panamericana.test` (vendedor), con el mismo id que en `usuarios`. La contraseña **no** va en archivos versionados; se comparte por canal privado (y va en la copia de `compartir/`).
 - **Autenticación:** Supabase firma los tokens con **ECC P-256** (clave actual `4190b38b-…`). La API los valida con el JWKS `https://tvyhpwpyxmbdfxogopnl.supabase.co/auth/v1/.well-known/jwks.json` (`ES256`, audiencia `authenticated`). `SUPABASE_JWT_SECRET` **no se usa**. La web usará la clave publicable `sb_publishable_…`. **No revocar** la clave anterior Legacy HS256 hasta desactivar las claves *legacy* `anon` y `service_role`.
 
 ---
@@ -181,7 +186,7 @@ npm run db:verificar   # prueba la conexión y lista las tablas
 - **Iterativo:** entregar `.md` paso a paso al planificar; recomendar en lugar de listar opciones sin postura.
 - **Acciones externas** (Trello, Supabase, GitHub): confirmar alcance con lo pedido por el usuario. Nunca tocar el repositorio 2.
 - **Cambios en el stack:** ejecutar `npm run lint`, `npm test` y `npm run build` antes del commit, y luego la búsqueda de rastros de la §3.3.
-- **Cambios que deben llegar al equipo:** documentarlos en `docs/repo2/CORRECCIONES_NN.md` (la siguiente es **02**) con la tabla de archivos, el comando de copia, la verificación y el estado. Avisar al usuario.
+- **Cambios que deben llegar al equipo:** documentarlos en `docs/repo2/CORRECCIONES_NN.md` (la siguiente es **03**; el trabajo de cada sprint va en su `REPLICACION_SPRINT_NN.md`) con la tabla de archivos, el comando de copia, la verificación y el estado. Avisar al usuario.
 - **Git:** commits en español, estilo *conventional*, con la línea de atribución. Ejecutar `git add`, `git commit` y `git push` **en llamadas separadas**: el clasificador de permisos bloquea a veces los comandos encadenados o el `push`. Si el `push` se bloquea, dejar el commit hecho y pedir al usuario que ejecute `git push`.
   - La computadora guarda **dos cuentas de GitHub** (Z&P y AngelParedesH20). Por eso el remoto de este repositorio lleva el usuario en la URL (`https://ZPSoftwareFastSolutions@github.com/ZPSoftwareFastSolutions/panamericana-base.git`). Sin eso, el administrador de credenciales abre un selector de cuenta y el `push` se queda esperando.
 - **Herramientas:**
@@ -215,6 +220,8 @@ npm run db:verificar   # prueba la conexión y lista las tablas
 | `docs/repo2/` | `README.md` básico del repositorio 2 · `CORRECCIONES_NN.md` (01 y 02 ✅) · `REPLICACION_SPRINT_NN.md` (gestión de cada sprint en el repositorio del equipo) | Hay cambios para el equipo o se construye un sprint |
 | `docs/bd/ANALISIS_NORMALIZACION.md` | Verificación de formas normales del modelo v1.0 y propuesta v2.0 (26 tablas + 4 vistas) | Se decide sobre la propuesta o cambia el modelo |
 | `docs/equipo/GUIA_DESARROLLO.md` | Guía para los 5 integrantes con el ejemplo `choferes` y el `.env` (con marcador en lugar de la contraseña) | Cambia el stack, una convención o el `.env` |
+| `docs/REVISION_FACTIBILIDAD.md` | Veredicto de factibilidad, ajustes A1–A7, ramas por sprint y protocolo de validación | Cambia el plan de ramas o un ajuste |
+| `docs/pruebas/` | Pruebas de aceptación automatizadas por sprint (crean y borran sus datos) | Se construye un sprint |
 | `compartir/` *(ignorada por git)* | Copia de la guía con el `.env` completo, lista para enviar al equipo | Se regenera cada vez que cambia la guía |
 
 ---
@@ -239,3 +246,5 @@ npm run db:verificar   # prueba la conexión y lista las tablas
 | 23/09 | Sprint 1 construido y validado como **referencia** en este repositorio; el equipo lo replica con `REPLICACION_SPRINT_01.md` (contrato `shared/` primero, PR chicos compartidos antes que los módulos) |
 | 23/09 | Tarjetas nuevas PAN-41 (núcleo de personas, John) y PAN-42 (catálogos, Grisel): las piezas que usan varios módulos tienen dueño |
 | 23/09 | Núcleo compartido `compartido/` para reglas de persona y transacciones; JSON aplanado para personas y anidado para referencias |
+| 23/09 | Revisión de factibilidad: MVP en **4 ramas** (`sprint01`…`sprint04`); PAN-15 crea las tarifas (A1); ML en TypeScript porque no hay Python (A4); encomiendas pagadas en origen (A6) |
+| 23/09 | Sprint 2: rutas del panel protegidas por rol (`autorizacion.requiere`), portal público con límite de reservas por IP, contrato web (servicios y hooks) en el PR del día 1 para evitar conflictos |

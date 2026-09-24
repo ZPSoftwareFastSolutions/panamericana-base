@@ -1,6 +1,6 @@
 # Product Backlog — Panamericana (MVP en 3 sprints)
 
-> **Versión:** 1.1 · **Fecha:** 2026-09-15 · **Estado:** Sprint 1 en curso · contexto Bolivia · despliegue en la fase final · tarjetas del Sprint 2 sin cargar en Trello
+> **Versión:** 1.2 · **Fecha:** 2026-09-23 · **Estado:** Sprint 2 en curso · referencias de los Sprints 1 y 2 listas en `panamericana-base` · contexto Bolivia · despliegue en la fase final · tarjetas del Sprint 2 documentadas, sin cargar en Trello
 > **Fuentes:** `PLANIFICACION.md` v0.4 · análisis deductivo-inductivo (fase alpha) · `PROPUESTA_BD.md` v1.0 · ADR-001, ADR-002, ADR-003
 > **Documento interno del Repositorio 1.** Al equipo le llega como **tarjetas de Trello** (una por cada `PAN-xx`), nunca como archivo.
 
@@ -26,8 +26,8 @@
 
 | Sprint | Fechas | Estado | Objetivo (incremento) | Puntos comprometidos |
 |---|---|---|---|---|
-| **Sprint 1** | 08/09/2026 → 19/09/2026 | 🔄 En curso · confirmado | **Base operativa:** el equipo trabaja en local sobre la misma base, primeros catálogos (terminales, usuarios, clientes) y maqueta del portal | 31 |
-| **Sprint 2** | 22/09/2026 → 03/10/2026 | ✅ Confirmado | **MVP 1 — Venta web con control de concurrencia (en local):** el administrador programa rutas y viajes; el cliente busca, elige asiento por tramo, reserva y compra; es imposible vender dos veces el mismo asiento | 45 |
+| **Sprint 1** | 08/09/2026 → 19/09/2026 | ✅ Referencia lista · el equipo lo completa al inicio del Sprint 2 | **Base operativa:** el equipo trabaja en local sobre la misma base, primeros catálogos (terminales, usuarios, clientes) y maqueta del portal | 31 |
+| **Sprint 2** | 22/09/2026 → 03/10/2026 | 🔄 En curso · referencia lista (`sprint02`) | **MVP 1 — Venta web con control de concurrencia (en local):** el administrador programa rutas y viajes; el cliente busca, elige asiento por tramo, reserva y compra; es imposible vender dos veces el mismo asiento | 45 |
 | **Sprint 3** | *06/10/2026 → 17/10/2026 (tentativo)* | ⚠️ **Sin confirmar por el docente** | **MVP 2 — Multicanal, control e IA:** taquilla, anulación, encomiendas, boleto con QR, panel de indicadores con predicción de demanda (machine learning) y PWA | 47 |
 
 > **Regla de diseño del plan:** cada sprint termina con un incremento **demostrable por sí solo**. Si el Sprint 3 no se confirma o se acorta, el **MVP 1 del Sprint 2** es un producto completo que se puede presentar. Ver el plan de contingencia (sección 7).
@@ -137,7 +137,7 @@ Estas decisiones responden de forma **provisional** las preguntas abiertas de `P
 - `/admin/*` redirige al login si no hay sesión; el menú muestra solo las opciones del rol.
 - Las rutas públicas de búsqueda y compra no piden sesión.
 
-**Must · 6 pts · Sprint 2 · PAN-10, PAN-11 · ⏳**
+**Must · 6 pts · Sprint 2 · PAN-10, PAN-11 · 🔄 referencia lista (`sprint02`)**
 
 #### HU-006 · Registro de usuarios internos
 **Como** administrador **quiero** registrar y listar usuarios internos con su rol **para** controlar quién opera el sistema.
@@ -204,7 +204,7 @@ Estas decisiones responden de forma **provisional** las preguntas abiertas de `P
 - `minutos_desde_origen` y `km_desde_origen` crecen con el orden; la duración total se lee de la vista `rutas_resumen`.
 - Pantalla para crear la ruta y ordenar sus paradas.
 
-**Must · 8 pts · Sprint 2 · PAN-13, PAN-14 · ⏳**
+**Must · 8 pts · Sprint 2 · PAN-13, PAN-14 · 🔄 referencia lista (`sprint02`)**
 
 #### HU-015 · Programar viajes
 **Como** administrador **quiero** programar un viaje con ruta, bus, fecha de salida y precio base **para** ponerlo a la venta.
@@ -212,7 +212,7 @@ Estas decisiones responden de forma **provisional** las preguntas abiertas de `P
 - La llegada estimada y la hora de paso por cada parada se leen de la vista `viajes_horarios` (no se guardan).
 - El viaje nace `programado`; la pantalla lista los viajes por fecha.
 
-**Must · 6 pts · Sprint 2 · PAN-15, PAN-16 · ⏳**
+**Must · 6 pts · Sprint 2 · PAN-15, PAN-16 · 🔄 referencia lista (`sprint02`)**
 
 #### HU-016 · Tarifas por tipo de asiento
 **Como** administrador **quiero** definir el precio por tipo de asiento de cada viaje **para** cobrar distinto la cama y la semicama.
@@ -237,7 +237,7 @@ Estas decisiones responden de forma **provisional** las preguntas abiertas de `P
 - Solo muestra viajes `programados` y con salida futura.
 - Cada resultado muestra hora de paso por el origen, llegada estimada al destino, precio del tramo y asientos libres.
 
-**Must · 4 pts · Sprint 2 · PAN-17, PAN-18 · ⏳**
+**Must · 4 pts · Sprint 2 · PAN-17, PAN-18 · 🔄 referencia lista (`sprint02`)**
 
 #### HU-019 · Ver disponibilidad y elegir asiento por tramo
 **Como** cliente **quiero** ver en el croquis qué asientos están libres **para mi tramo** **para** elegir uno.
@@ -245,7 +245,7 @@ Estas decisiones responden de forma **provisional** las preguntas abiertas de `P
 - Las reservas vencidas se muestran como libres.
 - El croquis respeta pisos, filas y columnas, y distingue libre, ocupado y seleccionado.
 
-**Must · 8 pts · Sprint 2 · PAN-19, PAN-20 · ⏳**
+**Must · 8 pts · Sprint 2 · PAN-19, PAN-20 · 🔄 referencia lista (`sprint02`)**
 
 #### HU-020 · Reservar asiento con retención temporal
 **Como** cliente **quiero** que mi asiento quede retenido mientras pago **para** que nadie me lo quite.
@@ -255,7 +255,7 @@ Estas decisiones responden de forma **provisional** las preguntas abiertas de `P
 - Si el asiento ya no está libre, la API responde **409 `asiento_no_disponible`** y no crea nada.
 - **Prueba de aceptación:** un script lanza dos reservas simultáneas del mismo asiento con tramos cruzados → una 201 y una 409. Con tramos que no se cruzan → dos 201.
 
-**Must · 5 pts · Sprint 2 · PAN-21 · ⏳**
+**Must · 5 pts · Sprint 2 · PAN-21 · 🔄 referencia lista (`sprint02`)**
 
 #### HU-021 · Confirmar compra y obtener pasaje
 **Como** cliente **quiero** ingresar los datos del pasajero, pagar y recibir el código de mi pasaje **para** poder viajar.
@@ -265,7 +265,7 @@ Estas decisiones responden de forma **provisional** las preguntas abiertas de `P
 - La confirmación muestra el código de la venta y de cada pasaje.
 - La web maneja el 409: avisa y refresca el croquis.
 
-**Must · 6 pts · Sprint 2 · PAN-22, PAN-23 · ⏳**
+**Must · 6 pts · Sprint 2 · PAN-22, PAN-23 · 🔄 referencia lista (`sprint02`)**
 
 #### HU-022 · Prueba automatizada de compras simultáneas
 **Como** equipo **quiero** una prueba automatizada que demuestre que no hay doble venta **para** detectar cualquier regresión en la concurrencia.
@@ -395,6 +395,8 @@ Detalle de cada tarjeta: `docs/guias-sprint/GUIA_SPRINT_01.md`.
 
 ### 5.2 Sprint 2 — 22/09 → 03/10 · MVP 1
 
+**Estado al 23/09:** en `panamericana-base` el sprint está **construido y validado** (rama `sprint02`, commit `399a8cb`: 78 pruebas unitarias y 60 casos de aceptación contra la base real, incluidas 8 reservas simultáneas del mismo asiento). La replicación, con los textos de las tarjetas para Trello, está en `docs/repo2/REPLICACION_SPRINT_02.md`. **Ajuste A1** (`docs/REVISION_FACTIBILIDAD.md`): PAN-15 crea las tarifas del viaje, porque el modelo v2.0 guarda el precio solo en `tarifas`.
+
 | Tarjeta | Responsable | Trabajo | HU | Pts | Depende de |
 |---|---|---|---|---|---|
 | PAN-10 | John | Autenticación en la API: validar el token de Supabase y los roles | HU-005 | 3 | — |
@@ -402,7 +404,7 @@ Detalle de cada tarjeta: `docs/guias-sprint/GUIA_SPRINT_01.md`.
 | PAN-12 | Grisel | Croquis de asientos de un bus (API) | HU-012 | 2 | — |
 | PAN-13 | Ángel | Rutas con paradas (API) | HU-014 | 5 | PAN-03 |
 | PAN-14 | Brisa | Pantalla de rutas y paradas | HU-014 | 3 | PAN-13 (contrato) |
-| PAN-15 | Grisel | Programación de viajes (API) | HU-015 | 3 | PAN-13 |
+| PAN-15 | Grisel | Programación de viajes **con sus tarifas por tipo de asiento** (API) | HU-015 | 3 | PAN-12, PAN-13 |
 | PAN-16 | Brisa | Pantalla de programación de viajes | HU-015 | 3 | PAN-15 (contrato) |
 | PAN-17 | Grisel | Búsqueda de viajes por origen, destino y fecha (API) | HU-018 | 2 | PAN-15 |
 | PAN-18 | Karime | Buscador conectado a la API y lista de resultados | HU-018 | 2 | PAN-17 (contrato) |
@@ -442,8 +444,8 @@ Decisión del 15/09: hasta esta fase **todo corre en local**. Es obligatoria por
 | PAN-32 | John | Consultar y anular pasaje por código (API) | HU-025 | 3 | PAN-22 |
 | PAN-33 | Grisel | Encomiendas: registro, estados, historial y seguimiento (API) | HU-023 | 5 | PAN-06 |
 | PAN-34 | Grisel | Pantallas de encomiendas y consulta por código | HU-023 | 3 | PAN-33 (contrato) |
-| PAN-35 | Ángel | Tarifas por tipo de asiento (API) | HU-016 | 3 | PAN-15 |
-| PAN-36 | Karime | Precio por tipo de asiento en el croquis y el checkout | HU-016 | 2 | PAN-35 (contrato) |
+| PAN-35 | Ángel | **Editar** las tarifas de un viaje programado (API y pantalla; crearlas ya lo hace PAN-15) | HU-016 | 3 | PAN-15 |
+| ~~PAN-36~~ | — | *Absorbida por PAN-20 y PAN-23 (Sprint 2): el croquis y el checkout ya muestran el precio por tipo de asiento* | HU-016 | 0 | — |
 | PAN-37 | Brisa | Editor de croquis de asientos | HU-012 | 2 | PAN-12 |
 | PAN-38 | Karime | Boleto electrónico con QR y consulta por código | HU-028 | 3 | PAN-32 (contrato) |
 | PAN-39 | Karime | Portal instalable como aplicación (PWA) | HU-026 | 2 | — |

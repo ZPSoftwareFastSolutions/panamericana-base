@@ -60,11 +60,14 @@ Luego completa `backend/.env` con los datos de Supabase:
 | `DATABASE_URL` | **Session pooler** (ver aviso abajo). La contraseña la comparte Ángel por canal privado | `postgresql://postgres.tvyhpwpyxmbdfxogopnl:CONTRASENA@aws-0-us-east-1.pooler.supabase.com:5432/postgres` |
 | `SUPABASE_URL` | Ya viene en el `.env.example` | `https://tvyhpwpyxmbdfxogopnl.supabase.co` |
 | `MINUTOS_RESERVA_ASIENTO` | acuerdo del equipo | `10` |
+| `LIMITE_RESERVAS_POR_HORA` | protección del portal: reservas por conexión y hora | `30` |
 
-`web/.env.local` solo necesita:
+`web/.env.local`:
 
 ```
 NEXT_PUBLIC_API_URL=http://localhost:4000
+NEXT_PUBLIC_SUPABASE_URL=https://tvyhpwpyxmbdfxogopnl.supabase.co
+NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=sb_publishable_…   (viene en el .example; es pública por diseño)
 ```
 
 > ⚠️ Los archivos `.env` y `.env.local` **nunca** se suben al repositorio. Solo se suben los `.example`.
@@ -86,7 +89,8 @@ npm run dev:web
 | ¿La base conecta? | `npm run db:verificar` en una terminal |
 | ¿La API responde? | http://localhost:4000/salud → `{"estado":"ok"}` |
 | La web | http://localhost:3000 |
-| El panel administrativo | http://localhost:3000/admin/buses |
+| El panel administrativo | http://localhost:3000/admin → pide iniciar sesión (cuentas de prueba de Ana y Luis; la contraseña la comparte Ángel) |
+| El portal de compra | http://localhost:3000 → buscar *Oruro → Cochabamba* |
 
 ### 2.5 Comandos que vas a usar siempre
 
@@ -99,6 +103,8 @@ npm run dev:web
 | `npm run build` | Compila todo, igual que en el servidor |
 | `npm run build:shared` | Recompila el contrato compartido (se ejecuta solo al usar `dev:*`) |
 | `npm run db:verificar` | Comprueba que el backend se conecta a la base y lista las tablas |
+| `npm run db:semilla` | Vuelve a cargar los datos de prueba (idempotente) |
+| `npm run db:demo` | Crea los viajes de demostración de hoy a 6 días (idempotente) |
 
 ---
 
@@ -135,13 +141,18 @@ panamericana/
 │       │   │   ├── ErrorDeDominio.ts       clase base de errores
 │       │   │   ├── erroresComunes.ts       DatoObligatorioError
 │       │   │   ├── Persona.ts              reglas bolivianas de una persona (CI, celular, correo)
-│       │   │   └── erroresPersona.ts       errores de los datos personales
+│       │   │   ├── erroresPersona.ts       errores de los datos personales
+│       │   │   ├── Tramo.ts                tramo de un viaje: paradas, hora de paso, precio (Bs 0,50)
+│       │   │   ├── erroresViaje.ts         viaje inexistente, no disponible, tramo inválido
+│       │   │   └── Codigo.ts               códigos V-/P- y documentos ocultos
 │       │   └── adaptadores/
-│       │       ├── http/manejadorErrores.ts   error → código HTTP
-│       │       └── pg/                        transaccion.ts · personasSql.ts · erroresPg.ts
+│       │       ├── http/                      manejadorErrores.ts · autorizacion.ts (roles) · limiteDePeticiones.ts
+│       │       └── pg/                        transaccion.ts · personasSql.ts · erroresPg.ts · reservasSql.ts
 │       ├── infraestructura/
 │       │   ├── config.ts        lee el .env
 │       │   ├── baseDeDatos.ts   conexión a Supabase
+│       │   ├── reloj.ts         "hoy" en La Paz
+│       │   ├── ejecutarSql.ts   npm run db:semilla / db:demo
 │       │   └── servidor.ts      arma Express
 │       ├── contenedor.ts        conecta las piezas (único lugar con "new")
 │       ├── rutas.ts             registra los routers de cada módulo
@@ -152,10 +163,10 @@ panamericana/
 │       ├── app/                              RUTAS: lo que el usuario ve en la URL
 │       │   ├── layout.tsx                    envoltura general
 │       │   ├── proveedores.tsx               cache de datos (TanStack Query)
-│       │   ├── (publico)/                    portal: layout.tsx y page.tsx ("/")
+│       │   ├── (publico)/                    portal: "/", login, viajes, viajes/[id], compra/[codigo]
 │       │   └── (backoffice)/
-│       │       ├── layout.tsx                usa MenuLateral
-│       │       └── admin/{buses,terminales,clientes}/page.tsx
+│       │       ├── layout.tsx                PanelConSesion: exige sesión y arma el menú por rol
+│       │       └── admin/                    page.tsx (inicio) y {buses,terminales,clientes,rutas,viajes}/page.tsx
 │       ├── modulos/
 │       │   └── buses/                        ← MÓDULO DE EJEMPLO (copiar esta forma)
 │       │       ├── componentes/              lo que se ve (tabla, formulario)
@@ -163,12 +174,13 @@ panamericana/
 │       │       └── servicios/                llamadas a la API
 │       └── compartido/
 │           ├── servicios/clienteHttp.ts      único lugar con fetch
-│           ├── componentes/                  Boton, Campo, CampoSeleccion, MenuLateral
-│           └── utilidades/fechas.ts          hoyEnBolivia, formatearFecha
+│           ├── componentes/                  Boton, Campo, CampoSeleccion, MenuLateral, PlanoAsientos, CuentaRegresiva
+│           └── utilidades/                   fechas.ts (hora de La Paz) · dinero.ts (formatearBs)
 │
 ├── supabase/
 │   ├── migrations/           archivos .sql que crean y cambian las tablas
-│   └── seed.sql              datos de prueba
+│   ├── seed.sql              datos de prueba
+│   └── demo.sql              viajes de demostración de la semana
 │
 └── docs/
     ├── api/openapi.yaml      referencia interna del módulo buses (no se mantiene; el contrato es shared/src)
@@ -417,19 +429,17 @@ Pegar el valor dentro del texto de la consulta permite inyección de SQL. Siempr
 
 ### 9.3 Transacciones (varios pasos que deben ir juntos)
 
+Se usa `enTransaccion` del núcleo compartido (`compartido/adaptadores/pg/transaccion.ts`), que hace `begin`, `commit` o `rollback` y libera la conexión:
+
 ```ts
-const conexion = await this.db.connect();
-try {
-  await conexion.query('begin');
-  // ... varias consultas, por ejemplo el bloqueo de asiento del ADR-001
-  await conexion.query('commit');
-} catch (error) {
-  await conexion.query('rollback');
-  throw error;
-} finally {
-  conexion.release();
-}
+await enTransaccion(this.db, async (conexion) => {
+  // turno: otra transaccion que bloquee el mismo viaje espera aqui
+  await conexion.query('select id from viajes where id = $1 for update', [viaje_id]);
+  // ... volver a revisar y escribir (ADR-001)
+});
 ```
+
+**Cuando dos personas pueden chocar** (el mismo asiento, el mismo bus, el mismo nombre), la regla se revisa **dos veces**: antes, para dar un mensaje claro, y **dentro** de la transacción con la fila bloqueada o con una restricción de la base (`pasajes_asiento_sin_traslape`, `rutas_nombre_unico`) que el repositorio traduce a un error de dominio (409).
 
 ### 9.4 Migraciones
 
@@ -454,6 +464,22 @@ npx supabase db push
 - **Reutilizar el núcleo:** las reglas de una persona se validan con `crearPersona` (`compartido/dominio/Persona.ts`) y se guardan con `guardarPersona` dentro de `enTransaccion`; nunca se copian en cada módulo.
 - **Las tablas puente usan clave natural**: `rutas_paradas (ruta_id, orden)`, `viajes_choferes (viaje_id, chofer_id)`, `tarifas (viaje_id, tipo_asiento)`.
 - Las **copias** solo se permiten si la base puede verificarlas con una clave foránea compuesta (el caso de `pasajes`, ADR-001).
+
+### 9.5 Sesión y roles (desde el Sprint 2)
+
+- El panel usa **Supabase Auth**. La web inicia sesión con `@supabase/supabase-js` y `clienteHttp` envía `Authorization: Bearer <token>` en cada petición.
+- La API valida el token con el **JWKS** del proyecto (ES256, audiencia `authenticated`) en `modulos/sesion` y carga los roles de `usuarios_roles`. El id del token es el id de `usuarios`.
+- Cada router del panel recibe `(casos, autorizacion)` y protege cada endpoint con un grupo de `compartido/adaptadores/http/autorizacion.ts`:
+
+| Grupo | Roles | Para |
+|---|---|---|
+| `ROLES_INTERNOS` | administrador, vendedor, encomiendas | Consultar (listas, detalle) |
+| `SOLO_ADMINISTRADOR` | administrador | Configurar: buses, croquis, terminales, rutas, viajes, usuarios |
+| `ROLES_VENTA` | administrador, vendedor | Taquilla y anulaciones |
+| `ROLES_ENCOMIENDAS` | administrador, encomiendas | Encomiendas |
+
+- **Públicos** (sin sesión): catálogos, búsqueda de viajes, asientos del tramo y la compra del portal (con límite de reservas por conexión).
+- El menú de la web (`MenuLateral`, arreglo `OPCIONES` con roles) **solo oculta** opciones; la protección real es la API.
 
 ---
 
@@ -531,8 +557,6 @@ npx supabase db push
 | Tema | Cuándo entra |
 |---|---|
 | App móvil nativa (React Native) | Fuera del MVP; el canal móvil es una PWA (E8, Sprint 3) |
-| Login y roles (Supabase Auth) | Épica E1, Sprint 2 |
-| Portal público de compra `app/(publico)/` | Maqueta en el Sprint 1; compra real en la épica E5, Sprint 2 |
 | Pruebas de humo en staging | Épica E10, Sprint 3 |
 | Validación automática de capas y del SQL | *Could*, fuera del compromiso del MVP |
 | Componentes de UI compartidos | Cuando el mismo componente se repita 3 veces |

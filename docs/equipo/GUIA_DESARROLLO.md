@@ -1,6 +1,6 @@
 # Guía de Desarrollo — Panamericana
 
-> **Para:** todo el equipo · **Versión:** 1.2 · **Fecha:** 23/09/2026 (piezas compartidas del Sprint 1)
+> **Para:** todo el equipo · **Versión:** 1.3 · **Fecha:** 23/09/2026 (inicio de sesión y roles del Sprint 2)
 > **Objetivo:** que cualquier integrante pueda agregar endpoints, pantallas y módulos **sin romper la arquitectura**, por su cuenta o con ayuda de un asistente de IA.
 > **Ejemplo que se usa en toda la guía:** el módulo **`choferes`** completo (listar con filtro, ver detalle, registrar y actualizar). Todo el código de esta guía **compila y funciona** con el proyecto actual.
 
@@ -60,12 +60,15 @@ ALLOWED_ORIGINS=http://localhost:3000
 SUPABASE_URL=https://tvyhpwpyxmbdfxogopnl.supabase.co
 DATABASE_URL=postgresql://postgres.tvyhpwpyxmbdfxogopnl:<CONTRASEÑA_DE_LA_BASE>@aws-0-us-east-1.pooler.supabase.com:5432/postgres
 MINUTOS_RESERVA_ASIENTO=10
+LIMITE_RESERVAS_POR_HORA=30
 ```
 
 **Archivo `web/.env.local`**:
 
 ```env
 NEXT_PUBLIC_API_URL=http://localhost:4000
+NEXT_PUBLIC_SUPABASE_URL=https://tvyhpwpyxmbdfxogopnl.supabase.co
+NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=sb_publishable_pekXdkyDZys5MbAEw4KJWA_pVnIHBMi
 ```
 
 Si en `DATABASE_URL` ves `<CONTRASEÑA_DE_LA_BASE>`, pídele la contraseña a Ángel por privado.
@@ -77,7 +80,9 @@ Si en `DATABASE_URL` ves `<CONTRASEÑA_DE_LA_BASE>`, pídele la contraseña a Á
 | `SUPABASE_URL` | Dirección del proyecto de base de datos y login |
 | `DATABASE_URL` | Conexión a PostgreSQL. **Usa el pooler** (`aws-0-us-east-1.pooler.supabase.com`); la conexión directa `db.…supabase.co` falla con `ENOTFOUND` |
 | `MINUTOS_RESERVA_ASIENTO` | Minutos que se retiene un asiento mientras se paga |
+| `LIMITE_RESERVAS_POR_HORA` | Reservas del portal que puede hacer una misma conexión por hora (evita que alguien acapare asientos). Para pruebas locales intensivas puedes subirlo |
 | `NEXT_PUBLIC_API_URL` | Dirección de la API que usa la web |
+| `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` | Inicio de sesión del panel. La clave *publicable* está hecha para el navegador: no es secreta |
 
 > 🧪 **La base de datos es compartida por todo el equipo.** Puedes crear datos de prueba, pero **borra lo que crees** al terminar y no hagas cargas masivas.
 
@@ -102,8 +107,11 @@ npm run dev:web
 | Abre | Debes ver |
 |---|---|
 | http://localhost:4000/salud | `{"estado":"ok"}` |
-| http://localhost:4000/v1/buses | Los buses de prueba en JSON |
-| http://localhost:3000/admin/buses | La tabla de buses y el formulario |
+| http://localhost:4000/v1/catalogos/ciudades | Las ciudades en JSON (ruta pública) |
+| http://localhost:4000/v1/buses | `401 no_autenticado`: **correcto**, el panel exige iniciar sesión |
+| http://localhost:3000/admin | Te envía a `/login`. Entra con la cuenta de prueba (Ángel te pasa la contraseña por privado) y verás el panel |
+
+**Cuentas de prueba:** `ana.quispe@panamericana.test` (administradora: ve todo) y `luis.rojas@panamericana.test` (vendedor: no ve la configuración). Sirven para comprobar que cada rol ve solo lo suyo.
 
 ---
 
@@ -200,10 +208,17 @@ Antes de escribir algo "genérico", revisa si ya está aquí:
 | `enTransaccion(pool, trabajo)` | `backend/src/compartido/adaptadores/pg/transaccion.ts` | Varias consultas que se guardan todas juntas o ninguna |
 | `guardarPersona(conexion, persona)` | `backend/src/compartido/adaptadores/pg/personasSql.ts` | Guarda la persona (o reutiliza la que ya existe con ese documento) y devuelve su `id` |
 | `CODIGOS_PG`, `codigoPg(error)` | `backend/src/compartido/adaptadores/pg/erroresPg.ts` | Reconocer errores de la base: valor repetido (23505), referencia inexistente (23503) |
+| `Autorizacion`, `ROLES_INTERNOS`, `SOLO_ADMINISTRADOR`, `ROLES_VENTA`, `ROLES_ENCOMIENDAS`, `usuarioEnSesion(res)` | `backend/src/compartido/adaptadores/http/autorizacion.ts` | Proteger un endpoint por rol y saber quién hizo la petición |
+| `resolverTramo`, `horaDePaso`, `precioDeTramo` | `backend/src/compartido/dominio/Tramo.ts` | Reglas del tramo de un viaje: paradas válidas, hora de paso y precio proporcional redondeado a Bs 0,50 |
+| `generarCodigo`, `enmascararDocumento` | `backend/src/compartido/dominio/Codigo.ts` | Códigos legibles de venta y pasaje (`V-…`, `P-…`) y documentos ocultos (`****351`) |
+| `PASAJE_ACTIVO`, `liberarReservasVencidas` | `backend/src/compartido/adaptadores/pg/reservasSql.ts` | Qué pasaje ocupa un asiento y liberar las reservas vencidas |
 | `Boton` | `web/src/compartido/componentes/Boton.tsx` | Botón con estado "Guardando..." |
 | `Campo`, `CampoSeleccion` | `web/src/compartido/componentes/Campo.tsx` | Campos de formulario con etiqueta y mensaje de error |
-| `MenuLateral` | `web/src/compartido/componentes/MenuLateral.tsx` | Menú del panel; resalta la pantalla actual |
-| `hoyEnBolivia`, `formatearFecha` | `web/src/compartido/utilidades/fechas.ts` | "Hoy" en hora de La Paz y fechas `dd/mm/aaaa` |
+| `MenuLateral` | `web/src/compartido/componentes/MenuLateral.tsx` | Menú del panel; muestra solo las opciones de los roles del usuario y resalta la pantalla actual |
+| `PlanoAsientos`, `CuentaRegresiva` | `web/src/compartido/componentes/` | Croquis de asientos por piso y reloj de la reserva |
+| `hoyEnBolivia`, `formatearFecha`, `horaEnBolivia`, `fechaHoraEnBolivia`, `aIsoBolivia`, `formatearDuracion` | `web/src/compartido/utilidades/fechas.ts` | Fechas y horas siempre en hora de La Paz |
+| `formatearBs` | `web/src/compartido/utilidades/dinero.ts` | Montos como `Bs 47,50` |
+| `useSesion` | `web/src/modulos/sesion/hooks/useSesion.ts` | El usuario conectado y sus roles |
 | `useCiudades`, `useTiposDocumento`, `useRoles` | `web/src/modulos/catalogos/hooks/useCatalogos.ts` | Listas para llenar selectores |
 
 > **Regla:** si una pieza la necesitan **dos módulos o más**, va en `compartido/`. Si solo la usa uno, va dentro de ese módulo.
@@ -810,11 +825,15 @@ export class PgChoferRepositorio implements ChoferRepositorio {
 
 **4b. Rutas HTTP.** Zod valida la **forma**; el dominio valida el **negocio**. No hace falta `try/catch`.
 
+Cada endpoint del panel se **protege por rol** con `autorizacion.requiere(...)`: sin sesión responde **401**, con un rol que no corresponde **403**. Los choferes los consulta todo el personal y solo la administradora los registra o cambia.
+
 ```ts
 // archivo: backend/src/modulos/choferes/adaptadores/choferRutas.ts
 import { Router } from 'express';
 import { z } from 'zod';
 import { RUTAS_API } from '@panamericana/shared';
+import type { Autorizacion } from '../../../compartido/adaptadores/http/autorizacion';
+import { ROLES_INTERNOS, SOLO_ADMINISTRADOR } from '../../../compartido/adaptadores/http/autorizacion';
 import type { ActualizarChofer } from '../casos-de-uso/ActualizarChofer';
 import type { ListarChoferes } from '../casos-de-uso/ListarChoferes';
 import type { ObtenerChofer } from '../casos-de-uso/ObtenerChofer';
@@ -842,15 +861,18 @@ const esquemaActualizar = z.object({
   activo: z.boolean().optional(),
 });
 
-export function choferRutas(casos: {
-  listarChoferes: ListarChoferes;
-  obtenerChofer: ObtenerChofer;
-  registrarChofer: RegistrarChofer;
-  actualizarChofer: ActualizarChofer;
-}): Router {
+export function choferRutas(
+  casos: {
+    listarChoferes: ListarChoferes;
+    obtenerChofer: ObtenerChofer;
+    registrarChofer: RegistrarChofer;
+    actualizarChofer: ActualizarChofer;
+  },
+  autorizacion: Autorizacion,
+): Router {
   const router = Router();
 
-  router.get(RUTAS_API.choferes.base, async (req, res) => {
+  router.get(RUTAS_API.choferes.base, autorizacion.requiere(...ROLES_INTERNOS), async (req, res) => {
     const { activo } = esquemaFiltro.parse(req.query);
     const choferes = await casos.listarChoferes.ejecutar({
       activo: activo === undefined ? undefined : activo === 'true',
@@ -858,19 +880,19 @@ export function choferRutas(casos: {
     res.json(choferes);
   });
 
-  router.get(RUTAS_API.choferes.porId, async (req, res) => {
+  router.get(RUTAS_API.choferes.porId, autorizacion.requiere(...ROLES_INTERNOS), async (req, res) => {
     const { id } = esquemaId.parse(req.params);
     const chofer = await casos.obtenerChofer.ejecutar(id);
     res.json(chofer);
   });
 
-  router.post(RUTAS_API.choferes.base, async (req, res) => {
+  router.post(RUTAS_API.choferes.base, autorizacion.requiere(...SOLO_ADMINISTRADOR), async (req, res) => {
     const entrada = esquemaRegistrar.parse(req.body);
     const chofer = await casos.registrarChofer.ejecutar(entrada);
     res.status(201).json(chofer);
   });
 
-  router.put(RUTAS_API.choferes.porId, async (req, res) => {
+  router.put(RUTAS_API.choferes.porId, autorizacion.requiere(...SOLO_ADMINISTRADOR), async (req, res) => {
     const { id } = esquemaId.parse(req.params);
     const cambios = esquemaActualizar.parse(req.body);
     const chofer = await casos.actualizarChofer.ejecutar(id, cambios);
@@ -907,15 +929,15 @@ export const casosDeUso = {
 };
 ```
 
-**5b.** En `backend/src/rutas.ts`, registra el router:
+**5b.** En `backend/src/rutas.ts`, registra el router pasándole `autorizacion` (ya se importa de `contenedor.ts`):
 
 ```ts
 // en: backend/src/rutas.ts (agregar)
 import { choferRutas } from './modulos/choferes/adaptadores/choferRutas';
 
 export function registrarRutas(app: Express): void {
-  app.use(busRutas(casosDeUso));
-  app.use(choferRutas(casosDeUso));
+  // ...los routers que ya estaban
+  app.use(choferRutas(casosDeUso, autorizacion));
 }
 ```
 
@@ -923,22 +945,32 @@ export function registrarRutas(app: Express): void {
 
 ### Paso 6 — Probar la API (antes de tocar la web)
 
-Con `npm run dev:backend` corriendo, en Git Bash:
+Con `npm run dev:backend` corriendo, en Git Bash.
+
+**6a. Consigue un token** (dura 1 hora). Reemplaza `CONTRASENA` por la de la cuenta de prueba:
 
 ```bash
-curl http://localhost:4000/v1/choferes
+TOKEN=$(curl -s "https://tvyhpwpyxmbdfxogopnl.supabase.co/auth/v1/token?grant_type=password" -H "apikey: sb_publishable_pekXdkyDZys5MbAEw4KJWA_pVnIHBMi" -H "Content-Type: application/json" -d '{"email":"ana.quispe@panamericana.test","password":"CONTRASENA"}' | node -pe "JSON.parse(require('fs').readFileSync(0)).access_token")
+```
+
+Sin el token, cualquier llamada al panel responde `401 no_autenticado` (compruébalo quitando el `-H`).
+
+**6b. Prueba los endpoints** con el token:
+
+```bash
+curl http://localhost:4000/v1/choferes -H "Authorization: Bearer $TOKEN"
 ```
 
 ```bash
-curl "http://localhost:4000/v1/choferes?activo=true"
+curl "http://localhost:4000/v1/choferes?activo=true" -H "Authorization: Bearer $TOKEN"
 ```
 
 ```bash
-curl http://localhost:4000/v1/choferes/00000000-0000-4000-8000-000000000501
+curl http://localhost:4000/v1/choferes/00000000-0000-4000-8000-000000000501 -H "Authorization: Bearer $TOKEN"
 ```
 
 ```bash
-curl -X POST http://localhost:4000/v1/choferes -H "Content-Type: application/json" -d '{"tipo_documento":"ci","numero_documento":"ABC","nombres":"X","apellidos":"Y","numero_licencia":"1","categoria_licencia":"c","fecha_vencimiento_licencia":"2028-01-01"}'
+curl -X POST http://localhost:4000/v1/choferes -H "Authorization: Bearer $TOKEN" -H "Content-Type: application/json" -d '{"tipo_documento":"ci","numero_documento":"ABC","nombres":"X","apellidos":"Y","numero_licencia":"1","categoria_licencia":"c","fecha_vencimiento_licencia":"2028-01-01"}'
 ```
 
 | Prueba | Respuesta esperada |
@@ -949,6 +981,8 @@ curl -X POST http://localhost:4000/v1/choferes -H "Content-Type: application/jso
 | Detalle con `/v1/choferes/abc` | 400 `solicitud_invalida` |
 | POST con CI `ABC` | 400 `documento_invalido` |
 | POST repitiendo documento | 409 `chofer_duplicado` |
+| Cualquiera sin el encabezado `Authorization` | 401 `no_autenticado` |
+| POST con el token de Luis (vendedor) | 403 `sin_permiso` |
 
 > También puedes usar la extensión **Thunder Client** o **REST Client** de VS Code en lugar de `curl`.
 > Si creas un chofer de prueba, **bórralo o desactívalo** al terminar (la base es compartida).
@@ -1418,12 +1452,14 @@ export default async function PaginaDetalleChofer({ params }: { params: Promise<
 
 ### Paso 11 — Web: agregar la opción al menú
 
-En `web/src/compartido/componentes/MenuLateral.tsx`, agrega tu opción al arreglo `OPCIONES` (no borres las de otros). El menú resalta solo la pantalla activa:
+En `web/src/compartido/componentes/MenuLateral.tsx`, agrega tu opción al arreglo `OPCIONES` (no borres las de otros) con los **roles** que la ven. El menú resalta solo la pantalla activa:
 
 ```tsx
 // en: web/src/compartido/componentes/MenuLateral.tsx (agregar dentro de OPCIONES)
-  { etiqueta: 'Choferes', ruta: '/admin/choferes' },
+  { etiqueta: 'Choferes', ruta: '/admin/choferes', roles: ['administrador', 'vendedor', 'encomiendas'] },
 ```
+
+> Los roles del menú solo **ocultan** la opción; quien protege los datos es la API (paso 4b). Pon en el menú los mismos roles que en `autorizacion.requiere(...)` del `GET`.
 
 ---
 
@@ -1610,6 +1646,7 @@ Proyecto: Panamericana (Bolivia). Monorepo con npm workspaces.
 - Base normalizada: los datos personales viven en la tabla "personas" y usuarios, clientes y choferes la enlazan con persona_id (join en el repositorio).
 - Las listas de valores son catalogos (tipos_documento, tipos_asiento, roles, metodos_pago, canales_venta, categorias_licencia, departamentos, ciudades) y guardan el codigo legible: ci, cama, taquilla.
 - Lo que se puede calcular NO se guarda: total de una venta, duracion de una ruta, hora de llegada y estado de una encomienda se leen de vistas.
+- Todo endpoint del panel lleva autorizacion.requiere(...ROLES) de compartido/adaptadores/http/autorizacion.ts; el router recibe (casos, autorizacion). Solo catalogos, busqueda de viajes y compra del portal son publicos.
 - Reutilizar lo compartido, no copiarlo: backend/src/compartido/dominio/Persona.ts (crearPersona: reglas de CI y celular), compartido/adaptadores/pg (enTransaccion, guardarPersona, CODIGOS_PG), web/src/compartido/componentes (Boton, Campo, CampoSeleccion, MenuLateral) y modulos/catalogos (useCiudades, useTiposDocumento).
 - Datos bolivianos: documentos ci/ce/pasaporte, placas 1234ABC, celulares de 8 digitos, montos en bolivianos.
 - No crear tablas ni cambiar el esquema: eso se coordina aparte.

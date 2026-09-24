@@ -11,8 +11,10 @@
 | Proyecto Supabase | `panamericana` (ref `tvyhpwpyxmbdfxogopnl`) |
 | Tablas creadas | **26**, todas con RLS activado y sin políticas públicas |
 | Vistas | **4** (`rutas_resumen`, `viajes_horarios`, `ventas_totales`, `encomiendas_estado_actual`), con `security_invoker` y sin acceso para `anon` |
-| Datos de prueba | `supabase/seed.sql`: 5 personas, 2 usuarios con rol, 2 clientes, 1 chofer, 3 terminales, 2 buses, 4 asientos, 1 ruta con 3 paradas, 1 viaje, 3 tarifas, 1 venta con pasaje y pago |
-| Migraciones | `supabase/migrations/` (10 archivos, aplicados) |
+| Datos de prueba | `supabase/seed.sql`: 5 personas, 2 usuarios con rol, 2 clientes, 1 chofer, 3 terminales, 2 buses con croquis completo (`2045KLP`: 4 cama + 32 semicama en 2 pisos; `3187HTR`: 40 semicama), 1 ruta con 3 paradas, 1 viaje, 3 tarifas, 1 venta con pasaje y pago |
+| Datos de demostración | `supabase/demo.sql` (`npm run db:demo`): viajes de hoy a 6 días con tarifas; idempotente y sin cruces de horario |
+| Cuentas de acceso | Supabase Auth: Ana (administradora) y Luis (vendedor), con el **mismo id** que en `usuarios`. La contraseña no se versiona |
+| Migraciones | `supabase/migrations/` (11 archivos, aplicados) |
 | Contexto | **Bolivia (La Paz):** documentos `ci`, `ce` y `pasaporte`; placas `1234ABC`; montos en bolivianos (Bs); fechas en hora de La Paz (UTC−4) |
 
 **Pruebas ejecutadas contra la base real (22/09):**
@@ -427,7 +429,7 @@ Las decisiones marcadas ✅ están en `PRODUCT_BACKLOG.md` §2 y **no requieren 
 
 | # | Pregunta | Qué cambiaría |
 |---|---|---|
-| **P7** | ¿Las encomiendas se pagan en origen, en destino o en ambos? | Momento en que se crea la `venta` de una encomienda |
+| ~~P7~~ | ✅ **Resuelta (23/09, ajuste A6):** se pagan **en origen**, en efectivo, al registrarlas (venta de canal `taquilla`) | Sin cambios |
 | ~~P9~~ | ✅ **Resuelta (22/09):** los roles son **datos** del catálogo `roles`; agregar uno es un `insert` | Sin cambios |
 | **P11** | ¿Guardamos historial de cambios de los pasajes, como en encomiendas? | Nueva tabla `historial_pasajes` |
 | **P16** | ¿La tripulación rota a mitad del recorrido en viajes largos? | `viajes_choferes` necesitaría el tramo asignado |
@@ -460,5 +462,6 @@ Las decisiones marcadas ✅ están en `PRODUCT_BACKLOG.md` §2 y **no requieren 
 | `20260922143733_personas.sql` | `personas`, `usuarios_roles` y los tres roles enlazados |
 | `20260922143814_derivados_y_vistas.sql` | quita las 7 columnas calculadas y crea las 4 vistas |
 | `20260922143903_integridad_y_claves.sql` | claves naturales, catálogos como FK y la integridad del tramo |
+| `20260924022028_rutas_nombre_unico.sql` | índice único `lower(nombre)` en `rutas`: dos registros simultáneos con el mismo nombre no pasan (Sprint 2, PAN-13) |
 
 Todas las tablas (salvo las puente y las de historial) tienen `creado_en` y `actualizado_en`; un *trigger* mantiene `actualizado_en` al día.

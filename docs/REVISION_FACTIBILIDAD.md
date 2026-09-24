@@ -11,7 +11,7 @@
 | Área | Resultado |
 |---|---|
 | **Arquitectura** (`ARQUITECTURA_CLEAN.md`, código del Sprint 1) | ✅ Capas respetadas: el dominio no importa librerías, el SQL vive solo en los repositorios, `contenedor.ts` es el único con `new`, el contrato está en `shared/`. El núcleo `compartido/` evita duplicar reglas |
-| **Base de datos** (26 tablas, 4 vistas, 10 migraciones) | ✅ Normalizada hasta 5FN; la restricción `pasajes_asiento_sin_traslape` y las claves foráneas compuestas cubren el requisito crítico. **No hace falta ninguna migración** para completar el MVP |
+| **Base de datos** (26 tablas, 4 vistas, 10 migraciones) | ✅ Normalizada hasta 5FN; la restricción `pasajes_asiento_sin_traslape` y las claves foráneas compuestas cubren el requisito crítico. No hace falta cambiar el modelo. Durante el Sprint 2 se agregó **un índice** (`rutas_nombre_unico`) para que la regla del nombre único de la ruta resista registros simultáneos |
 | **Planificación** (`PRODUCT_BACKLOG.md`, `PLANIFICACION.md`, ADR-001/002/003) | ⚠️ 3 tarjetas quedaron desalineadas con el modelo v2.0 (ver §2) |
 | **Autenticación** (ADR-003, HU-005) | ✅ Verificado hoy: Supabase entrega tokens **ES256** con `kid 4190b38b…`, audiencia `authenticated`, y `sub` igual al `id` de `usuarios` |
 | **Entorno** | ⚠️ No hay Python en la computadora de trabajo; la CI solo corre en `main` |
