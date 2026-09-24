@@ -311,7 +311,7 @@ Estas decisiones responden de forma **provisional** las preguntas abiertas de `P
 - Manifiesto con nombre, íconos y color; se instala desde el navegador en Android.
 - El flujo de compra funciona completo en una pantalla de 375 px.
 
-**Should · 2 pts · Sprint 3 · PAN-39 · ⏳**
+**Should · 2 pts · Sprint 3 · PAN-39 · 🔄 referencia lista (`sprint04`)**
 
 #### HU-027 · Aplicación móvil nativa
 **Won't · 🚫 Fuera del MVP** (épica posterior si el proyecto continúa)
@@ -332,7 +332,7 @@ Estas decisiones responden de forma **provisional** las preguntas abiertas de `P
 - Indicadores: pasajes vendidos, ingresos, ocupación (%) por viaje y ventas por canal.
 - Incluye el gráfico de predicción de HU-033.
 
-**Should · 5 pts · Sprint 3 · PAN-29, PAN-28 · ⏳**
+**Should · 5 pts · Sprint 3 · PAN-29, PAN-28 · 🔄 referencia lista (`sprint04`)**
 
 ### E10 — Calidad y endurecimiento
 
@@ -342,7 +342,7 @@ Estas decisiones responden de forma **provisional** las preguntas abiertas de `P
 - Checklist: RLS activo en las 26 tablas y vistas sin acceso para `anon`, sin claves en el repositorio, CORS limitado al dominio de la web y rutas `/admin` protegidas.
 - Los defectos encontrados se registran como tarjetas.
 
-**Must · 3 pts · Sprint 3 · PAN-40 · ⏳**
+**Must · 3 pts · Sprint 3 · PAN-40 · 🔄 referencia lista (`sprint04`)**
 
 #### HU-031 · Validación automática del SQL
 **Could · 2 pts (estimado) · Sin sprint · ⏳** (sqlfluff en la CI para la regla R1)
@@ -359,7 +359,7 @@ Estas decisiones responden de forma **provisional** las preguntas abiertas de `P
 - **Integración:** los coeficientes se exportan a JSON y la API los usa en un caso de uso de predicción; la API no ejecuta Python.
 - **Salida:** pasajes estimados por ruta y día para los próximos 7 días; alerta de "refuerzo sugerido" cuando la demanda estimada supera el 90 % de la capacidad programada.
 
-**Must · 6 pts · Sprint 3 · PAN-26, PAN-27 (+ gráfico en PAN-28) · ⏳**
+**Must · 6 pts · Sprint 3 · PAN-26, PAN-27 (+ gráfico en PAN-28) · 🔄 referencia lista (`sprint04`)**
 
 #### HU-034 · Asistente virtual de preguntas frecuentes (chatbot)
 **Como** cliente **quiero** preguntar por horarios, equipaje, anulaciones y encomiendas **para** resolver dudas sin ir a la terminal.
@@ -448,6 +448,8 @@ Decisión del 15/09: hasta esta fase **todo corre en local**. Es obligatoria por
 | PAN-43 | Grisel | Cambiar el tipo de un asiento y catálogo de tipos (API) | HU-012 | 1 | PAN-12 |
 
 ### 5.5 Incremento 4 — cierre del MVP · rama `sprint04`
+
+**Estado al 24/09:** construido y validado en `panamericana-base` (rama `sprint04`, commit `9661664`): modelo con R² 0,947 en días de prueba, 114 pruebas unitarias, 3 de integración, 22 casos de aceptación, humo 17/17 y seguridad 12/12. Replicación: `docs/repo2/REPLICACION_SPRINT_04.md`.
 
 Si el docente no amplía el calendario, entra en la **fase final** junto al despliegue (ver `docs/REVISION_FACTIBILIDAD.md`, ajuste A5). El modelo se entrena en **TypeScript** (ajuste A4: no hay Python en la computadora de trabajo).
 

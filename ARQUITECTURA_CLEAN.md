@@ -105,6 +105,10 @@ npm run dev:web
 | `npm run db:verificar` | Comprueba que el backend se conecta a la base y lista las tablas |
 | `npm run db:semilla` | Vuelve a cargar los datos de prueba (idempotente) |
 | `npm run db:demo` | Crea los viajes de demostración de hoy a 6 días (idempotente) |
+| `npm run ml:entrenar` | Reentrena el modelo de demanda y escribe sus coeficientes en `modelo-demanda.json` |
+| `npm run test:integracion` | Pruebas contra la base real (`*.integracion.test.ts`, no las corre la CI) |
+| `npm run prueba:humo` | Recorre la API sin escribir datos (con `API_URL` sirve contra staging) |
+| `npm run prueba:seguridad` | RLS, políticas, vistas, CORS, secretos y rutas cerradas |
 
 ---
 
@@ -480,6 +484,12 @@ npx supabase db push
 
 - **Públicos** (sin sesión): catálogos, búsqueda de viajes, asientos del tramo y la compra del portal (con límite de reservas por conexión).
 - El menú de la web (`MenuLateral`, arreglo `OPCIONES` con roles) **solo oculta** opciones; la protección real es la API.
+
+### 9.7 Machine learning sin romper las capas (desde el incremento 4)
+
+- El modelo se **entrena fuera de la API** (`modulos/prediccion/entrenamiento/`, `npm run ml:entrenar`) y se guarda como coeficientes en un JSON junto al adaptador que lo lee.
+- Lo que describe un día (`Caracteristicas.ts`, feriados de Bolivia) vive en el **dominio**: entrenar y predecir usan el mismo código. `exigirModeloCompatible` rechaza un JSON viejo.
+- El caso de uso solo multiplica y suma; la base de la ruta sale de las ventas reales cuando hay suficientes y, si no, del modelo. Los datos de entrenamiento sintéticos se **declaran** en la respuesta.
 
 ### 9.6 Una regla, un lugar (desde el Sprint 3)
 

@@ -58,6 +58,8 @@ gitGraph
 | `sprint03` | **MVP 2 — Operación multicanal:** taquilla sobre el mismo inventario, anulación, encomiendas con seguimiento, boleto con QR, tarifas y editor de croquis | PAN-30 a PAN-38 (sin PAN-36) y PAN-43 | `REPLICACION_SPRINT_03.md` |
 | `sprint04` | **Cierre del MVP:** predicción de demanda (ML), panel de indicadores, PWA, prueba automatizada de compras simultáneas, pruebas de humo y checklist de seguridad | PAN-25 a PAN-29, PAN-39, PAN-40 | `REPLICACION_SPRINT_04.md` |
 
+**Estado al 24/09:** las cuatro ramas están construidas y validadas (`sprint01` subida; `sprint02` a `sprint04` con commit local, a la espera del `push`).
+
 ---
 
 ## 4. Cómo se valida cada sprint antes de subir su rama

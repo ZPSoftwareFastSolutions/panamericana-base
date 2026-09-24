@@ -1,6 +1,6 @@
 # Guía de Desarrollo — Panamericana
 
-> **Para:** todo el equipo · **Versión:** 1.4 · **Fecha:** 24/09/2026 (piezas compartidas del Sprint 3)
+> **Para:** todo el equipo · **Versión:** 1.5 · **Fecha:** 24/09/2026 (cierre del MVP: panel, predicción, PWA y pruebas)
 > **Objetivo:** que cualquier integrante pueda agregar endpoints, pantallas y módulos **sin romper la arquitectura**, por su cuenta o con ayuda de un asistente de IA.
 > **Ejemplo que se usa en toda la guía:** el módulo **`choferes`** completo (listar con filtro, ver detalle, registrar y actualizar). Todo el código de esta guía **compila y funciona** con el proyecto actual.
 
@@ -212,11 +212,13 @@ Antes de escribir algo "genérico", revisa si ya está aquí:
 | `resolverTramo`, `horaDePaso`, `precioDeTramo` | `backend/src/compartido/dominio/Tramo.ts` | Reglas del tramo de un viaje: paradas válidas, hora de paso y precio proporcional redondeado a Bs 0,50 |
 | `generarCodigo`, `enmascararDocumento` | `backend/src/compartido/dominio/Codigo.ts` | Códigos legibles de venta y pasaje (`V-…`, `P-…`) y documentos ocultos (`****351`) |
 | `PASAJE_ACTIVO`, `liberarReservasVencidas` | `backend/src/compartido/adaptadores/pg/reservasSql.ts` | Qué pasaje ocupa un asiento y liberar las reservas vencidas |
+| `sumarDias`, `diasEntre` | `backend/src/compartido/dominio/Fechas.ts` | Cuentas con fechas AAAA-MM-DD (dias de La Paz) sin horas |
 | `guardarCliente(conexion, persona)` | `backend/src/compartido/adaptadores/pg/personasSql.ts` | Guarda la persona y la deja como cliente (pasajero, remitente o destinatario); devuelve el id del cliente |
 | `Boton` | `web/src/compartido/componentes/Boton.tsx` | Botón con estado "Guardando..." |
 | `Campo`, `CampoSeleccion` | `web/src/compartido/componentes/Campo.tsx` | Campos de formulario con etiqueta y mensaje de error |
 | `MenuLateral` | `web/src/compartido/componentes/MenuLateral.tsx` | Menú del panel; muestra solo las opciones de los roles del usuario y resalta la pantalla actual |
 | `PlanoAsientos`, `CuentaRegresiva` | `web/src/compartido/componentes/` | Croquis de asientos por piso y reloj de la reserva |
+| `GraficoBarras` | `web/src/compartido/componentes/GraficoBarras.tsx` | Grafico de barras agrupadas en SVG, sin librerias |
 | `CodigoQR`, `ConsultaPorCodigo` | `web/src/compartido/componentes/` | QR de un codigo y formulario "escribe tu codigo" (boleto, encomienda) |
 | `SeleccionDeAsientos` | `web/src/modulos/ventas/componentes/SeleccionDeAsientos.tsx` | Elegir asientos y pasajeros de un tramo (lo usan el portal y la taquilla) |
 | `useTiposAsiento` | `web/src/modulos/catalogos/hooks/useCatalogos.ts` | Tipos de asiento del catalogo (normal, semicama, cama) |
@@ -1703,5 +1705,10 @@ Sigue el mismo patron del modulo "buses" que ya existe.
 | `npm run lint` | Revisa el estilo del código |
 | `npm run build` | Compila todo como en la integración continua |
 | `npm run build:shared` | Recompila solo `shared` |
+| `npm run db:demo` | Crea los viajes de la semana para probar la compra |
+| `npm run test:integracion` | Pruebas contra la base real (archivos `*.integracion.test.ts`; borran solo lo que crean) |
+| `npm run prueba:humo` | Recorre la API sin escribir datos (con `CLAVE_DEMO` prueba tambien el panel) |
+| `npm run prueba:seguridad` | Revisa RLS, CORS, secretos y rutas cerradas antes de presentar |
+| `npm run ml:entrenar` | Reentrena el modelo de demanda |
 | `git checkout dev/tu-nombre` | Cambia a tu rama |
 | `git pull origin main` | Trae lo último de `main` a tu rama |
