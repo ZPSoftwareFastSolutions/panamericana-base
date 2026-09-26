@@ -16,6 +16,7 @@ export class PgPasajeRepositorio implements PasajeRepositorio {
       `select p.codigo, p.estado, p.precio::float8 as precio,
               json_build_object('codigo', ve.codigo, 'canal', ve.canal) as venta,
               json_build_object('numero', a.numero, 'piso', a.piso, 'tipo', a.tipo) as asiento,
+              json_build_object('codigo', tp.codigo, 'nombre', tp.nombre, 'requisito', tp.requisito) as tipo_pasajero,
               json_build_object('tipo_documento', pe.tipo_documento, 'numero_documento', pe.numero_documento,
                                 'nombres', pe.nombres, 'apellidos', pe.apellidos) as pasajero,
               json_build_object(
@@ -27,6 +28,7 @@ export class PgPasajeRepositorio implements PasajeRepositorio {
          from pasajes p
          join ventas ve on ve.id = p.venta_id
          join asientos a on a.id = p.asiento_id
+         join tipos_pasajero tp on tp.codigo = p.tipo_pasajero
          join clientes cl on cl.id = p.cliente_id
          join personas pe on pe.id = cl.persona_id
          join viajes v on v.id = p.viaje_id

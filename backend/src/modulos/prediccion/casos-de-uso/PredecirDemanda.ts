@@ -42,7 +42,7 @@ export class PredecirDemanda {
 
   async ejecutar(dias = 7): Promise<ResultadoPrediccion> {
     if (!Number.isInteger(dias) || dias < 1 || dias > MAXIMO_DIAS) {
-      throw new PeriodoInvalidoError(`Se predicen de 1 a ${MAXIMO_DIAS} dias`);
+      throw new PeriodoInvalidoError(`Se predicen de 1 a ${MAXIMO_DIAS} días`);
     }
     const modelo = await this.fuente.cargar();
     exigirModeloCompatible(modelo);

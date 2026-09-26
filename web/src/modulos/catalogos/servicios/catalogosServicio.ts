@@ -1,5 +1,5 @@
 import { RUTAS_API } from '@panamericana/shared';
-import type { Ciudad, ElementoCatalogo } from '@panamericana/shared';
+import type { Ciudad, ElementoCatalogo, TipoPasajero } from '@panamericana/shared';
 import { clienteHttp } from '@/compartido/servicios/clienteHttp';
 
 /**
@@ -11,4 +11,5 @@ export const catalogosServicio = {
   tiposDocumento: () => clienteHttp.get<ElementoCatalogo[]>(RUTAS_API.catalogos.tiposDocumento),
   roles: () => clienteHttp.get<ElementoCatalogo[]>(RUTAS_API.catalogos.roles),
   tiposAsiento: () => clienteHttp.get<ElementoCatalogo[]>(RUTAS_API.catalogos.tiposAsiento),
+  tiposPasajero: () => clienteHttp.get<TipoPasajero[]>(RUTAS_API.catalogos.tiposPasajero),
 };

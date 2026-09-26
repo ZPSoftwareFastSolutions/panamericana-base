@@ -70,10 +70,10 @@ export function registrarEncomienda(datos: DatosEncomienda, ahora: Date): Encomi
     throw new EncomiendaInvalidaError(`Describe el contenido en 1 a ${LARGO_MAXIMO_DESCRIPCION} caracteres`);
   }
   if (!esCantidadValida(datos.peso_kg, PESO_MAXIMO_KG)) {
-    throw new EncomiendaInvalidaError(`El peso va de 0,01 a ${PESO_MAXIMO_KG} kg, con 2 decimales como maximo`);
+    throw new EncomiendaInvalidaError(`El peso va de 0,01 a ${PESO_MAXIMO_KG} kg, con 2 decimales como máximo`);
   }
   if (!esCantidadValida(datos.costo, COSTO_MAXIMO)) {
-    throw new EncomiendaInvalidaError(`El costo va de Bs 0,01 a Bs ${COSTO_MAXIMO}, con 2 decimales como maximo`);
+    throw new EncomiendaInvalidaError(`El costo va de Bs 0,01 a Bs ${COSTO_MAXIMO}, con 2 decimales como máximo`);
   }
 
   return {

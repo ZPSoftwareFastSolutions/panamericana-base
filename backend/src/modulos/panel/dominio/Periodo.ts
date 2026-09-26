@@ -14,14 +14,14 @@ const esFechaValida = (fecha: string) =>
 export function resolverPeriodo(entrada: { desde?: string; hasta?: string }, hoy: string): { desde: string; hasta: string } {
   for (const fecha of [entrada.desde, entrada.hasta]) {
     if (fecha !== undefined && !esFechaValida(fecha)) {
-      throw new PeriodoDelPanelInvalidoError('Las fechas deben ser dias reales con el formato AAAA-MM-DD');
+      throw new PeriodoDelPanelInvalidoError('Las fechas deben ser días reales con el formato AAAA-MM-DD');
     }
   }
   const hasta = entrada.hasta ?? hoy;
   const desde = entrada.desde ?? sumarDias(hasta, -(DIAS_POR_DEFECTO - 1));
   if (desde > hasta) throw new PeriodoDelPanelInvalidoError('La fecha "desde" no puede ser posterior a "hasta"');
   if (diasEntre(desde, hasta) + 1 > MAXIMO_DIAS) {
-    throw new PeriodoDelPanelInvalidoError(`El periodo puede tener hasta ${MAXIMO_DIAS} dias`);
+    throw new PeriodoDelPanelInvalidoError(`El periodo puede tener hasta ${MAXIMO_DIAS} días`);
   }
   return { desde, hasta };
 }

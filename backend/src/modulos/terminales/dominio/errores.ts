@@ -14,7 +14,7 @@ export class CiudadNoEncontradaError extends ErrorDeDominio {
   readonly estadoHttp = 400;
 
   constructor() {
-    super('La ciudad elegida no existe o no esta activa');
+    super('La ciudad elegida no existe o no está activa');
   }
 }
 

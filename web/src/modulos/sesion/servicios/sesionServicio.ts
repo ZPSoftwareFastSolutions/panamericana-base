@@ -12,7 +12,7 @@ export const sesionServicio = {
   async iniciar(correo: string, clave: string): Promise<void> {
     const { error } = await clienteSupabase().auth.signInWithPassword({ email: correo.trim(), password: clave });
     if (error) {
-      throw new ErrorDeApi('credenciales_invalidas', 'Correo o contrasena incorrectos', 401);
+      throw new ErrorDeApi('credenciales_invalidas', 'Correo o contraseña incorrectos', 401);
     }
   },
 

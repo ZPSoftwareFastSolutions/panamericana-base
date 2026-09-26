@@ -36,7 +36,7 @@ const crear = () => {
 };
 
 describe('ObtenerIndicadores', () => {
-  it('por defecto mira los ultimos 30 dias y calcula neto, ocupacion ponderada y encomiendas', async () => {
+  it('por defecto mira los últimos 30 días y calcula neto, ocupación ponderada y encomiendas', async () => {
     const { obtener, repositorio } = crear();
 
     const r = await obtener.ejecutar({});

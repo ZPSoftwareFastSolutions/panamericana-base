@@ -1,6 +1,6 @@
 # CLAUDE.md — panamericana-base
 
-> **Punto de entrada para cualquier sesión.** Léelo completo antes de actuar. Última actualización: **24/09/2026**.
+> **Punto de entrada para cualquier sesión.** Léelo completo antes de actuar. Última actualización: **26/09/2026**.
 > Idioma de trabajo: **español** (documentos, respuestas, commits y comentarios del código).
 
 ---
@@ -51,7 +51,7 @@
 
 ---
 
-## 4. Estado actual (24/09/2026)
+## 4. Estado actual (26/09/2026)
 
 **Hecho**
 - Stack base con el módulo **`buses`** de punta a punta: BD → API → pantalla (11–12/09).
@@ -68,12 +68,15 @@
 - **Sprint 3 construido y validado aquí (24/09, rama `sprint03`, commit `f6f2b97`)**: taquilla sobre el mismo inventario (reutiliza reservar y pagar), boleto con QR, anulación con reembolso (hasta 2 h antes de subir), encomiendas cobradas en origen con máquina de estados, historial y seguimiento público, edición de tarifas y editor de croquis. 101 pruebas unitarias, **52 casos de aceptación** (web y taquilla por el mismo asiento, 5 anulaciones y 4 despachos simultáneos), regresión 60/60, navegador en computadora y 375 px, revisión de código (7 de 8 hallazgos corregidos). Sin migraciones; se quitó de la semilla la tarifa `normal` del viaje 701. Tarjeta nueva **PAN-43**. Guía: `docs/repo2/REPLICACION_SPRINT_03.md`; prueba: `docs/pruebas/aceptacion_sprint03.mjs`.
 - **Incremento 4 (cierre del MVP) construido y validado aquí (24/09, rama `sprint04`, commit `9661664`)**: predicción de demanda con regresión lineal múltiple entrenada en TypeScript (`npm run ml:entrenar`, datos sintéticos declarados, MAE 4,27 · RMSE 5,43 · R² 0,947 en días de prueba), panel de indicadores, PWA (manifiesto, íconos, service worker, página sin conexión, encabezados de seguridad), prueba de integración de compras simultáneas (`npm run test:integracion`: 20 a la vez, gana 1), `npm run prueba:humo` (17/17) y `npm run prueba:seguridad` (12/12). 114 unitarias, 22 casos de aceptación, regresión 60/60 y 52/52. **Pendiente:** confirmar el registro del service worker en Chrome o Android (el navegador integrado no lo admite). Guía: `docs/repo2/REPLICACION_SPRINT_04.md`; `docs/repo2/CORRECCIONES_03.md` (comentario de `eslint.config.mjs` con un código interno).
 - **MVP completo en 4 ramas** (`sprint01` … `sprint04`), cada una validada y con su guía de replicación.
+- **Incremento de calidad y legal (26/09, rama `calidad-y-legal`, desde `sprint04`)**: verificación legal boliviana (DS 1793, Ley 453, reglamento de transporte de la ATT, Leyes 1886 y 223) y guía UI/UX Pro Max. **Migración 12** `tarifas_diferenciadas` (adulto mayor 20 %, discapacidad 50 %, menor 50 %; la API informa `precios_por_tarifa`), consentimiento obligatorio al vender (`acepta_condiciones`), Términos, Privacidad, Reembolsos y Cookies, datos del operador en `shared/src/negocio.ts` (pendientes: `[por completar]` y el sitio oficial no se construye), accesibilidad WCAG 2.2 AA (axe-core sin violaciones en 24 pantallas, contraste, foco, 375 px), buscadores cerrados hasta tener dominio, textos con tildes (web y API), favicon propio (el de la plantilla era el logo de Vercel) y clientes sin fecha de nacimiento. 119 unitarias, 3 de integración, **31 casos de aceptación** (`docs/pruebas/aceptacion_calidad.mjs`), regresión 60/60 · 52/52 · 22/22, humo y seguridad (15/15, 3 controles legales) en verde. Tarjetas **PAN-44 a PAN-50**. Guía: `docs/repo2/REPLICACION_CALIDAD.md` (3 PR en orden) y `docs/repo2/CORRECCIONES_04.md`; informe: `docs/calidad/INFORME_CALIDAD_LEGAL.md`. Guía del equipo **v1.6**.
 
 **En curso:** Sprint 2 (22/09 → 03/10) en el equipo; en este repositorio el MVP completo ya está construido como referencia. El Sprint 1 cerró el 19/09 sin sus módulos: sus tarjetas se completan **al inicio del Sprint 2** en el repositorio del equipo, guiadas por `REPLICACION_SPRINT_01.md`. Agenda apretada: las fechas de vencimiento de Trello no se usan.
 
 **Próximos pasos (en orden)**
 0. **El usuario sube las ramas `sprint02`, `sprint03` y `sprint04`** (`git push -u origin <rama>`: el `push` desde Claude quedó bloqueado) y luego avanza `main` hasta `sprint04` (`git checkout main`, `git merge --ff-only sprint04`, `git push`).
 0b. **Ángel aplica `CORRECCIONES_03.md`** (un comentario) y confirma el service worker de la PWA en Chrome o Android.
+0c. **El usuario sube la rama `calidad-y-legal`** y, antes del despliegue oficial, **el Product Owner completa `shared/src/negocio.ts`** con la empresa (razón social, NIT, dirección, teléfono, correo, autorización de la ATT) y hace revisar los documentos legales por un abogado. Pendientes legales en el informe §7 (facturación SIN, venta en línea ante la ATT, plazo de conservación).
+0d. **Ángel aplica `CORRECCIONES_04.md`** (favicon propio) y, después del incremento 4, `REPLICACION_CALIDAD.md`.
 0. **Ángel ejecuta `REPLICACION_SPRINT_01.md`**: contrato `shared/` el día 1, luego PAN-41 y PAN-08 A, PAN-42, PAN-03/04 y PAN-06/07/08 B; cierre con la prueba de aceptación y la comparación entre repositorios. Asignar a mano a John en PAN-41 y a Grisel en PAN-42.
 1. **Compartir la guía actualizada (v1.2)** con el equipo: `compartir/GUIA_DESARROLLO_PANAMERICANA.md` por un canal privado. **No** se sube al repositorio 2 (regla: sin `.md`).
 2. Cuando el equipo termine el Sprint 1: registrar el resultado en el backlog (✅ y velocidad real) y recalibrar la capacidad.
@@ -139,6 +142,7 @@ npm run prueba:seguridad  # RLS, CORS, secretos y rutas cerradas
 - **Forma del JSON:** los roles de una persona (cliente, usuario, chofer) se devuelven **aplanados** con los campos de `personas`; una referencia a otra entidad va **anidada** con su nombre en singular (`terminal.ciudad`). Tras guardar, los casos de uso **vuelven a leer** el registro (una persona existente conserva sus nombres).
 - **Menú del panel:** `web/src/compartido/componentes/MenuLateral.tsx` (arreglo `OPCIONES`), ya no `layout.tsx`.
 - **Portada estática:** "hoy" se calcula en el navegador al validar (`hoyEnBolivia`) y los `input type=date` con `min`/`max` llevan `suppressHydrationWarning`.
+- **Calidad y legal (26/09):** formularios solo con `Campo`/`CampoSeleccion`/`CampoCasilla`; textos visibles con tildes (identificadores sin tildes); foco y colores en `globals.css` (`@theme static`); grillas `grid-cols-1` + `minmax(0,1fr)` y tablas en `relative overflow-x-auto`; datos de la empresa solo en `shared/src/negocio.ts` con `DatoDelNegocio`; documentos legales en `web/src/modulos/legal/`; `NEXT_PUBLIC_SITIO_URL` abre los buscadores. Reglas completas: `ARQUITECTURA_CLEAN.md` §9.8.
 
 ---
 
@@ -151,7 +155,7 @@ npm run prueba:seguridad  # RLS, CORS, secretos y rutas cerradas
   - La contraseña vive **solo** en `backend/.env` (ignorado por git). Nunca va a archivos versionados, documentos, Trello ni commits.
 - **Reglas:** SQL con palabras reservadas en minúsculas · nombres de tablas y campos **congelados** (modelo v2.0, recongelados el 22/09) · cambios solo con **migraciones nuevas**, hacia adelante · toda tabla con RLS activado y sin políticas públicas (datos solo por la API) · **un dato que se puede calcular no se guarda**: va en una vista.
 - **Modelo v2.0 (22/09), normalizado hasta 5FN** (`docs/bd/ANALISIS_NORMALIZACION.md`): `personas` única + `usuarios`/`clientes`/`choferes` como roles · `usuarios_roles` · 8 catálogos con el código como clave (`tipos_documento`, `tipos_asiento`, `roles`, `canales_venta`, `metodos_pago`, `categorias_licencia`, `departamentos`, `ciudades`) · 4 vistas para los datos calculados · claves naturales en `rutas_paradas`, `viajes_choferes` y `tarifas` · claves foráneas compuestas que garantizan el tramo en `pasajes`.
-- **Migraciones aplicadas (11):** `buses` · `funciones_y_personas` · `flota_y_rutas` · `ventas_pasajes_pagos` (restricción de exclusión por tramo `pasajes_asiento_sin_traslape`, `btree_gist`) · `encomiendas` · `documentos_bolivia` · `catalogos` · `personas` · `derivados_y_vistas` · `integridad_y_claves` · `rutas_nombre_unico` (23/09, índice único `lower(nombre)`).
+- **Migraciones aplicadas (12):** `buses` · `funciones_y_personas` · `flota_y_rutas` · `ventas_pasajes_pagos` (restricción de exclusión por tramo `pasajes_asiento_sin_traslape`, `btree_gist`) · `encomiendas` · `documentos_bolivia` · `catalogos` · `personas` · `derivados_y_vistas` · `integridad_y_claves` · `rutas_nombre_unico` (23/09, índice único `lower(nombre)`) · `tarifas_diferenciadas` (26/09, catálogo `tipos_pasajero` y `pasajes.tipo_pasajero`; **27 tablas**).
 - **Flujo para una migración nueva desde Claude:**
   1. Aplicarla con el MCP de Supabase (`apply_migration`).
   2. Leer la versión asignada con `list_migrations`.
@@ -195,7 +199,7 @@ npm run prueba:seguridad  # RLS, CORS, secretos y rutas cerradas
 - **Iterativo:** entregar `.md` paso a paso al planificar; recomendar en lugar de listar opciones sin postura.
 - **Acciones externas** (Trello, Supabase, GitHub): confirmar alcance con lo pedido por el usuario. Nunca tocar el repositorio 2.
 - **Cambios en el stack:** ejecutar `npm run lint`, `npm test` y `npm run build` antes del commit, y luego la búsqueda de rastros de la §3.3.
-- **Cambios que deben llegar al equipo:** documentarlos en `docs/repo2/CORRECCIONES_NN.md` (la siguiente es **04**; el trabajo de cada sprint va en su `REPLICACION_SPRINT_NN.md`) con la tabla de archivos, el comando de copia, la verificación y el estado. Avisar al usuario.
+- **Cambios que deben llegar al equipo:** documentarlos en `docs/repo2/CORRECCIONES_NN.md` (la siguiente es **05**; el trabajo de cada sprint va en su `REPLICACION_SPRINT_NN.md`) con la tabla de archivos, el comando de copia, la verificación y el estado. Avisar al usuario.
 - **Git:** commits en español, estilo *conventional*, con la línea de atribución. Ejecutar `git add`, `git commit` y `git push` **en llamadas separadas**: el clasificador de permisos bloquea a veces los comandos encadenados o el `push`. Si el `push` se bloquea, dejar el commit hecho y pedir al usuario que ejecute `git push`.
   - La computadora guarda **dos cuentas de GitHub** (Z&P y AngelParedesH20). Por eso el remoto de este repositorio lleva el usuario en la URL (`https://ZPSoftwareFastSolutions@github.com/ZPSoftwareFastSolutions/panamericana-base.git`). Sin eso, el administrador de credenciales abre un selector de cuenta y el `push` se queda esperando.
 - **Herramientas:**
@@ -226,11 +230,12 @@ npm run prueba:seguridad  # RLS, CORS, secretos y rutas cerradas
 | `REPLICACION_REPO2.md` | Reglas de aislamiento, copia al repositorio 2, ramas y sincronización | Cambia cómo se transfiere al equipo |
 | `docs/adr/` | ADR-001 concurrencia · ADR-002 despliegue · ADR-003 Supabase | Se toma o cambia una decisión técnica |
 | `docs/guias-sprint/` | `GUIA_SPRINT_01.md` y la plantilla (se convierten en tarjetas, no se copian) | Se planifica un sprint |
-| `docs/repo2/` | `README.md` básico del repositorio 2 · `CORRECCIONES_NN.md` (01 y 02 ✅, 03 ⏳) · `REPLICACION_SPRINT_NN.md` (gestión de cada sprint en el repositorio del equipo) | Hay cambios para el equipo o se construye un sprint |
+| `docs/repo2/` | `README.md` básico del repositorio 2 · `CORRECCIONES_NN.md` (01 y 02 ✅, 03 y 04 ⏳) · `REPLICACION_SPRINT_NN.md` y `REPLICACION_CALIDAD.md` (gestión de cada incremento en el repositorio del equipo) | Hay cambios para el equipo o se construye un sprint |
 | `docs/bd/ANALISIS_NORMALIZACION.md` | Verificación de formas normales del modelo v1.0 y propuesta v2.0 (26 tablas + 4 vistas) | Se decide sobre la propuesta o cambia el modelo |
-| `docs/equipo/GUIA_DESARROLLO.md` | Guía para los 5 integrantes con el ejemplo `choferes` y el `.env` (con marcador en lugar de la contraseña) | Cambia el stack, una convención o el `.env` |
+| `docs/equipo/GUIA_DESARROLLO.md` | Guía para los 5 integrantes (v1.6) con el ejemplo `choferes`, reglas de accesibilidad y datos personales, y el `.env` (con marcador en lugar de la contraseña) | Cambia el stack, una convención o el `.env` |
 | `docs/REVISION_FACTIBILIDAD.md` | Veredicto de factibilidad, ajustes A1–A7, ramas por sprint y protocolo de validación | Cambia el plan de ramas o un ajuste |
-| `docs/pruebas/` | Pruebas de aceptación automatizadas por sprint 02, 03 y 04 (crean y borran sus datos) | Se construye un sprint |
+| `docs/pruebas/` | Pruebas de aceptación automatizadas por sprint 02, 03 y 04 y del incremento de calidad (crean y borran sus datos) | Se construye un sprint |
+| `docs/calidad/INFORME_CALIDAD_LEGAL.md` | Verificación de calidad (pruebas, accesibilidad, terceros) y de la normativa boliviana, con fuentes y pendientes legales | Cambia una norma, un documento legal o se repite la verificación |
 | `compartir/` *(ignorada por git)* | Copia de la guía con el `.env` completo, lista para enviar al equipo | Se regenera cada vez que cambia la guía |
 
 ---
@@ -259,3 +264,4 @@ npm run prueba:seguridad  # RLS, CORS, secretos y rutas cerradas
 | 24/09 | Incremento 4: el modelo de demanda se entrena en TypeScript fuera de la API (JSON de coeficientes); características de un día en el dominio para entrenar y predecir igual; pruebas de integración aparte de la CI (`*.integracion.test.ts`); humo y seguridad como comandos del proyecto (el repositorio del equipo no admite `.md`) |
 | 24/09 | Sprint 3: la taquilla reutiliza los casos de uso de la web; anular bloquea venta → pasaje (mismo orden que el pago); la web muestra los pasos de una encomienda que manda la API (`siguientes`); PAN-43 para el editor de croquis |
 | 23/09 | Sprint 2: rutas del panel protegidas por rol (`autorizacion.requiere`), portal público con límite de reservas por IP, contrato web (servicios y hooks) en el PR del día 1 para evitar conflictos |
+| 26/09 | Calidad y legal: tarifas diferenciadas de ley (migración 12), consentimiento obligatorio al vender, reembolso del 100 % hasta 2 h antes, datos de la empresa en un solo archivo que bloquea el sitio oficial si faltan, buscadores cerrados hasta tener dominio, sin cookies ni analíticas (sin aviso de consentimiento), accesibilidad WCAG 2.2 AA como regla del equipo |

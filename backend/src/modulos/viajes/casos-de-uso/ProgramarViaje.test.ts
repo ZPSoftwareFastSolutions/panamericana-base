@@ -60,7 +60,7 @@ const entrada = {
 };
 
 describe('ProgramarViaje', () => {
-  it('calcula la llegada con la duracion de la ruta y guarda las tarifas', async () => {
+  it('calcula la llegada con la duración de la ruta y guarda las tarifas', async () => {
     const { programar } = crear();
 
     const viaje = await programar.ejecutar(entrada);
@@ -81,7 +81,7 @@ describe('ProgramarViaje', () => {
     ).rejects.toThrow(ViajeInvalidoError);
   });
 
-  it('rechaza precios en cero, negativos o con mas de 2 decimales', async () => {
+  it('rechaza precios en cero, negativos o con más de 2 decimales', async () => {
     const { programar } = crear();
     for (const precio of [0, -10, 95.555]) {
       await expect(

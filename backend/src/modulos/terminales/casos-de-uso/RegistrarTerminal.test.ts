@@ -50,7 +50,7 @@ describe('RegistrarTerminal', () => {
     expect(repositorio.terminales).toHaveLength(1);
   });
 
-  it('limpia los espacios del nombre y la direccion', async () => {
+  it('limpia los espacios del nombre y la dirección', async () => {
     const terminal = await new RegistrarTerminal(new TerminalRepositorioEnMemoria()).ejecutar({
       ...datosValidos,
       nombre: '  Terminal   Oruro ',

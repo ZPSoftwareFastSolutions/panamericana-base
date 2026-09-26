@@ -64,7 +64,7 @@ describe('RegistrarCliente', () => {
     );
   });
 
-  it('el mismo numero con otro tipo de documento es otra persona', async () => {
+  it('el mismo número con otro tipo de documento es otra persona', async () => {
     const { registrar, repositorio } = crearCaso();
     await registrar.ejecutar(datosValidos);
 

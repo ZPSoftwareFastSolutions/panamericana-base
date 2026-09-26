@@ -28,7 +28,7 @@ function GeneradorCroquis({ busId, numeroPisos }: { busId: string; numeroPisos: 
         generar.mutate({ pisos });
       }}
     >
-      <p className="text-slate-600">El bus todavia no tiene asientos. Genera el croquis estandar y luego ajusta cada asiento.</p>
+      <p className="text-slate-600">El bus todavía no tiene asientos. Genera el croquis estándar y luego ajusta cada asiento.</p>
       {pisos.map((piso, i) => (
         <fieldset key={piso.piso} className="grid gap-2 sm:grid-cols-3">
           <legend className="text-sm font-semibold">Piso {piso.piso}</legend>
@@ -74,7 +74,7 @@ export function EditorCroquis({ busId }: { busId: string }) {
   const cambiarTipo = useCambiarTipoAsiento(busId);
   const [elegido, setElegido] = useState<string | null>(null);
 
-  if (croquis.isPending) return <p className="text-slate-500">Cargando el croquis...</p>;
+  if (croquis.isPending) return <p className="text-slate-600">Cargando el croquis...</p>;
   if (croquis.error) return <p className="text-red-600">{croquis.error.message}</p>;
 
   const datos = croquis.data;
@@ -89,8 +89,9 @@ export function EditorCroquis({ busId }: { busId: string }) {
   }));
 
   return (
-    <div className="grid gap-6 lg:grid-cols-[auto_1fr]">
+    <div className="grid grid-cols-1 gap-6 lg:grid-cols-[auto_minmax(0,1fr)]">
       <section className="flex flex-col gap-2">
+        <h2 className="sr-only">Asientos del bus</h2>
         <p className="text-sm text-slate-600">
           {datos.asientos.length} asientos · {Object.entries(conteo).map(([tipo, n]) => `${n} ${tipo}`).join(' · ')}
         </p>
@@ -117,7 +118,7 @@ export function EditorCroquis({ busId }: { busId: string }) {
               disabled={cambiarTipo.isPending}
               onChange={(e) => cambiarTipo.mutate({ asientoId: asiento.id, tipo: e.target.value })}
             />
-            {cambiarTipo.isPending && <p className="text-sm text-slate-500">Guardando...</p>}
+            {cambiarTipo.isPending && <p className="text-sm text-slate-600">Guardando...</p>}
             {cambiarTipo.error && (
               <p role="alert" className="text-sm text-red-600">
                 {cambiarTipo.error.message}

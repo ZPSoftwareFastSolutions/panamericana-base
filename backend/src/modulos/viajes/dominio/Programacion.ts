@@ -43,7 +43,7 @@ export function validarTarifas(tarifas: TarifaEntrada[], bus: { placa: string; t
     const centavos = Math.round(tarifa.precio * 100);
     if (!(tarifa.precio > 0) || tarifa.precio > PRECIO_MAXIMO || Math.abs(centavos - tarifa.precio * 100) > 1e-6) {
       throw new ViajeInvalidoError(
-        `El precio ${tarifa.tipo_asiento} debe ser mayor que 0, hasta Bs ${PRECIO_MAXIMO} y con 2 decimales como maximo`,
+        `El precio ${tarifa.tipo_asiento} debe ser mayor que 0, hasta Bs ${PRECIO_MAXIMO} y con 2 decimales como máximo`,
       );
     }
   }
@@ -55,12 +55,12 @@ export function programarViaje(
 ): NuevoViaje {
   const { ruta, bus, fecha_salida, tarifas } = datos;
 
-  if (!ruta.activo) throw new ViajeInvalidoError(`La ruta "${ruta.nombre}" esta inactiva`);
+  if (!ruta.activo) throw new ViajeInvalidoError(`La ruta "${ruta.nombre}" está inactiva`);
   if (bus.estado !== 'activo') {
-    throw new ViajeInvalidoError(`El bus ${bus.placa} esta en estado "${bus.estado}" y no puede viajar`);
+    throw new ViajeInvalidoError(`El bus ${bus.placa} está en estado "${bus.estado}" y no puede viajar`);
   }
   if (bus.tipos_asiento.length === 0) {
-    throw new ViajeInvalidoError(`El bus ${bus.placa} todavia no tiene croquis de asientos`);
+    throw new ViajeInvalidoError(`El bus ${bus.placa} todavía no tiene croquis de asientos`);
   }
   if (Number.isNaN(fecha_salida.getTime()) || fecha_salida <= ahora) {
     throw new ViajeInvalidoError('La fecha de salida debe ser futura');

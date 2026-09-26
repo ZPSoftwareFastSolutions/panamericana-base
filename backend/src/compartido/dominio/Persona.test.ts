@@ -57,7 +57,7 @@ describe('crearPersona', () => {
     );
   });
 
-  it('rechaza un ci con letras o con menos de 5 digitos', () => {
+  it('rechaza un ci con letras o con menos de 5 dígitos', () => {
     expect(() => crearPersona({ ...datosValidos, numero_documento: 'ABC123' }, HOY)).toThrow(
       DocumentoInvalidoError,
     );

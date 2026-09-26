@@ -1,6 +1,6 @@
 # Product Backlog — Panamericana (MVP en 3 sprints)
 
-> **Versión:** 1.2 · **Fecha:** 2026-09-23 · **Estado:** Sprint 2 en curso · referencias de los Sprints 1 y 2 listas en `panamericana-base` · contexto Bolivia · despliegue en la fase final · tarjetas del Sprint 2 documentadas, sin cargar en Trello
+> **Versión:** 1.3 · **Fecha:** 2026-09-26 · **Estado:** Sprint 2 en curso · referencias de los Sprints 1 a 4 y del incremento de calidad y legal listas en `panamericana-base` · contexto Bolivia · despliegue en la fase final · tarjetas del Sprint 2 documentadas, sin cargar en Trello
 > **Fuentes:** `PLANIFICACION.md` v0.4 · análisis deductivo-inductivo (fase alpha) · `PROPUESTA_BD.md` v1.0 · ADR-001, ADR-002, ADR-003
 > **Documento interno del Repositorio 1.** Al equipo le llega como **tarjetas de Trello** (una por cada `PAN-xx`), nunca como archivo.
 
@@ -65,6 +65,11 @@ Estas decisiones responden de forma **provisional** las preguntas abiertas de `P
 | P17 | ¿Precio de un tramo? | **Proporcional al tiempo**: precio completo × (minutos del tramo ÷ duración total), redondeado a 0,50 | Se calcula con `rutas_paradas.minutos_desde_origen` |
 | — | Canal móvil | **PWA** (portal web instalable). La app nativa queda fuera del MVP (HU-027) | Cumple "web y móvil" del título sin duplicar el frontend |
 | — | Liberar reservas vencidas | **Al consultar o reservar**, no con una tarea programada | No depende de un cron (ver ADR-002) |
+| — | Tarifas diferenciadas (26/09) | **Obligatorias por ley:** adulto mayor 20 % (Ley 1886), discapacidad grave o muy grave 50 % (Ley 223 y DS 1893), niñas y niños de 3 a 12 años 50 % (reglamento de la ATT, art. 81). El descuento se redondea hacia abajo a Bs 0,50 y el documento se muestra al subir. Migración `tarifas_diferenciadas` | Verificación legal del 25–26/09 |
+| — | Consentimiento (26/09) | **Sin aceptar los Términos y la Política de Privacidad no se vende** (`acepta_condiciones`, web y taquilla). En clientes y encomiendas, casilla del personal | DS 1793 (reglamento de la Ley 164): informar y obtener el consentimiento antes de tratar datos |
+| — | Reembolso por anulación (26/09) | **100 %** hasta 2 h antes de subir (el reglamento exige al menos 85 %); cancelación o demora mayor a 30 min atribuible al operador: 100 % | Decisión del Product Owner: mejor que el mínimo legal |
+| — | Datos del negocio (26/09) | Un solo archivo (`shared/src/negocio.ts`). Mientras falten, se ven como `[por completar]` y **no se puede publicar el sitio oficial** (build y `prueba:seguridad` en producción fallan) | La empresa todavía no entregó razón social, NIT, contacto ni autorización de la ATT |
+| — | Buscadores (26/09) | **Sin indexar** hasta configurar el dominio oficial (`NEXT_PUBLIC_SITIO_URL`); nunca se indexan el panel, las compras, los boletos ni las encomiendas por código | Evita publicar un sitio a medias y datos personales |
 
 > ✅ **P12 resuelta (15/09):** contexto Bolivia. La base acepta `ci`, `ce` y `pasaporte`; los datos de prueba usan CI, placas bolivianas, celulares de 8 dígitos y la ruta La Paz → Oruro → Cochabamba.
 
@@ -87,7 +92,7 @@ Estas decisiones responden de forma **provisional** las preguntas abiertas de `P
 | **E10** | Calidad y endurecimiento | Transversal | Must | 3 | Karime · todos |
 | **E11** | Inteligencia artificial | Inteligencia Artificial (**machine learning**) | Must | 3 | Ángel · John · Brisa |
 
-> Se mantienen los códigos `E0`–`E10` de la versión anterior del roadmap para no romper referencias; se agrega **E11**.
+> Se mantienen los códigos `E0`–`E10` de la versión anterior del roadmap para no romper referencias; se agrega **E11**. El incremento de calidad y legal (26/09) suma HU-035 a E5 y HU-036 y HU-037 a E10.
 
 ---
 
@@ -275,6 +280,14 @@ Estas decisiones responden de forma **provisional** las preguntas abiertas de `P
 
 **Must · 3 pts · Sprint 3 · PAN-25 · ⏳**
 
+#### HU-035 · Tarifas diferenciadas de ley
+**Como** pasajero adulto mayor, con discapacidad o menor de 12 años **quiero** comprar con el descuento que me da la ley **para** pagar lo que corresponde.
+- Catálogo `tipos_pasajero` (general, adulto mayor 20 %, discapacidad 50 %, menor 50 %) con el documento que se presenta al subir.
+- La API calcula el precio con descuento (redondeo hacia abajo a Bs 0,50) y guarda la tarifa en el pasaje; la web muestra el total antes de reservar.
+- El boleto, el detalle de la compra y la taquilla muestran la tarifa y el documento a presentar; anular devuelve lo pagado con descuento.
+
+**Must · 5 pts · Incremento de calidad y legal · PAN-44, PAN-49 · 🔄 referencia lista (`calidad-y-legal`)**
+
 ### E6 — Encomiendas
 
 #### HU-023 · Registrar y dar seguimiento a encomiendas
@@ -339,10 +352,28 @@ Estas decisiones responden de forma **provisional** las preguntas abiertas de `P
 #### HU-030 · Pruebas de humo en staging y checklist de seguridad
 **Como** equipo **quiero** verificar el flujo completo en la nube antes de la demo **para** presentar un MVP estable.
 - Guion de humo ejecutado en staging: buscar → elegir asiento → reservar → pagar → boleto, más taquilla y encomienda.
-- Checklist: RLS activo en las 26 tablas y vistas sin acceso para `anon`, sin claves en el repositorio, CORS limitado al dominio de la web y rutas `/admin` protegidas.
+- Checklist: RLS activo en todas las tablas y vistas sin acceso para `anon`, sin claves en el repositorio, CORS limitado al dominio de la web y rutas `/admin` protegidas.
 - Los defectos encontrados se registran como tarjetas.
 
 **Must · 3 pts · Sprint 3 · PAN-40 · 🔄 referencia lista (`sprint04`)**
+
+#### HU-036 · Cumplimiento legal: documentos, consentimiento y datos del negocio
+**Como** empresa **quiero** publicar los Términos y Condiciones, la Política de Privacidad, la de Cookies y la de Reembolsos, pedir el consentimiento al recolectar datos y mostrar los datos del operador **para** cumplir la normativa boliviana (Ley 453, Ley 164 y DS 1793, reglamento de transporte de la ATT) y no tener problemas legales.
+- Cuatro páginas legales enlazadas en el pie de todas las páginas públicas, con su fecha de actualización.
+- Sin aceptar los términos no se reserva ni se vende (400); en clientes y encomiendas el personal confirma que informó la política.
+- Solo se piden los datos necesarios (se deja de pedir la fecha de nacimiento del cliente).
+- Sin analíticas ni scripts de terceros; si se agregan, antes se pide consentimiento y se actualiza la Política de Cookies (lo vigila `prueba:seguridad`).
+- Datos del operador en el boleto y el pie; el sitio oficial no se publica sin ellos. Imágenes propias (el favicon de la plantilla era el logo de un tercero).
+
+**Must · 7 pts · Incremento de calidad y legal · PAN-45, PAN-46, PAN-50 · 🔄 referencia lista (`calidad-y-legal`)**
+
+#### HU-037 · Accesibilidad y buscadores
+**Como** persona que usa teclado, lector de pantalla o un celular **quiero** poder usar todo el sistema **para** comprar y trabajar sin barreras; **y como** empresa quiero aparecer en los buscadores solo con el sitio oficial.
+- WCAG 2.2 AA: etiquetas en todos los campos, errores y ayudas enlazados, foco visible, contraste 4,5:1 (3:1 en gráficos), áreas táctiles de 44 px, sin desplazamiento horizontal a 375 px, textos con tildes, gráficos con tabla accesible y movimiento reducido.
+- `robots.txt`, mapa del sitio, título por página y `noindex` en el panel y en las páginas con datos personales.
+- axe-core sin violaciones en todas las páginas del portal y del panel.
+
+**Must · 4 pts · Incremento de calidad y legal · PAN-47, PAN-48 · 🔄 referencia lista (`calidad-y-legal`)**
 
 #### HU-031 · Validación automática del SQL
 **Could · 2 pts (estimado) · Sin sprint · ⏳** (sqlfluff en la CI para la regla R1)
@@ -462,6 +493,22 @@ Si el docente no amplía el calendario, entra en la **fase final** junto al desp
 | PAN-29 | Grisel | Métricas del panel: ventas, ingresos y ocupación (API) | HU-029 | 2 | PAN-22 |
 | PAN-39 | Karime | Portal instalable como aplicación (PWA) | HU-026 | 2 | — |
 | PAN-40 | Karime | Pruebas de humo y checklist de seguridad | HU-030 | 3 | Todas (últimos días) |
+
+### 5.6 Incremento de calidad y legal · rama `calidad-y-legal`
+
+**Estado al 26/09:** construido y validado en `panamericana-base` (rama `calidad-y-legal`, creada desde `sprint04`): migración 12 (`tarifas_diferenciadas`), 119 pruebas unitarias, 3 de integración, **31 casos de aceptación** (`docs/pruebas/aceptacion_calidad.mjs`), regresión 60/60, 52/52 y 22/22, humo y seguridad en verde, y **axe-core sin violaciones** en las 24 pantallas revisadas (portal y panel), sin desplazamiento horizontal a 375 px. Replicación: `docs/repo2/REPLICACION_CALIDAD.md`; correcciones de incrementos anteriores: `docs/repo2/CORRECCIONES_04.md`.
+
+| Tarjeta | Responsable | Trabajo | HU | Pts | Depende de |
+|---|---|---|---|---|---|
+| PAN-44 | John | Tarifas diferenciadas: catálogo `tipos-pasajero`, precio con descuento y tarifa en pasaje y boleto (API) | HU-035 | 3 | Migración ya aplicada |
+| PAN-45 | Ángel | Consentimiento obligatorio al reservar y vender (API), controles legales en `prueba:seguridad` y mensajes de la API con tildes | HU-036 | 2 | PAN-44 (contrato) |
+| PAN-46 | Karime | Documentos legales, datos del negocio, pie del portal, favicon propio y portada sin afirmaciones sin respaldo | HU-036 | 3 | — |
+| PAN-47 | Brisa | Accesibilidad: `Campo`, `CampoCasilla`, `Boton`, foco visible, contraste, tablas y grillas en celular, gráficos con tabla, formulario de buses con etiquetas | HU-037 | 3 | — |
+| PAN-48 | Karime | Buscadores: `robots.txt`, mapa del sitio, títulos por página y `noindex` | HU-037 | 1 | PAN-46 |
+| PAN-49 | Karime | Tarifa en el formulario de pasajeros, total con descuento, casilla de aceptación y tarifa en boleto, detalle y taquilla (web) | HU-035 | 2 | PAN-44, PAN-45, PAN-47 (contrato) |
+| PAN-50 | Grisel | Clientes sin fecha de nacimiento y casilla de privacidad en clientes y encomiendas (web) | HU-036 | 1 | PAN-47 |
+
+> Entra al inicio de la fase final o antes de la demo, cuando el equipo tenga replicado el incremento 4. Los datos del negocio (`shared/src/negocio.ts`) los completa el Product Owner con la empresa antes del despliegue oficial.
 
 ---
 

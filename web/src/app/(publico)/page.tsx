@@ -1,9 +1,10 @@
 import { BuscadorViajes } from '@/modulos/viajes/componentes/BuscadorViajes';
 
+// solo lo que el sistema hace hoy (sin promesas ni cifras que no se puedan respaldar)
 const BENEFICIOS = [
-  { titulo: 'Compra en linea', texto: 'Elige tu viaje y paga desde el celular, sin filas.' },
-  { titulo: 'Tu asiento, tu tramo', texto: 'Escoge el asiento exacto para el tramo que viajas.' },
-  { titulo: 'Encomiendas', texto: 'Envia paquetes y sigue su recorrido con un codigo.' },
+  { titulo: 'Compra en línea', texto: 'Elige tu viaje y tu asiento desde el celular o la computadora.' },
+  { titulo: 'Tu asiento, tu tramo', texto: 'Compra solo el tramo que viajas, de una parada a otra de la ruta.' },
+  { titulo: 'Encomiendas', texto: 'Envía paquetes desde la terminal y sigue su recorrido con un código.' },
 ];
 
 /**
@@ -16,19 +17,17 @@ export default function PaginaInicio() {
       <section className="bg-slate-900 px-4 pt-8 pb-16 text-white sm:pt-12">
         <div className="mx-auto flex max-w-5xl flex-col gap-3">
           <h1 className="text-3xl font-bold sm:text-4xl">Viaja por Bolivia</h1>
-          <p className="text-slate-300">
-            Busca tu viaje entre La Paz, Oruro, Cochabamba y mas destinos.
-          </p>
+          <p className="text-slate-200">Busca tu viaje, elige tu asiento y compra tu pasaje por tramos.</p>
         </div>
       </section>
 
-      <section className="-mt-10 px-4">
+      <section aria-label="Buscar viajes" className="-mt-10 px-4">
         <div className="mx-auto max-w-5xl">
           <BuscadorViajes />
         </div>
       </section>
 
-      <section className="px-4 py-12">
+      <section aria-label="Servicios" className="px-4 py-12">
         <ul className="mx-auto grid max-w-5xl gap-4 sm:grid-cols-3">
           {BENEFICIOS.map((beneficio) => (
             <li key={beneficio.titulo} className="rounded-lg border border-slate-200 bg-white p-4">

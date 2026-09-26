@@ -5,7 +5,7 @@ export class PlacaInvalidaError extends ErrorDeDominio {
   readonly estadoHttp = 400;
 
   constructor(placa: string) {
-    super(`La placa "${placa}" no tiene un formato valido`);
+    super(`La placa "${placa}" no tiene un formato válido`);
   }
 }
 

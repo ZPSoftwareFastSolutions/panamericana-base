@@ -1,4 +1,4 @@
-import { exigirTramoALaVenta, precioDeTramo, resolverTramo } from '../../../compartido/dominio/Tramo';
+import { exigirTramoALaVenta, precioDeTramo, preciosPorTarifa, resolverTramo } from '../../../compartido/dominio/Tramo';
 import { ViajeNoEncontradoError } from '../../../compartido/dominio/erroresViaje';
 import type { ViajeRepositorio } from '../dominio/ViajeRepositorio';
 import type { PuntoDelTramo } from './BuscarViajes';
@@ -11,7 +11,10 @@ export type AsientoDisponible = {
   fila: number;
   columna: number;
   tipo: string;
+  /** precio del tramo con la tarifa general */
   precio: number;
+  /** el mismo precio con cada tarifa diferenciada: la web no recalcula descuentos */
+  precios_por_tarifa: Record<string, number>;
   disponible: boolean;
 };
 
@@ -42,7 +45,10 @@ export class ConsultarDisponibilidad {
     exigirTramoALaVenta(viaje.estado, viaje.fecha_salida, tramo.origen, this.ahora());
 
     await this.viajes.liberarReservasVencidas(viaje_id);
-    const asientos = await this.viajes.asientosDelTramo(viaje_id, desde, hasta);
+    const [asientos, tiposPasajero] = await Promise.all([
+      this.viajes.asientosDelTramo(viaje_id, desde, hasta),
+      this.viajes.tiposPasajero(),
+    ]);
 
     return {
       viaje_id,
@@ -51,6 +57,8 @@ export class ConsultarDisponibilidad {
       destino: puntoDelTramo(viaje.fecha_salida, tramo.destino),
       asientos: asientos.map((asiento) => {
         const tarifa = viaje.tarifas.find((t) => t.tipo_asiento === asiento.tipo);
+        // sin tarifa para su tipo, el asiento no se puede vender
+        const precio = tarifa ? precioDeTramo(tarifa.precio, tramo.minutos, viaje.duracion_ruta) : 0;
         return {
           id: asiento.id,
           numero: asiento.numero,
@@ -58,8 +66,8 @@ export class ConsultarDisponibilidad {
           fila: asiento.fila,
           columna: asiento.columna,
           tipo: asiento.tipo,
-          // sin tarifa para su tipo, el asiento no se puede vender
-          precio: tarifa ? precioDeTramo(tarifa.precio, tramo.minutos, viaje.duracion_ruta) : 0,
+          precio,
+          precios_por_tarifa: tarifa ? preciosPorTarifa(precio, tiposPasajero) : {},
           disponible: !asiento.ocupado && tarifa !== undefined,
         };
       }),

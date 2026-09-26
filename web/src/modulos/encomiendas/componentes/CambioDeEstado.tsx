@@ -68,7 +68,7 @@ export function CambioDeEstado({ encomienda }: { encomienda: Encomienda }) {
             onChange={(e) => setViajeId(e.target.value)}
           />
         )}
-        <Campo etiqueta="Observacion (opcional)" value={observacion} onChange={(e) => setObservacion(e.target.value)} />
+        <Campo etiqueta="Observación (opcional)" value={observacion} onChange={(e) => setObservacion(e.target.value)} />
       </div>
       {cambiar.error && (
         <p role="alert" className="text-sm text-red-600">

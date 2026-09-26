@@ -13,6 +13,8 @@ export type PasajeroEntrada = {
   apellidos: string;
   telefono?: string | null;
   correo?: string | null;
+  /** tarifa diferenciada (catalogo tipos_pasajero); sin indicar, 'general' */
+  tipo_pasajero?: string;
 };
 
 /** reservar asientos de un tramo: crea la venta pendiente y retiene los asientos unos minutos */
@@ -21,6 +23,8 @@ export type ReservarEntrada = {
   orden_origen: number;
   orden_destino: number;
   pasajeros: PasajeroEntrada[];
+  /** el comprador acepto los Terminos y Condiciones y la Politica de Privacidad (obligatorio) */
+  acepta_condiciones: boolean;
 };
 
 /** venta presencial: reserva y cobra en efectivo en un solo paso (mismo inventario que la web) */
@@ -36,6 +40,8 @@ export type PasajeDeVenta = {
   estado: EstadoPasaje;
   precio: number;
   asiento: { numero: number; piso: number; tipo: string };
+  /** tarifa con que se vendio y documento que debe presentar al subir */
+  tipo_pasajero: { codigo: string; nombre: string; requisito: string | null };
   pasajero: {
     tipo_documento: TipoDocumento;
     numero_documento: string;

@@ -31,7 +31,7 @@ export function PanelConSesion({ children }: { children: React.ReactNode }) {
   }
 
   if (sesion.isPending || sinSesion) {
-    return <p className="p-8 text-slate-500">Verificando la sesion...</p>;
+    return <p className="p-8 text-slate-600">Verificando la sesión...</p>;
   }
 
   if (sesion.error) {
@@ -39,7 +39,7 @@ export function PanelConSesion({ children }: { children: React.ReactNode }) {
       <div className="flex flex-col gap-3 p-8">
         <p className="text-red-600">{sesion.error.message}</p>
         <button type="button" onClick={cerrarSesion} className="w-fit underline">
-          Cerrar sesion
+          Cerrar sesión
         </button>
       </div>
     );
@@ -57,7 +57,9 @@ export function PanelConSesion({ children }: { children: React.ReactNode }) {
           alCerrarSesion={cerrarSesion}
         />
       </aside>
-      <main className="flex-1 p-4 md:p-8">{children}</main>
+      <main id="contenido" tabIndex={-1} className="min-w-0 flex-1 p-4 outline-none md:p-8">
+        {children}
+      </main>
     </div>
   );
 }

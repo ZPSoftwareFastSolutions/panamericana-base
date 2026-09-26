@@ -1,5 +1,10 @@
+import type { Metadata } from 'next';
 import { AnulacionPasaje } from '@/modulos/taquilla/componentes/AnulacionPasaje';
 import { VentaTaquilla } from '@/modulos/taquilla/componentes/VentaTaquilla';
+
+export const metadata: Metadata = {
+  title: 'Taquilla',
+};
 
 /** /admin/taquilla — venta presencial en efectivo y anulacion de pasajes */
 export default function PaginaTaquilla() {

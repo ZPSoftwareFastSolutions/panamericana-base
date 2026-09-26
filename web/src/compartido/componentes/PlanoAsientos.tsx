@@ -5,6 +5,8 @@
  * Lo usan el portal (elegir asiento), la taquilla y el editor de croquis.
  *
  * No sabe de viajes ni de ventas: recibe cada asiento con su estado y avisa cual se toco.
+ * El estado no se distingue solo por el color: el ocupado va tachado y el elegido, relleno;
+ * cada boton mide al menos 44 px y dice su estado a los lectores de pantalla.
  */
 
 export type EstadoAsiento = 'libre' | 'ocupado' | 'seleccionado';
@@ -19,6 +21,8 @@ export type AsientoDelPlano = {
   estado: EstadoAsiento;
   /** texto corto debajo del numero (por ejemplo el precio) */
   detalle?: string;
+  /** el mismo detalle dicho completo para lectores de pantalla (por ejemplo "Bs 47,50") */
+  detalleAccesible?: string;
 };
 
 type Propiedades = {
@@ -30,7 +34,7 @@ type Propiedades = {
 const ESTILOS: Record<EstadoAsiento, string> = {
   libre: 'border-emerald-600 bg-white text-slate-900 hover:bg-emerald-50',
   seleccionado: 'border-slate-900 bg-slate-900 text-white',
-  ocupado: 'cursor-not-allowed border-slate-300 bg-slate-200 text-slate-400',
+  ocupado: 'cursor-not-allowed border-slate-300 bg-slate-200 text-slate-600 line-through',
 };
 
 export function PlanoAsientos({ numeroPisos, asientos, alElegir }: Propiedades) {
@@ -38,10 +42,16 @@ export function PlanoAsientos({ numeroPisos, asientos, alElegir }: Propiedades) 
 
   return (
     <div className="flex flex-col gap-6">
-      <div className="flex flex-wrap gap-4 text-xs text-slate-600">
-        <span className="flex items-center gap-1"><i className="h-3 w-3 rounded border border-emerald-600 bg-white" /> Libre</span>
-        <span className="flex items-center gap-1"><i className="h-3 w-3 rounded bg-slate-900" /> Elegido</span>
-        <span className="flex items-center gap-1"><i className="h-3 w-3 rounded bg-slate-200" /> Ocupado</span>
+      <div className="flex flex-wrap gap-4 text-xs text-slate-700">
+        <span className="flex items-center gap-1">
+          <i aria-hidden="true" className="h-3 w-3 rounded border-2 border-emerald-600 bg-white" /> Libre
+        </span>
+        <span className="flex items-center gap-1">
+          <i aria-hidden="true" className="h-3 w-3 rounded bg-slate-900" /> Elegido
+        </span>
+        <span className="flex items-center gap-1">
+          <i aria-hidden="true" className="h-3 w-3 rounded border border-slate-300 bg-slate-200" /> Ocupado (tachado)
+        </span>
       </div>
 
       {pisos.map((piso) => {
@@ -67,13 +77,13 @@ export function PlanoAsientos({ numeroPisos, asientos, alElegir }: Propiedades) 
                   disabled={asiento.estado === 'ocupado' || !alElegir}
                   onClick={() => alElegir?.(asiento)}
                   aria-pressed={asiento.estado === 'seleccionado'}
-                  aria-label={`Asiento ${asiento.numero}, ${asiento.tipo}, ${asiento.estado}`}
+                  aria-label={`Asiento ${asiento.numero}, ${asiento.tipo}, ${asiento.estado}${asiento.detalleAccesible ? `, ${asiento.detalleAccesible}` : ''}`}
                   title={`Asiento ${asiento.numero} · ${asiento.tipo}`}
-                  className={`flex flex-col items-center rounded-lg border-2 px-1 py-1.5 text-sm font-semibold transition-colors ${ESTILOS[asiento.estado]}`}
+                  className={`flex min-h-11 flex-col items-center justify-center rounded-lg border-2 px-1 py-1.5 text-sm font-semibold transition-colors ${ESTILOS[asiento.estado]}`}
                   style={{ gridColumn: asiento.columna, gridRow: asiento.fila }}
                 >
                   {asiento.numero}
-                  {asiento.detalle && <span className="text-[10px] font-normal leading-tight">{asiento.detalle}</span>}
+                  {asiento.detalle && <span className="text-xs font-normal leading-tight">{asiento.detalle}</span>}
                 </button>
               ))}
             </div>

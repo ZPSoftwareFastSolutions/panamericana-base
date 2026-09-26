@@ -14,7 +14,7 @@ export class EncomiendaNoEncontradaError extends ErrorDeDominio {
   readonly estadoHttp = 404;
 
   constructor(codigo: string) {
-    super(`No existe una encomienda con el codigo ${codigo}`);
+    super(`No existe una encomienda con el código ${codigo}`);
   }
 }
 
@@ -26,8 +26,8 @@ export class TransicionInvalidaError extends ErrorDeDominio {
     const legible = (estado: string) => estado.replaceAll('_', ' ');
     super(
       permitidos.length > 0
-        ? `La encomienda esta ${legible(actual)}: puede pasar a ${permitidos.map(legible).join(' o ')}, no a ${legible(nuevo)}`
-        : `La encomienda ya esta ${legible(actual)} y no cambia de estado`,
+        ? `La encomienda está ${legible(actual)}: puede pasar a ${permitidos.map(legible).join(' o ')}, no a ${legible(nuevo)}`
+        : `La encomienda ya está ${legible(actual)} y no cambia de estado`,
     );
   }
 }
@@ -37,7 +37,7 @@ export class EstadoCambiadoError extends ErrorDeDominio {
   readonly estadoHttp = 409;
 
   constructor() {
-    super('Otra persona cambio el estado de la encomienda mientras tanto. Vuelve a cargarla');
+    super('Otra persona cambió el estado de la encomienda mientras tanto. Vuelve a cargarla');
   }
 }
 
@@ -46,7 +46,7 @@ export class TerminalNoValidaError extends ErrorDeDominio {
   readonly estadoHttp = 400;
 
   constructor() {
-    super('La terminal de origen o de destino no existe o esta inactiva');
+    super('La terminal de origen o de destino no existe o está inactiva');
   }
 }
 
@@ -55,6 +55,6 @@ export class ViajeNoSirveError extends ErrorDeDominio {
   readonly estadoHttp = 400;
 
   constructor() {
-    super('Ese viaje no esta programado o no pasa por la terminal de origen y despues por la de destino');
+    super('Ese viaje no está programado o no pasa por la terminal de origen y después por la de destino');
   }
 }

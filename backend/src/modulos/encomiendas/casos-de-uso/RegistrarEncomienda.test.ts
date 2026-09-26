@@ -98,7 +98,7 @@ function crear() {
 }
 
 describe('RegistrarEncomienda', () => {
-  it('registra y cobra: codigo E-, venta V-, descripcion limpia y estado registrada', async () => {
+  it('registra y cobra: código E-, venta V-, descripción limpia y estado registrada', async () => {
     const { registrar } = crear();
 
     const encomienda = await registrar.ejecutar(envio, USUARIO);
@@ -155,7 +155,7 @@ describe('CambiarEstadoEncomienda', () => {
     expect(repositorio.cambios.at(-1)?.observacion).toBe('Recibio su hermana');
   });
 
-  it('no permite saltos ni cambios despues de entregada', async () => {
+  it('no permite saltos ni cambios después de entregada', async () => {
     const { registrar, cambiar } = crear();
     const { codigo_seguimiento } = await registrar.ejecutar(envio, USUARIO);
 
@@ -189,7 +189,7 @@ describe('CambiarEstadoEncomienda', () => {
     ).rejects.toThrow(EncomiendaInvalidaError);
   });
 
-  it('si otra persona cambio el estado mientras tanto, responde estado_cambiado', async () => {
+  it('si otra persona cambió el estado mientras tanto, responde estado_cambiado', async () => {
     const { registrar, cambiar, repositorio } = crear();
     const { codigo_seguimiento } = await registrar.ejecutar(envio, USUARIO);
     repositorio.otroCambioElEstado = true;
@@ -201,7 +201,7 @@ describe('CambiarEstadoEncomienda', () => {
 });
 
 describe('SeguirEncomienda', () => {
-  it('el seguimiento publico no muestra personas ni observaciones', async () => {
+  it('el seguimiento público no muestra personas ni observaciones', async () => {
     const { registrar, cambiar, repositorio } = crear();
     const { codigo_seguimiento } = await registrar.ejecutar(envio, USUARIO);
     await cambiar.ejecutar(codigo_seguimiento, { estado: 'en_transito', observacion: 'Con Pedro' }, USUARIO);

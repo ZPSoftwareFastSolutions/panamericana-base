@@ -69,8 +69,8 @@ export function FormularioRuta() {
             <div className="flex items-center justify-between text-sm font-medium">
               <span>Parada {i + 1}{i === 0 ? ' · origen' : i === paradas.length - 1 ? ' · destino' : ''}</span>
               {paradas.length > 2 && (
-                <button type="button" className="text-red-600 underline" onClick={() => quitarParada(i)}>
-                  Quitar
+                <button type="button" className="min-h-11 px-2 text-red-600 underline" onClick={() => quitarParada(i)}>
+                  Quitar<span className="sr-only"> la parada {i + 1}</span>
                 </button>
               )}
             </div>

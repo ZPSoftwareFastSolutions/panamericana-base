@@ -38,7 +38,7 @@ export class ProgramarViaje {
     await this.viajes.guardar(viaje);
 
     const guardado = await this.viajes.buscarPorId(viaje.id);
-    if (!guardado) throw new Error('El viaje no se encontro despues de guardarlo');
+    if (!guardado) throw new Error('El viaje no se encontró después de guardarlo');
     return guardado;
   }
 }

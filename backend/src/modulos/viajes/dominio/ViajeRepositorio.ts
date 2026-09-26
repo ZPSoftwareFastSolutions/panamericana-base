@@ -1,4 +1,4 @@
-import type { ParadaDelViaje } from '../../../compartido/dominio/Tramo';
+import type { ParadaDelViaje, TipoDePasajero } from '../../../compartido/dominio/Tramo';
 import type { BusParaProgramar, NuevoViaje, RutaParaProgramar, TarifaEntrada } from './Programacion';
 
 /** un viaje tal como lo ve el backoffice */
@@ -71,4 +71,6 @@ export interface ViajeRepositorio {
   buscarConParadas(viaje_id: string): Promise<ViajeConParadas | null>;
   liberarReservasVencidas(viaje_id: string): Promise<void>;
   asientosDelTramo(viaje_id: string, desde: number, hasta: number): Promise<AsientoDelTramo[]>;
+  /** tarifas diferenciadas activas (general, adulto mayor, discapacidad, menor) */
+  tiposPasajero(): Promise<TipoDePasajero[]>;
 }

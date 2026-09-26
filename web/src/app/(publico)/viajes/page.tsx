@@ -1,5 +1,10 @@
+import type { Metadata } from 'next';
 import { BuscadorViajes } from '@/modulos/viajes/componentes/BuscadorViajes';
 import { ResultadosBusqueda } from '@/modulos/viajes/componentes/ResultadosBusqueda';
+
+export const metadata: Metadata = {
+  title: 'Viajes disponibles',
+};
 
 type Parametros = { origen?: string; destino?: string; fecha?: string };
 

@@ -14,7 +14,7 @@ export class TerminalInvalidaError extends ErrorDeDominio {
   readonly estadoHttp = 400;
 
   constructor() {
-    super('Alguna terminal de la ruta no existe o esta inactiva');
+    super('Alguna terminal de la ruta no existe o está inactiva');
   }
 }
 

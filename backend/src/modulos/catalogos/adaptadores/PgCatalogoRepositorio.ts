@@ -1,5 +1,5 @@
 import type { Pool } from 'pg';
-import type { Ciudad, ElementoCatalogo } from '../dominio/Catalogo';
+import type { Ciudad, ElementoCatalogo, TipoPasajero } from '../dominio/Catalogo';
 import type { CatalogoRepositorio } from '../dominio/CatalogoRepositorio';
 
 /** SQL del modulo catalogos. Solo se listan los valores activos. */
@@ -30,6 +30,16 @@ export class PgCatalogoRepositorio implements CatalogoRepositorio {
     const resultado = await this.db.query<ElementoCatalogo>(
       `select codigo, nombre
          from tipos_asiento
+        where activo
+        order by orden`,
+    );
+    return resultado.rows;
+  }
+
+  async listarTiposPasajero(): Promise<TipoPasajero[]> {
+    const resultado = await this.db.query<TipoPasajero>(
+      `select codigo, nombre, descuento_porcentaje::float8 as descuento_porcentaje, requisito
+         from tipos_pasajero
         where activo
         order by orden`,
     );

@@ -35,7 +35,7 @@ export function MenuLateral({ roles, nombre, alCerrarSesion }: Propiedades) {
 
   return (
     <div className="flex flex-col gap-4">
-      <nav className="flex flex-col gap-1 text-sm">
+      <nav aria-label="Menú del panel" className="flex flex-col gap-1 text-sm">
         {visibles.map((opcion) => {
           // "Inicio" solo se marca en /admin exacto; las demas tambien en sus subpaginas
           const activa =
@@ -59,9 +59,9 @@ export function MenuLateral({ roles, nombre, alCerrarSesion }: Propiedades) {
 
       <div className="border-t border-slate-200 pt-3 text-sm">
         <p className="font-medium text-slate-900">{nombre}</p>
-        <p className="text-xs text-slate-500">{roles.join(', ')}</p>
-        <button type="button" onClick={alCerrarSesion} className="mt-2 text-slate-700 underline hover:text-slate-900">
-          Cerrar sesion
+        <p className="text-xs text-slate-600">{roles.join(', ')}</p>
+        <button type="button" onClick={alCerrarSesion} className="mt-2 min-h-11 text-slate-700 underline hover:text-slate-900">
+          Cerrar sesión
         </button>
       </div>
     </div>

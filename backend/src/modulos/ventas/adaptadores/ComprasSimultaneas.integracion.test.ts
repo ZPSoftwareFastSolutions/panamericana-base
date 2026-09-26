@@ -88,7 +88,7 @@ describe.skipIf(!process.env.DATABASE_URL)('Compras simultaneas contra la base r
   it('20 personas a la vez por el mismo asiento y tramo: exactamente una gana', async () => {
     const intentos = await Promise.allSettled(
       Array.from({ length: 20 }, (_, i) =>
-        reservar().ejecutar({ viaje_id: viaje, orden_origen: 1, orden_destino: 2, pasajeros: [pasajero(asientos[0]!, i)] }),
+        reservar().ejecutar({ viaje_id: viaje, orden_origen: 1, orden_destino: 2, pasajeros: [pasajero(asientos[0]!, i)], acepta_condiciones: true }),
       ),
     );
 
@@ -107,8 +107,8 @@ describe.skipIf(!process.env.DATABASE_URL)('Compras simultaneas contra la base r
 
   it('el mismo asiento en tramos que NO se cruzan (1-2 y 2-3) se vende dos veces, a la vez', async () => {
     const [primero, segundo] = await Promise.allSettled([
-      reservar().ejecutar({ viaje_id: viaje, orden_origen: 1, orden_destino: 2, pasajeros: [pasajero(asientos[1]!, 100)] }),
-      reservar().ejecutar({ viaje_id: viaje, orden_origen: 2, orden_destino: 3, pasajeros: [pasajero(asientos[1]!, 101)] }),
+      reservar().ejecutar({ viaje_id: viaje, orden_origen: 1, orden_destino: 2, pasajeros: [pasajero(asientos[1]!, 100)], acepta_condiciones: true }),
+      reservar().ejecutar({ viaje_id: viaje, orden_origen: 2, orden_destino: 3, pasajeros: [pasajero(asientos[1]!, 101)], acepta_condiciones: true }),
     ]);
 
     expect([primero!.status, segundo!.status]).toEqual(['fulfilled', 'fulfilled']);

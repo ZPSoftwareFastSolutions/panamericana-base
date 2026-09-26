@@ -7,12 +7,16 @@
  *  2. configuracion: origenes permitidos (CORS) definidos y sin comodin;
  *  3. repositorio: ningun .env versionado ni contraseñas o claves secretas en los archivos;
  *  4. API (si esta corriendo): rutas del panel cerradas, CORS que rechaza otros sitios y sin
- *     el encabezado que delata la tecnologia (x-powered-by).
+ *     el encabezado que delata la tecnologia (x-powered-by);
+ *  5. legal: datos del negocio completos (en produccion), documentos legales publicados y la web
+ *     sin analiticas, fuentes ni scripts de terceros (si aparecen, hay que pedir consentimiento
+ *     y actualizar la Politica de Cookies antes de publicar).
  */
 import { execSync } from 'node:child_process';
-import { existsSync, readFileSync } from 'node:fs';
+import { existsSync, readdirSync, readFileSync } from 'node:fs';
+import { join } from 'node:path';
 import { Client } from 'pg';
-import { RUTAS_API } from '@panamericana/shared';
+import { datosDelNegocioPendientes, RUTAS_API } from '@panamericana/shared';
 
 if (existsSync('.env')) process.loadEnvFile('.env');
 
@@ -41,7 +45,7 @@ async function revisarBase() {
     const politicas = await db.query<{ politica: string }>(
       `select tablename || '.' || policyname as politica from pg_policies where schemaname = 'public'`,
     );
-    control('base', 'sin politicas que abran datos al publico', politicas.rowCount === 0, politicas.rows.map((f) => f.politica).join(', '));
+    control('base', 'sin políticas que abran datos al público', politicas.rowCount === 0, politicas.rows.map((f) => f.politica).join(', '));
 
     const vistas = await db.query<{ vista: string; invoker: boolean; anon: boolean }>(
       `select c.relname as vista,
@@ -81,7 +85,7 @@ function revisarRepositorio() {
     return;
   }
   const envVersionados = archivos.filter((a) => /(^|\/)\.env(\.local)?$/.test(a));
-  control('repositorio', 'ningun .env ni .env.local versionado', envVersionados.length === 0, envVersionados.join(', '));
+  control('repositorio', 'ningún .env ni .env.local versionado', envVersionados.length === 0, envVersionados.join(', '));
 
   // una cadena de conexion con contraseña real (no el marcador) o claves secretas de Supabase
   const secretos = [/postgres(ql)?:\/\/[^:\s/]+:(?!CONTRASENA|<)[^@\s]{6,}@/, /sb_secret_[A-Za-z0-9_-]{10,}/, /service_role["'\s:=]+ey[A-Za-z0-9_-]{20,}/];
@@ -93,6 +97,36 @@ function revisarRepositorio() {
     return secretos.some((patron) => patron.test(contenido));
   });
   control('repositorio', 'sin contraseñas ni claves secretas en los archivos', conSecretos.length === 0, conSecretos.join(', '));
+}
+
+/** archivos de la web que se revisan en busca de terceros */
+function archivosDeLaWeb(carpeta: string, lista: string[] = []): string[] {
+  for (const entrada of readdirSync(carpeta, { withFileTypes: true })) {
+    const ruta = join(carpeta, entrada.name);
+    if (entrada.isDirectory()) archivosDeLaWeb(ruta, lista);
+    else if (/\.(tsx?|css|js)$/.test(entrada.name)) lista.push(ruta);
+  }
+  return lista;
+}
+
+function revisarLegal() {
+  const pendientes = datosDelNegocioPendientes();
+  const produccion = process.env.NODE_ENV === 'production';
+  control(
+    'legal',
+    'datos del negocio completos (razón social, NIT, contacto, autorización ATT)',
+    pendientes.length === 0 || !produccion,
+    pendientes.length === 0 ? '' : `faltan: ${pendientes.join(', ')}${produccion ? '' : ' (bloquean el despliegue)'}`,
+  );
+
+  const documentos = ['terminos', 'privacidad', 'reembolsos', 'cookies'];
+  const faltantes = documentos.filter((d) => !existsSync(`../web/src/app/(publico)/${d}/page.tsx`));
+  control('legal', `los ${documentos.length} documentos legales están publicados`, faltantes.length === 0, faltantes.join(', '));
+
+  // analiticas, publicidad, fuentes o scripts externos: exigirian aviso de cookies y consentimiento
+  const terceros = /googletagmanager|google-analytics|gtag\(|facebook\.net|fbq\(|hotjar|clarity\.ms|mixpanel|segment\.(com|io)|posthog|plausible|umami|@vercel\/analytics|@vercel\/speed-insights|fonts\.googleapis|next\/font\/google|<script[^>]+src=["']https?:/i;
+  const conTerceros = [...archivosDeLaWeb('../web/src'), '../web/package.json'].filter((archivo) => terceros.test(readFileSync(archivo, 'utf8')));
+  control('legal', 'la web no carga analíticas ni scripts de terceros', conTerceros.length === 0, conTerceros.join(', '));
 }
 
 async function revisarApi() {
@@ -121,6 +155,7 @@ async function principal() {
   await revisarBase();
   revisarConfiguracion();
   revisarRepositorio();
+  revisarLegal();
   await revisarApi();
 
   console.table(filas.map((f) => ({ ...f, ok: f.ok ? 'si' : 'NO' })));

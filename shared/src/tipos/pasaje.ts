@@ -11,6 +11,8 @@ export type Pasaje = {
   precio: number;
   venta: { codigo: string; canal: CanalVenta };
   asiento: { numero: number; piso: number; tipo: string };
+  /** tarifa con que se vendio y documento que debe presentar al subir */
+  tipo_pasajero: { codigo: string; nombre: string; requisito: string | null };
   pasajero: {
     tipo_documento: TipoDocumento;
     numero_documento: string;

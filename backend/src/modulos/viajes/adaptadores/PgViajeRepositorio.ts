@@ -1,7 +1,7 @@
 import type { Pool } from 'pg';
 import { PASAJE_ACTIVO, liberarReservasVencidas } from '../../../compartido/adaptadores/pg/reservasSql';
 import { enTransaccion } from '../../../compartido/adaptadores/pg/transaccion';
-import type { ParadaDelViaje } from '../../../compartido/dominio/Tramo';
+import type { ParadaDelViaje, TipoDePasajero } from '../../../compartido/dominio/Tramo';
 import type { BusParaProgramar, NuevoViaje, RutaParaProgramar, TarifaEntrada } from '../dominio/Programacion';
 import type {
   AsientoDelTramo,
@@ -232,6 +232,13 @@ export class PgViajeRepositorio implements ViajeRepositorio {
         where v.id = $1
         order by a.numero`,
       [viaje_id, desde, hasta],
+    );
+    return resultado.rows;
+  }
+
+  async tiposPasajero(): Promise<TipoDePasajero[]> {
+    const resultado = await this.db.query<TipoDePasajero>(
+      'select codigo, descuento_porcentaje::float8 as descuento_porcentaje from tipos_pasajero where activo order by orden',
     );
     return resultado.rows;
   }

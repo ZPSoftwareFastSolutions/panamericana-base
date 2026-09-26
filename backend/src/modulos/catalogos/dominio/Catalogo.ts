@@ -18,3 +18,11 @@ export type ElementoCatalogo = {
   codigo: string;
   nombre: string;
 };
+
+/** una tarifa diferenciada de la normativa boliviana: descuento y documento que se presenta al subir */
+export type TipoPasajero = {
+  codigo: string;
+  nombre: string;
+  descuento_porcentaje: number;
+  requisito: string | null;
+};

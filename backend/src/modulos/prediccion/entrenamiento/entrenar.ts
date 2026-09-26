@@ -63,5 +63,5 @@ if (require.main === module) {
   writeFileSync(destino, JSON.stringify(modelo, null, 2) + '\n');
   console.log('Modelo guardado en', destino);
   console.table(Object.fromEntries(modelo.caracteristicas.map((c, i) => [c, modelo.coeficientes[i]])));
-  console.log('Metricas en los dias de prueba (pasajes por dia):', modelo.metricas);
+  console.log('Métricas en los días de prueba (pasajes por día):', modelo.metricas);
 }

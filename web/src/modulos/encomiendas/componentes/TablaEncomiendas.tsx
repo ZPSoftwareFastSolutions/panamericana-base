@@ -27,23 +27,25 @@ export function TablaEncomiendas() {
         />
       </div>
 
-      {isPending && <p className="text-slate-500">Cargando encomiendas...</p>}
+      {isPending && <p className="text-slate-600">Cargando encomiendas...</p>}
       {error && <p className="text-red-600">No se pudo cargar la lista: {error.message}</p>}
-      {encomiendas?.length === 0 && <p className="text-slate-500">No hay encomiendas con ese estado.</p>}
+      {encomiendas?.length === 0 && <p className="text-slate-600">No hay encomiendas con ese estado.</p>}
 
       <ul className="flex flex-col divide-y divide-slate-200">
         {encomiendas?.map((e) => (
           <li key={e.id} className="flex flex-col gap-2 py-3 text-sm">
             <button
               type="button"
-              className="flex flex-wrap items-center justify-between gap-2 text-left"
+              className="flex min-h-11 flex-wrap items-center justify-between gap-2 text-left"
               onClick={() => setAbierta(abierta === e.id ? null : e.id)}
               aria-expanded={abierta === e.id}
             >
               <span>
-                <span className="font-mono font-semibold">{e.codigo_seguimiento}</span> · {e.terminal_origen.ciudad} →{' '}
+                <span className="font-mono font-semibold">{e.codigo_seguimiento}</span> · {e.terminal_origen.ciudad}{' '}
+                <span aria-hidden="true">→</span>
+                <span className="sr-only">a</span>{' '}
                 {e.terminal_destino.ciudad} · {e.descripcion}
-                <span className="block text-xs text-slate-500">
+                <span className="block text-xs text-slate-600">
                   De {e.remitente.nombres} {e.remitente.apellidos} para {e.destinatario.nombres} {e.destinatario.apellidos} ·{' '}
                   {e.peso_kg} kg · {formatearBs(e.costo)} · {fechaHoraEnBolivia(e.creado_en)}
                 </span>

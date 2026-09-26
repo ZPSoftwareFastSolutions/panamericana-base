@@ -7,8 +7,8 @@ export class AsientoNoDisponibleError extends ErrorDeDominio {
   constructor(numeros: number[] = []) {
     super(
       numeros.length > 0
-        ? `El asiento ${numeros.join(', ')} ya no esta libre para ese tramo. Elige otro`
-        : 'Alguno de los asientos ya no esta libre para ese tramo. Elige otro',
+        ? `El asiento ${numeros.join(', ')} ya no está libre para ese tramo. Elige otro`
+        : 'Alguno de los asientos ya no está libre para ese tramo. Elige otro',
     );
   }
 }
@@ -27,7 +27,7 @@ export class ReservaExpiradaError extends ErrorDeDominio {
   readonly estadoHttp = 409;
 
   constructor() {
-    super('El tiempo para pagar termino y los asientos se liberaron. Vuelve a elegirlos');
+    super('El tiempo para pagar terminó y los asientos se liberaron. Vuelve a elegirlos');
   }
 }
 
@@ -36,7 +36,7 @@ export class VentaNoEncontradaError extends ErrorDeDominio {
   readonly estadoHttp = 404;
 
   constructor(codigo: string) {
-    super(`No existe una venta con el codigo ${codigo}`);
+    super(`No existe una venta con el código ${codigo}`);
   }
 }
 
@@ -45,7 +45,7 @@ export class VentaNoPendienteError extends ErrorDeDominio {
   readonly estadoHttp = 409;
 
   constructor(estado: string) {
-    super(`La venta ya esta ${estado}: no se puede pagar otra vez`);
+    super(`La venta ya está ${estado}: no se puede pagar otra vez`);
   }
 }
 
@@ -54,7 +54,7 @@ export class PasajeNoEncontradoError extends ErrorDeDominio {
   readonly estadoHttp = 404;
 
   constructor(codigo: string) {
-    super(`No existe un pasaje con el codigo ${codigo}`);
+    super(`No existe un pasaje con el código ${codigo}`);
   }
 }
 
@@ -63,7 +63,7 @@ export class PasajeNoAnulableError extends ErrorDeDominio {
   readonly estadoHttp = 409;
 
   constructor(estado: string) {
-    super(`El pasaje esta ${estado}: solo se anula un pasaje pagado`);
+    super(`El pasaje está ${estado}: solo se anula un pasaje pagado`);
   }
 }
 

@@ -3,7 +3,7 @@ import { CODIGOS_PG, codigoPg } from '../../../compartido/adaptadores/pg/errores
 import { guardarCliente } from '../../../compartido/adaptadores/pg/personasSql';
 import { PASAJE_ACTIVO, liberarReservasVencidas } from '../../../compartido/adaptadores/pg/reservasSql';
 import { enTransaccion } from '../../../compartido/adaptadores/pg/transaccion';
-import type { AsientoParaReservar, VentaNueva, ViajeParaReservar } from '../dominio/Venta';
+import type { AsientoParaReservar, TipoDePasajero, VentaNueva, ViajeParaReservar } from '../dominio/Venta';
 import type { ResultadoPago, VentaDetalle, VentaRepositorio } from '../dominio/VentaRepositorio';
 import { AsientoNoDisponibleError } from '../dominio/errores';
 
@@ -61,7 +61,10 @@ export class PgVentaRepositorio implements VentaRepositorio {
         where a.bus_id = $4`,
       [viaje_id, desde, hasta, viaje.rows[0].bus_id],
     );
-    return { viaje: viaje.rows[0], asientos: asientos.rows };
+    const tipos = await this.db.query<TipoDePasajero>(
+      'select codigo, descuento_porcentaje::float8 as descuento_porcentaje from tipos_pasajero where activo',
+    );
+    return { viaje: viaje.rows[0], asientos: asientos.rows, tiposPasajero: tipos.rows };
   }
 
   async guardarReserva(venta: VentaNueva): Promise<void> {
@@ -97,8 +100,8 @@ export class PgVentaRepositorio implements VentaRepositorio {
           // DEFENSA 3 — la restriccion pasajes_asiento_sin_traslape rechaza un tramo que se cruce
           await conexion.query(
             `insert into pasajes (id, codigo, venta_id, viaje_id, asiento_id, cliente_id, ruta_id, bus_id,
-                                  orden_origen, orden_destino, precio, estado, reservado_hasta)
-             values ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, 'reservado', $12)`,
+                                  orden_origen, orden_destino, precio, estado, reservado_hasta, tipo_pasajero)
+             values ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, 'reservado', $12, $13)`,
             [
               pasaje.id,
               pasaje.codigo,
@@ -112,6 +115,7 @@ export class PgVentaRepositorio implements VentaRepositorio {
               venta.orden_destino,
               pasaje.precio,
               venta.reservado_hasta,
+              pasaje.tipo_pasajero,
             ],
           );
         }
@@ -152,12 +156,14 @@ export class PgVentaRepositorio implements VentaRepositorio {
               coalesce((select json_agg(json_build_object(
                           'codigo', p.codigo, 'estado', p.estado, 'precio', p.precio,
                           'asiento', json_build_object('numero', a.numero, 'piso', a.piso, 'tipo', a.tipo),
+                          'tipo_pasajero', json_build_object('codigo', tp.codigo, 'nombre', tp.nombre, 'requisito', tp.requisito),
                           'pasajero', json_build_object('tipo_documento', pe.tipo_documento,
                                                         'numero_documento', pe.numero_documento,
                                                         'nombres', pe.nombres, 'apellidos', pe.apellidos))
                           order by a.numero)
                           from pasajes p
                           join asientos a on a.id = p.asiento_id
+                          join tipos_pasajero tp on tp.codigo = p.tipo_pasajero
                           join clientes cl on cl.id = p.cliente_id
                           join personas pe on pe.id = cl.persona_id
                          where p.venta_id = ve.id), '[]') as pasajes

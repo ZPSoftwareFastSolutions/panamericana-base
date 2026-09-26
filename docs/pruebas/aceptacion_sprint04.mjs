@@ -33,7 +33,12 @@ async function token(correo) {
   });
   return (await r.json()).access_token;
 }
+// reservar y vender exigen aceptar los Terminos y Condiciones: se envia salvo que el caso lo indique
+const CON_CONSENTIMIENTO = ['/v1/ventas/reservas', '/v1/taquilla/ventas'];
 async function pedir(metodo, ruta, { cuerpo, tk } = {}) {
+  if (metodo === 'POST' && CON_CONSENTIMIENTO.includes(ruta) && cuerpo && !('acepta_condiciones' in cuerpo)) {
+    cuerpo = { ...cuerpo, acepta_condiciones: true };
+  }
   const r = await fetch(API + ruta, {
     method: metodo,
     headers: { ...(cuerpo ? { 'Content-Type': 'application/json' } : {}), ...(tk ? { Authorization: `Bearer ${tk}` } : {}) },

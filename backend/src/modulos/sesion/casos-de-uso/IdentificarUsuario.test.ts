@@ -15,7 +15,7 @@ const ANA: Cuenta = {
 /** verificador falso: acepta el token "token-<id>" y rechaza cualquier otro */
 const verificadorFalso: VerificadorDeToken = {
   async verificar(token) {
-    if (!token.startsWith('token-')) throw new Error('firma invalida');
+    if (!token.startsWith('token-')) throw new Error('firma inválida');
     return { id: token.slice('token-'.length) };
   },
 };
@@ -27,7 +27,7 @@ function repositorio(cuentas: Cuenta[]): CuentaRepositorio {
 describe('IdentificarUsuario', () => {
   const identificar = new IdentificarUsuario(verificadorFalso, repositorio([ANA]));
 
-  it('devuelve la cuenta con sus roles cuando el token es valido', async () => {
+  it('devuelve la cuenta con sus roles cuando el token es válido', async () => {
     await expect(identificar.ejecutar('token-id-ana', ['administrador'])).resolves.toEqual(ANA);
   });
 
@@ -47,7 +47,7 @@ describe('IdentificarUsuario', () => {
     await expect(identificar.ejecutar('token-id-desconocido')).rejects.toThrow(NoAutenticadoError);
   });
 
-  it('un rol que no esta entre los permitidos responde "sin permiso" (403)', async () => {
+  it('un rol que no está entre los permitidos responde "sin permiso" (403)', async () => {
     await expect(identificar.ejecutar('token-id-ana', ['vendedor'])).rejects.toThrow(
       SinPermisoError,
     );

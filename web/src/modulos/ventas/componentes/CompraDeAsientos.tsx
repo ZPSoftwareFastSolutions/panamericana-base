@@ -19,8 +19,15 @@ export function CompraDeAsientos({ viajeId, desde, hasta }: { viajeId: string; d
       hasta={hasta}
       textoBoton="Continuar al pago"
       nota="Al continuar, tus asientos quedan reservados por 10 minutos mientras pagas."
-      alConfirmar={async (pasajeros) => {
-        const venta = await reservar.mutateAsync({ viaje_id: viajeId, orden_origen: desde, orden_destino: hasta, pasajeros });
+      consentimiento="comprador"
+      alConfirmar={async (pasajeros, acepta_condiciones) => {
+        const venta = await reservar.mutateAsync({
+          viaje_id: viajeId,
+          orden_origen: desde,
+          orden_destino: hasta,
+          pasajeros,
+          acepta_condiciones,
+        });
         router.push(`/compra/${venta.codigo}`);
       }}
     />

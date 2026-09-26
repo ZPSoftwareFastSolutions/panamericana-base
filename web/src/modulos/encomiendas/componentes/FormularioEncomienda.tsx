@@ -1,9 +1,10 @@
 'use client';
 
 import { useState } from 'react';
+import Link from 'next/link';
 import type { Encomienda, PersonaEncomiendaEntrada } from '@panamericana/shared';
 import { Boton } from '@/compartido/componentes/Boton';
-import { Campo, CampoSeleccion } from '@/compartido/componentes/Campo';
+import { Campo, CampoCasilla, CampoSeleccion } from '@/compartido/componentes/Campo';
 import { formatearBs } from '@/compartido/utilidades/dinero';
 import { useTiposDocumento } from '@/modulos/catalogos/hooks/useCatalogos';
 import { useTerminales } from '@/modulos/terminales/hooks/useTerminales';
@@ -48,12 +49,26 @@ function DatosPersona({
         value={valor.tipo_documento}
         onChange={(e) => cambiar('tipo_documento', e.target.value)}
       />
-      <Campo etiqueta="Numero" value={valor.numero_documento} onChange={(e) => cambiar('numero_documento', e.target.value)} required />
-      <Campo etiqueta="Nombres" value={valor.nombres} onChange={(e) => cambiar('nombres', e.target.value)} required />
-      <Campo etiqueta="Apellidos" value={valor.apellidos} onChange={(e) => cambiar('apellidos', e.target.value)} required />
+      <Campo
+        etiqueta="Número de documento"
+        autoComplete="off"
+        value={valor.numero_documento}
+        onChange={(e) => cambiar('numero_documento', e.target.value)}
+        required
+      />
+      <Campo etiqueta="Nombres" autoComplete="off" value={valor.nombres} onChange={(e) => cambiar('nombres', e.target.value)} required />
+      <Campo
+        etiqueta="Apellidos"
+        autoComplete="off"
+        value={valor.apellidos}
+        onChange={(e) => cambiar('apellidos', e.target.value)}
+        required
+      />
       <Campo
         etiqueta="Celular (opcional)"
+        type="tel"
         inputMode="numeric"
+        autoComplete="off"
         value={valor.telefono ?? ''}
         onChange={(e) => cambiar('telefono', e.target.value)}
       />
@@ -61,7 +76,11 @@ function DatosPersona({
   );
 }
 
-/** REGISTRAR UNA ENCOMIENDA: se cobra en efectivo al registrarla y entrega el codigo de seguimiento */
+/**
+ * REGISTRAR UNA ENCOMIENDA: se cobra en efectivo al registrarla y entrega el codigo de seguimiento.
+ * Antes de registrar, el personal confirma que el remitente acepto los Terminos y Condiciones
+ * y fue informado de la Politica de Privacidad (sus datos y los del destinatario).
+ */
 export function FormularioEncomienda() {
   const terminales = useTerminales();
   const registrar = useRegistrarEncomienda();
@@ -69,6 +88,7 @@ export function FormularioEncomienda() {
   const [destinatario, setDestinatario] = useState(PERSONA_VACIA);
   const [datos, setDatos] = useState(VACIO);
   const [registrada, setRegistrada] = useState<Encomienda | null>(null);
+  const [aceptaCondiciones, setAceptaCondiciones] = useState(false);
 
   const opciones = (terminales.data ?? [])
     .filter((t) => t.activo)
@@ -93,6 +113,7 @@ export function FormularioEncomienda() {
           setRemitente(PERSONA_VACIA);
           setDestinatario(PERSONA_VACIA);
           setDatos(VACIO);
+          setAceptaCondiciones(false);
         },
       },
     );
@@ -104,12 +125,12 @@ export function FormularioEncomienda() {
 
       {registrada && (
         <p role="status" className="rounded bg-emerald-50 p-3 text-sm text-emerald-800">
-          Cobrado {formatearBs(registrada.costo)} en efectivo. Codigo de seguimiento:{' '}
+          Cobrado {formatearBs(registrada.costo)} en efectivo. Código de seguimiento:{' '}
           <strong className="font-mono">{registrada.codigo_seguimiento}</strong>
         </p>
       )}
 
-      <DatosPersona titulo="Remitente (paga el envio)" valor={remitente} alCambiar={setRemitente} />
+      <DatosPersona titulo="Remitente (paga el envío)" valor={remitente} alCambiar={setRemitente} />
       <DatosPersona titulo="Destinatario" valor={destinatario} alCambiar={setDestinatario} />
 
       <div className="grid gap-2 sm:grid-cols-2">
@@ -158,6 +179,18 @@ export function FormularioEncomienda() {
           />
         </div>
       </div>
+
+      <CampoCasilla checked={aceptaCondiciones} onChange={(e) => setAceptaCondiciones(e.target.checked)} required>
+        El remitente aceptó los{' '}
+        <Link href="/terminos" target="_blank" rel="noopener" className="text-blue-700 underline">
+          Términos y Condiciones<span className="sr-only"> (se abre en otra pestaña)</span>
+        </Link>{' '}
+        y fue informado de la{' '}
+        <Link href="/privacidad" target="_blank" rel="noopener" className="text-blue-700 underline">
+          Política de Privacidad<span className="sr-only"> (se abre en otra pestaña)</span>
+        </Link>
+        .
+      </CampoCasilla>
 
       {registrar.error && (
         <p role="alert" className="text-red-600">

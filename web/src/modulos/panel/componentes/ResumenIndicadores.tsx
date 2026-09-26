@@ -9,9 +9,9 @@ const NOMBRES_CANAL: Record<string, string> = { web: 'Portal web', movil: 'Celul
 function Tarjeta({ titulo, valor, detalle }: { titulo: string; valor: string; detalle?: string }) {
   return (
     <div className="rounded-lg border border-slate-300 bg-white p-4">
-      <p className="text-sm text-slate-500">{titulo}</p>
+      <p className="text-sm text-slate-600">{titulo}</p>
       <p className="text-2xl font-bold">{valor}</p>
-      {detalle && <p className="text-xs text-slate-500">{detalle}</p>}
+      {detalle && <p className="text-xs text-slate-600">{detalle}</p>}
     </div>
   );
 }
@@ -30,7 +30,7 @@ export function ResumenIndicadores({ datos }: { datos: Indicadores }) {
           detalle={`cobrado ${formatearBs(datos.ingresos.cobrado)} · devuelto ${formatearBs(datos.ingresos.reembolsado)}`}
         />
         <Tarjeta
-          titulo="Ocupacion promedio"
+          titulo="Ocupación promedio"
           valor={datos.ocupacion_promedio === null ? '—' : `${datos.ocupacion_promedio} %`}
           detalle={`${datos.ocupacion.length} viajes en el periodo`}
         />
@@ -41,10 +41,10 @@ export function ResumenIndicadores({ datos }: { datos: Indicadores }) {
         />
       </div>
 
-      <section className="grid gap-6 lg:grid-cols-[1fr_2fr]">
+      <section className="grid grid-cols-1 gap-6 lg:grid-cols-[minmax(0,1fr)_minmax(0,2fr)]">
         <div className="rounded-lg border border-slate-300 bg-white p-4">
           <h2 className="mb-3 font-semibold">Ventas por canal</h2>
-          {datos.ventas_por_canal.length === 0 && <p className="text-sm text-slate-500">Sin ventas en el periodo.</p>}
+          {datos.ventas_por_canal.length === 0 && <p className="text-sm text-slate-600">Sin ventas en el periodo.</p>}
           <ul className="flex flex-col gap-3">
             {datos.ventas_por_canal.map((c) => (
               <li key={c.canal} className="text-sm">
@@ -54,7 +54,7 @@ export function ResumenIndicadores({ datos }: { datos: Indicadores }) {
                     {c.ventas} ventas · {formatearBs(c.monto)}
                   </span>
                 </div>
-                <div className="mt-1 h-2 rounded bg-slate-100">
+                <div aria-hidden="true" className="mt-1 h-2 rounded bg-slate-100">
                   <div className="h-2 rounded bg-slate-800" style={{ width: `${totalCanales ? (c.monto / totalCanales) * 100 : 0}%` }} />
                 </div>
               </li>
@@ -63,8 +63,8 @@ export function ResumenIndicadores({ datos }: { datos: Indicadores }) {
         </div>
 
         <div className="rounded-lg border border-slate-300 bg-white p-4">
-          <h2 className="mb-3 font-semibold">Ocupacion por viaje</h2>
-          {datos.ocupacion.length === 0 && <p className="text-sm text-slate-500">No hay viajes en el periodo.</p>}
+          <h2 className="mb-3 font-semibold">Ocupación por viaje</h2>
+          {datos.ocupacion.length === 0 && <p className="text-sm text-slate-600">No hay viajes en el periodo.</p>}
           <div className="max-h-80 overflow-y-auto">
             <table className="w-full text-sm">
               <tbody>
@@ -73,7 +73,7 @@ export function ResumenIndicadores({ datos }: { datos: Indicadores }) {
                     <td className="py-1 pr-2 whitespace-nowrap">{fechaHoraEnBolivia(v.fecha_salida)}</td>
                     <td className="py-1 pr-2">{v.bus}</td>
                     <td className="w-1/2 py-1">
-                      <div className="h-2 rounded bg-slate-100">
+                      <div aria-hidden="true" className="h-2 rounded bg-slate-100">
                         <div
                           className={`h-2 rounded ${v.porcentaje >= 90 ? 'bg-red-600' : 'bg-emerald-600'}`}
                           style={{ width: `${v.porcentaje}%` }}

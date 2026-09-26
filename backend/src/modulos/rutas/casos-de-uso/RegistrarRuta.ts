@@ -26,7 +26,7 @@ export class RegistrarRuta {
     await this.rutas.guardar(ruta);
 
     const guardada = await this.rutas.buscarPorId(ruta.id);
-    if (!guardada) throw new Error('La ruta no se encontro despues de guardarla');
+    if (!guardada) throw new Error('La ruta no se encontró después de guardarla');
     return guardada;
   }
 }

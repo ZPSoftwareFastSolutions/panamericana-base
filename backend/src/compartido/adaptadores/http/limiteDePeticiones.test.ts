@@ -12,7 +12,7 @@ function pedir(limite: ReturnType<typeof limitarPorIp>, ip: string): unknown {
 }
 
 describe('limitarPorIp', () => {
-  it('deja pasar hasta el maximo y despues responde 429', () => {
+  it('deja pasar hasta el máximo y después responde 429', () => {
     const limite = limitarPorIp({ maximo: 2, ventanaMs: 1000, ahora: () => 0 });
 
     expect(pedir(limite, '1.1.1.1')).toBe('ok');

@@ -27,14 +27,14 @@ export function AnulacionPasaje() {
 
   return (
     <section className="flex flex-col gap-3">
-      <form onSubmit={buscar} className="flex items-end gap-2">
-        <Campo etiqueta="Codigo del pasaje" placeholder="P-XXXXXXXX" value={texto} onChange={(e) => setTexto(e.target.value)} required />
+      <form onSubmit={buscar} className="flex flex-wrap items-end gap-2">
+        <Campo etiqueta="Código del pasaje" placeholder="P-XXXXXXXX" value={texto} onChange={(e) => setTexto(e.target.value)} required />
         <Boton type="submit" variante="secundario">
           Buscar
         </Boton>
       </form>
 
-      {pasaje.isFetching && <p className="text-slate-500">Buscando...</p>}
+      {pasaje.isFetching && <p className="text-slate-600">Buscando...</p>}
       {pasaje.error && <p className="text-red-600">{pasaje.error.message}</p>}
 
       {datos && (
@@ -47,15 +47,17 @@ export function AnulacionPasaje() {
             {datos.pasajero.numero_documento})
           </p>
           <p>
-            {datos.viaje.origen.terminal} → {datos.viaje.destino.terminal} · sube {fechaHoraEnBolivia(datos.viaje.origen.hora)} ·
+            {datos.viaje.origen.terminal} <span aria-hidden="true">→</span>
+            <span className="sr-only">a</span> {datos.viaje.destino.terminal} · sube {fechaHoraEnBolivia(datos.viaje.origen.hora)} ·
             asiento {datos.asiento.numero}
           </p>
           <p>Pagado: {formatearBs(datos.precio)}</p>
-          <p className="text-slate-500">Se puede anular hasta el {fechaHoraEnBolivia(datos.anulable_hasta)}</p>
+          {datos.tipo_pasajero.requisito && <p>Tarifa: {datos.tipo_pasajero.nombre}</p>}
+          <p className="text-slate-600">Se puede anular hasta el {fechaHoraEnBolivia(datos.anulable_hasta)}</p>
 
           {anular.data ? (
             <p role="status" className="rounded bg-emerald-50 p-2 text-emerald-800">
-              Pasaje anulado. Devolver {formatearBs(anular.data.reembolso)} al pasajero; el asiento quedo libre.
+              Pasaje anulado. Devolver {formatearBs(anular.data.reembolso)} al pasajero; el asiento quedó libre.
             </p>
           ) : (
             datos.estado === 'pagado' && (

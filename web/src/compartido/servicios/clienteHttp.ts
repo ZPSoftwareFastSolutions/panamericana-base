@@ -46,7 +46,7 @@ async function pedir<T>(ruta: string, opciones: RequestInit = {}): Promise<T> {
     const error = (await respuesta.json().catch(() => null)) as RespuestaError | null;
     throw new ErrorDeApi(
       error?.codigo ?? 'error_desconocido',
-      error?.mensaje ?? 'No se pudo completar la operacion',
+      error?.mensaje ?? 'No se pudo completar la operación',
       respuesta.status,
     );
   }

@@ -1,4 +1,10 @@
+import type { Metadata } from 'next';
 import { SeguimientoEncomienda } from '@/modulos/encomiendas/componentes/SeguimientoEncomienda';
+
+export const metadata: Metadata = {
+  title: 'Seguimiento de encomienda',
+  robots: { index: false, follow: false },
+};
 
 /** PAGINA /seguimiento/[codigo]: estado e historial de una encomienda (sin datos personales) */
 export default async function PaginaSeguimiento({ params }: { params: Promise<{ codigo: string }> }) {

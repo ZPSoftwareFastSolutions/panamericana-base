@@ -39,6 +39,14 @@ const ASIENTOS: AsientoParaReservar[] = [
   { id: 'a3', numero: 3, tipo: 'semicama', ocupado: true },
 ];
 
+// tarifas diferenciadas del catalogo tipos_pasajero
+const TIPOS_PASAJERO = [
+  { codigo: 'general', descuento_porcentaje: 0 },
+  { codigo: 'adulto_mayor', descuento_porcentaje: 20 },
+  { codigo: 'discapacidad', descuento_porcentaje: 50 },
+  { codigo: 'menor', descuento_porcentaje: 50 },
+];
+
 /** repositorio falso: guarda en memoria y arma el detalle como lo haria la base */
 class VentasEnMemoria implements VentaRepositorio {
   guardadas: VentaNueva[] = [];
@@ -47,7 +55,7 @@ class VentasEnMemoria implements VentaRepositorio {
   resultadoPago: ResultadoPago = 'pagada';
 
   async contextoDeReserva(viaje_id: string) {
-    return viaje_id === VIAJE.id ? { viaje: VIAJE, asientos: ASIENTOS } : null;
+    return viaje_id === VIAJE.id ? { viaje: VIAJE, asientos: ASIENTOS, tiposPasajero: TIPOS_PASAJERO } : null;
   }
   async guardarReserva(venta: VentaNueva) {
     this.guardadas.push(venta);
@@ -71,6 +79,7 @@ class VentasEnMemoria implements VentaRepositorio {
         estado: estado === 'pagada' ? 'pagado' : 'reservado',
         precio: p.precio,
         asiento: { numero: ASIENTOS.find((a) => a.id === p.asiento_id)!.numero, piso: 1, tipo: 'cama' },
+        tipo_pasajero: { codigo: p.tipo_pasajero, nombre: p.tipo_pasajero, requisito: null },
         pasajero: { ...p.pasajero },
       })),
     };
@@ -98,6 +107,7 @@ const entrada = {
   orden_origen: 2,
   orden_destino: 3,
   pasajeros: [pasajero('a1', '4827351'), pasajero('a2', '6093184')],
+  acepta_condiciones: true,
 };
 
 function crear(ahora = AHORA) {
@@ -129,7 +139,7 @@ describe('ReservarAsientos', () => {
     expect(venta.pasajes[0]!.pasajero.numero_documento).toBe('****351');
   });
 
-  it('responde 409 si el asiento ya esta ocupado en ese tramo', async () => {
+  it('responde 409 si el asiento ya está ocupado en ese tramo', async () => {
     await expect(
       crear().reservar.ejecutar({ ...entrada, pasajeros: [pasajero('a3', '4827351')] }),
     ).rejects.toThrow(AsientoNoDisponibleError);
@@ -169,6 +179,46 @@ describe('ReservarAsientos', () => {
   });
 });
 
+describe('Tarifas diferenciadas y consentimiento', () => {
+  it('aplica el descuento de la ley sobre el precio del tramo y lo guarda en el pasaje', async () => {
+    const { reservar, repositorio } = crear();
+
+    const venta = await reservar.ejecutar({
+      ...entrada,
+      pasajeros: [
+        { ...pasajero('a1', '4827351'), tipo_pasajero: 'adulto_mayor' },
+        { ...pasajero('a2', '6093184'), tipo_pasajero: 'discapacidad' },
+      ],
+    });
+
+    // cama 60 con -20 % = 48 · semicama 47,50 con -50 % = 23,75 -> 23,50 (a favor del pasajero)
+    expect(venta.pasajes.map((p) => p.precio)).toEqual([48, 23.5]);
+    expect(repositorio.guardadas[0]!.pasajes.map((p) => p.tipo_pasajero)).toEqual(['adulto_mayor', 'discapacidad']);
+  });
+
+  it('sin indicar tarifa se cobra la general; una tarifa inexistente se rechaza', async () => {
+    const { reservar, repositorio } = crear();
+
+    await reservar.ejecutar(entrada);
+    expect(repositorio.guardadas[0]!.pasajes.every((p) => p.tipo_pasajero === 'general')).toBe(true);
+    await expect(
+      reservar.ejecutar({ ...entrada, pasajeros: [{ ...pasajero('a1', '4827351'), tipo_pasajero: 'estudiante' }] }),
+    ).rejects.toThrow('La tarifa "estudiante" no existe');
+  });
+
+  it('sin aceptar los Terminos y Condiciones no se reserva ni se consulta el viaje', async () => {
+    const { reservar } = crear();
+
+    await expect(reservar.ejecutar({ ...entrada, acepta_condiciones: false })).rejects.toThrow(
+      'Para comprar hay que aceptar los Términos y Condiciones',
+    );
+    // aunque el viaje no exista, el error es por el consentimiento (400) y no 404
+    await expect(reservar.ejecutar({ ...entrada, viaje_id: 'no-existe', acepta_condiciones: false })).rejects.toThrow(
+      ReservaInvalidaError,
+    );
+  });
+});
+
 describe('PagarVenta', () => {
   it('cobra la venta pendiente y los pasajes quedan pagados', async () => {
     const { reservar, pagar } = crear();
@@ -180,7 +230,7 @@ describe('PagarVenta', () => {
     expect(pagada.pasajes.every((p) => p.estado === 'pagado')).toBe(true);
   });
 
-  it('si la reserva vencio, libera los asientos y responde "reserva expirada"', async () => {
+  it('si la reserva venció, libera los asientos y responde "reserva expirada"', async () => {
     const { reservar, pagar, repositorio } = crear();
     const reservada = await reservar.ejecutar(entrada);
 
@@ -190,7 +240,7 @@ describe('PagarVenta', () => {
     expect(repositorio.expiradas).toHaveLength(1);
   });
 
-  it('una venta que ya quedo expirada responde "reserva expirada" (no "ya pagada")', async () => {
+  it('una venta que ya quedó expirada responde "reserva expirada" (no "ya pagada")', async () => {
     const { reservar, pagar, repositorio } = crear();
     const reservada = await reservar.ejecutar(entrada);
     await repositorio.expirar(reservada.id);
@@ -198,7 +248,7 @@ describe('PagarVenta', () => {
     await expect(pagar().ejecutar(reservada.codigo)).rejects.toThrow(ReservaExpiradaError);
   });
 
-  it('si vence justo durante el pago tambien responde "reserva expirada"', async () => {
+  it('si vence justo durante el pago también responde "reserva expirada"', async () => {
     const { reservar, pagar, repositorio } = crear();
     const reservada = await reservar.ejecutar(entrada);
     repositorio.resultadoPago = 'expirada';

@@ -36,8 +36,8 @@ describe('Feriados de Bolivia', () => {
   });
 });
 
-describe('Caracteristicas del dia', () => {
-  it('marca el dia de la semana, el feriado, la temporada alta y la tendencia', () => {
+describe('Características del día', () => {
+  it('marca el día de la semana, el feriado, la temporada alta y la tendencia', () => {
     // 2026-08-06 es jueves, feriado y no temporada alta; 2027-01-01 esta a un año del inicio
     expect(caracteristicasDelDia('2026-08-06', '2025-08-06')).toEqual([1, 0, 0, 0, 1, 0, 0, 1, 0, 0, 365 / 365.25]);
     expect(caracteristicasDelDia('2026-07-19', '2026-07-19')).toEqual([1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0]); // domingo de julio
@@ -57,7 +57,7 @@ describe('Regresion lineal multiple', () => {
     expect(metricas(y, y)).toEqual({ mae: 0, rmse: 0, r2: 1 });
   });
 
-  it('el modelo entrenado predice los dias de prueba con R² alto y es compatible con el dominio', () => {
+  it('el modelo entrenado predice los días de prueba con R² alto y es compatible con el dominio', () => {
     const modelo = entrenar();
     expect(() => exigirModeloCompatible(modelo)).not.toThrow();
     expect(modelo.metricas.r2).toBeGreaterThan(0.85);
@@ -73,7 +73,7 @@ describe('Reglas del modelo', () => {
     expect(pasajesEstimados({ ...MODELO, coeficientes: [-1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0] }, 40, '2026-10-05')).toBe(0);
   });
 
-  it('la base sale de las ventas reales solo si hay suficientes dias', () => {
+  it('la base sale de las ventas reales solo si hay suficientes días', () => {
     const ruta = { nombre: 'La Paz - Cochabamba' };
     expect(baseDeRuta(MODELO, ruta, { dias_con_ventas: 20, promedio: 12.34 }, 14)).toEqual({ pasajes_por_dia: 12.3, fuente: 'ventas_reales' });
     expect(baseDeRuta(MODELO, ruta, { dias_con_ventas: 3, promedio: 12 }, 14)).toEqual({ pasajes_por_dia: 40, fuente: 'modelo' });
@@ -86,7 +86,7 @@ describe('Reglas del modelo', () => {
     expect(evaluarCapacidad(10, 0)).toEqual({ ocupacion_estimada: null, alerta: 'sin_viajes' });
   });
 
-  it('rechaza un JSON con otras caracteristicas', () => {
+  it('rechaza un JSON con otras características', () => {
     expect(() => exigirModeloCompatible({ ...MODELO, caracteristicas: ['intercepto'] })).toThrow(ModeloInvalidoError);
   });
 });
@@ -107,7 +107,7 @@ class DatosEnMemoria implements PrediccionRepositorio {
 describe('PredecirDemanda', () => {
   const predecir = () => new PredecirDemanda({ cargar: async () => MODELO }, new DatosEnMemoria(), () => '2026-10-01');
 
-  it('estima cada ruta y dia y compara con la capacidad programada', async () => {
+  it('estima cada ruta y día y compara con la capacidad programada', async () => {
     const resultado = await predecir().ejecutar(3);
 
     expect(resultado.bases).toEqual([{ ruta: { id: 'r1', nombre: 'La Paz - Cochabamba' }, pasajes_por_dia: 40, fuente: 'modelo' }]);
@@ -118,7 +118,7 @@ describe('PredecirDemanda', () => {
     ]);
   });
 
-  it('acepta de 1 a 31 dias', async () => {
+  it('acepta de 1 a 31 días', async () => {
     await expect(predecir().ejecutar(0)).rejects.toThrow(PeriodoInvalidoError);
     await expect(predecir().ejecutar(32)).rejects.toThrow(PeriodoInvalidoError);
   });

@@ -33,7 +33,7 @@ export function FormularioTerminal() {
 
       <Campo
         etiqueta="Nombre"
-        placeholder="Ej. Terminal de Buses Potosi"
+        placeholder="Ej. Terminal de Buses Potosí"
         value={valores.nombre}
         onChange={(e) => setValores({ ...valores, nombre: e.target.value })}
         required
@@ -50,7 +50,7 @@ export function FormularioTerminal() {
       />
 
       <Campo
-        etiqueta="Direccion"
+        etiqueta="Dirección"
         placeholder="Ej. Av. Universitaria s/n"
         value={valores.direccion}
         onChange={(e) => setValores({ ...valores, direccion: e.target.value })}

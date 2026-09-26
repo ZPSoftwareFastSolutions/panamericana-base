@@ -15,7 +15,7 @@ export function resolverSistema(A: number[][], b: number[]): number[] {
     for (let fila = col + 1; fila < n; fila++) {
       if (Math.abs(m[fila]![col]!) > Math.abs(m[pivote]![col]!)) pivote = fila;
     }
-    if (Math.abs(m[pivote]![col]!) < 1e-12) throw new Error('El sistema no tiene solucion unica');
+    if (Math.abs(m[pivote]![col]!) < 1e-12) throw new Error('El sistema no tiene solución única');
     [m[col], m[pivote]] = [m[pivote]!, m[col]!];
     for (let fila = 0; fila < n; fila++) {
       if (fila === col) continue;

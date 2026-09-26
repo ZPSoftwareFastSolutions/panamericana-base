@@ -39,7 +39,7 @@ class CroquisEnMemoria implements CroquisRepositorio {
 }
 
 describe('GenerarCroquis', () => {
-  it('numera de corrido: primero el piso 1 y despues el piso 2, con el pasillo libre', async () => {
+  it('numera de corrido: primero el piso 1 y después el piso 2, con el pasillo libre', async () => {
     const repositorio = new CroquisEnMemoria();
 
     const croquis = await new GenerarCroquis(repositorio).ejecutar(BUS.id, [
@@ -90,7 +90,7 @@ describe('GenerarCroquis', () => {
 });
 
 describe('RegistrarAsiento', () => {
-  it('agrega un asiento suelto y rechaza repetir numero o posicion', async () => {
+  it('agrega un asiento suelto y rechaza repetir número o posición', async () => {
     const repositorio = new CroquisEnMemoria();
     const registrar = new RegistrarAsiento(repositorio);
 

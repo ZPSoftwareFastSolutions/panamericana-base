@@ -20,7 +20,7 @@ export function Checkout({ codigo }: { codigo: string }) {
   const [vencio, setVencio] = useState(false);
   const alTerminar = useCallback(() => setVencio(true), []);
 
-  if (venta.isPending) return <p className="text-slate-500">Cargando tu compra...</p>;
+  if (venta.isPending) return <p className="text-slate-600">Cargando tu compra...</p>;
   if (venta.error) {
     return (
       <p className="text-red-600">
@@ -37,10 +37,12 @@ export function Checkout({ codigo }: { codigo: string }) {
   if (datos.estado === 'pagada') {
     return (
       <div className="flex flex-col gap-4 rounded-xl bg-white p-6 shadow">
-        <p className="rounded bg-emerald-50 p-3 font-semibold text-emerald-800">Compra confirmada</p>
+        <p role="status" className="rounded bg-emerald-50 p-3 font-semibold text-emerald-800">
+          Compra confirmada
+        </p>
         <p className="text-sm text-slate-600">
-          Codigo de tu compra: <strong className="font-mono text-base text-slate-900">{datos.codigo}</strong>. Presenta el
-          codigo de cada pasaje y el documento del pasajero al abordar.
+          Código de tu compra: <strong className="font-mono text-base text-slate-900">{datos.codigo}</strong>. Presenta el
+          código de cada pasaje y el documento del pasajero al abordar.
         </p>
         <DetalleVenta venta={datos} />
       </div>
@@ -52,8 +54,10 @@ export function Checkout({ codigo }: { codigo: string }) {
   if (expirada) {
     return (
       <div className="flex flex-col gap-3 rounded-xl bg-white p-6 shadow">
-        <p className="font-semibold text-red-600">El tiempo para pagar termino y los asientos se liberaron.</p>
-        <Link href={volverAlCroquis} className="w-fit rounded bg-slate-900 px-4 py-2 text-white">
+        <p role="alert" className="font-semibold text-red-600">
+          El tiempo para pagar terminó y los asientos se liberaron.
+        </p>
+        <Link href={volverAlCroquis} className="inline-flex min-h-11 w-fit items-center rounded bg-slate-900 px-4 py-2 text-white">
           Volver a elegir asientos
         </Link>
       </div>
@@ -61,7 +65,7 @@ export function Checkout({ codigo }: { codigo: string }) {
   }
 
   if (datos.estado !== 'pendiente') {
-    return <p className="rounded-xl bg-white p-6 shadow">Esta compra esta {datos.estado}.</p>;
+    return <p className="rounded-xl bg-white p-6 shadow">Esta compra está {datos.estado}.</p>;
   }
 
   return (
@@ -72,7 +76,7 @@ export function Checkout({ codigo }: { codigo: string }) {
         </p>
         {datos.reservado_hasta && (
           <p className="text-sm">
-            Tus asientos estan reservados: <CuentaRegresiva hasta={datos.reservado_hasta} alTerminar={alTerminar} />
+            Tus asientos están reservados: <CuentaRegresiva hasta={datos.reservado_hasta} alTerminar={alTerminar} />
           </p>
         )}
       </div>
@@ -80,7 +84,7 @@ export function Checkout({ codigo }: { codigo: string }) {
       <DetalleVenta venta={datos} />
 
       <div className="rounded-lg border border-dashed border-slate-300 p-3 text-sm text-slate-600">
-        Pago simulado con tarjeta: en esta version no se cobra dinero real.
+        Pago simulado con tarjeta: en esta versión no se cobra dinero real.
       </div>
 
       <Boton type="button" onClick={() => pagar.mutate()} cargando={pagar.isPending}>

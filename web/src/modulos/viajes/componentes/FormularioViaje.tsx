@@ -84,9 +84,9 @@ export function FormularioViaje() {
       {valores.bus_id && (
         <fieldset className="flex flex-col gap-2">
           <legend className="text-sm text-slate-700">Tarifa del recorrido completo (Bs)</legend>
-          {croquis.isPending && <p className="text-sm text-slate-500">Leyendo el croquis del bus...</p>}
+          {croquis.isPending && <p className="text-sm text-slate-600">Leyendo el croquis del bus...</p>}
           {croquis.data && tipos.length === 0 && (
-            <p className="text-sm text-red-600">Este bus todavia no tiene croquis de asientos.</p>
+            <p className="text-sm text-red-600">Este bus todavía no tiene croquis de asientos.</p>
           )}
           {tipos.map((tipo) => (
             <Campo

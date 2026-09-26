@@ -35,14 +35,14 @@ export function FormularioLogin({ volver }: { volver?: string }) {
         required
       />
       <Campo
-        etiqueta="Contrasena"
+        etiqueta="Contraseña"
         type="password"
         autoComplete="current-password"
         value={clave}
         onChange={(e) => setClave(e.target.value)}
         required
       />
-      <Boton type="submit" cargando={iniciar.isPending}>
+      <Boton type="submit" cargando={iniciar.isPending} textoCargando="Ingresando...">
         Ingresar
       </Boton>
       {iniciar.error && (

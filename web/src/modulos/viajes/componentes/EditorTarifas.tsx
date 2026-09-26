@@ -18,7 +18,7 @@ export function EditorTarifas({ viaje, alTerminar }: { viaje: Viaje; alTerminar:
   // solo guarda lo que la persona escribio; lo demas se muestra con el precio actual
   const [escritos, setEscritos] = useState<Record<string, string>>({});
 
-  if (croquis.isPending) return <p className="text-sm text-slate-500">Cargando los tipos de asiento del bus...</p>;
+  if (croquis.isPending) return <p className="text-sm text-slate-600">Cargando los tipos de asiento del bus...</p>;
   if (croquis.error) return <p className="text-sm text-red-600">{croquis.error.message}</p>;
 
   const tipos = [...new Set(croquis.data.asientos.map((a) => a.tipo))];

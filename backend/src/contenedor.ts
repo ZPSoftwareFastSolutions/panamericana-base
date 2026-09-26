@@ -16,6 +16,7 @@ import { PgCatalogoRepositorio } from './modulos/catalogos/adaptadores/PgCatalog
 import { ListarCiudades } from './modulos/catalogos/casos-de-uso/ListarCiudades';
 import { ListarRoles } from './modulos/catalogos/casos-de-uso/ListarRoles';
 import { ListarTiposAsiento } from './modulos/catalogos/casos-de-uso/ListarTiposAsiento';
+import { ListarTiposPasajero } from './modulos/catalogos/casos-de-uso/ListarTiposPasajero';
 import { ListarTiposDocumento } from './modulos/catalogos/casos-de-uso/ListarTiposDocumento';
 import { PgClienteRepositorio } from './modulos/clientes/adaptadores/PgClienteRepositorio';
 import { BuscarClientePorDocumento } from './modulos/clientes/casos-de-uso/BuscarClientePorDocumento';
@@ -113,6 +114,7 @@ export const casosDeUso = {
   listarTiposDocumento: new ListarTiposDocumento(catalogoRepositorio),
   listarRoles: new ListarRoles(catalogoRepositorio),
   listarTiposAsiento: new ListarTiposAsiento(catalogoRepositorio),
+  listarTiposPasajero: new ListarTiposPasajero(catalogoRepositorio),
 
   // modulo: terminales
   listarTerminales: new ListarTerminales(terminalRepositorio),

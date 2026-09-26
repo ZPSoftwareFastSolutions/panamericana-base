@@ -29,7 +29,7 @@ export function CodigoQR({ texto, tamano = 160 }: { texto: string; tamano?: numb
   return (
     <div
       role="img"
-      aria-label={`Codigo QR de ${texto}`}
+      aria-label={`Código QR de ${texto}`}
       style={{ width: tamano, height: tamano }}
       // el SVG lo genera la libreria a partir del codigo: no contiene datos del usuario
       dangerouslySetInnerHTML={{ __html: svg }}

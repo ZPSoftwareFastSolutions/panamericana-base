@@ -1,4 +1,4 @@
-import type { AsientoParaReservar, VentaNueva, ViajeParaReservar } from './Venta';
+import type { AsientoParaReservar, TipoDePasajero, VentaNueva, ViajeParaReservar } from './Venta';
 
 type PuntoDelTramo = { orden: number; terminal: string; ciudad: string; hora: string };
 
@@ -24,6 +24,7 @@ export type VentaDetalle = {
     estado: string;
     precio: number;
     asiento: { numero: number; piso: number; tipo: string };
+    tipo_pasajero: { codigo: string; nombre: string; requisito: string | null };
     pasajero: { tipo_documento: string; numero_documento: string; nombres: string; apellidos: string };
   }[];
 };
@@ -33,14 +34,15 @@ export type ResultadoPago = 'pagada' | 'expirada' | 'no_pendiente';
 /** lo que el modulo necesita de la base; la implementacion con SQL esta en adaptadores/ */
 export interface VentaRepositorio {
   /**
-   * el viaje con sus paradas y tarifas, y los asientos del bus marcando los ocupados
-   * en ese tramo (las reservas vencidas no cuentan). null si el viaje no existe.
+   * el viaje con sus paradas y tarifas, los asientos del bus marcando los ocupados
+   * en ese tramo (las reservas vencidas no cuentan) y las tarifas diferenciadas activas.
+   * null si el viaje no existe.
    */
   contextoDeReserva(
     viaje_id: string,
     desde: number,
     hasta: number,
-  ): Promise<{ viaje: ViajeParaReservar; asientos: AsientoParaReservar[] } | null>;
+  ): Promise<{ viaje: ViajeParaReservar; asientos: AsientoParaReservar[]; tiposPasajero: TipoDePasajero[] } | null>;
 
   /**
    * guarda la venta pendiente, los clientes y los pasajes reservados en UNA transaccion,

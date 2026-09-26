@@ -2,7 +2,7 @@ import type { EstadoEncomienda } from '@panamericana/shared';
 
 export const NOMBRES_ESTADO: Record<EstadoEncomienda, string> = {
   registrada: 'Registrada',
-  en_transito: 'En transito',
+  en_transito: 'En tránsito',
   en_destino: 'En destino',
   entregada: 'Entregada',
   cancelada: 'Cancelada',

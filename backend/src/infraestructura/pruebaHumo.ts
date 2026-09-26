@@ -67,6 +67,8 @@ async function principal() {
   const ciudades = (Array.isArray(r.datos) ? r.datos : []) as { id: string; nombre: string }[];
   r = await pedir(RUTAS_API.catalogos.tiposAsiento);
   revisar('catalogo de tipos de asiento', r.estado, 200);
+  r = await pedir(RUTAS_API.catalogos.tiposPasajero);
+  revisar('tarifas diferenciadas de la ley', r.estado, 200, `${Array.isArray(r.datos) ? r.datos.length : 0} tarifas`);
 
   const origen = ciudades.find((c) => c.nombre === 'La Paz');
   const destino = ciudades.find((c) => c.nombre === 'Oruro');
@@ -87,28 +89,33 @@ async function principal() {
   revisar('seguimiento inexistente -> 404', r.estado, 404);
   r = await pedir(RUTAS_API.ventas.reservas, { metodo: 'POST', cuerpo: {} });
   revisar('reserva sin datos -> 400', r.estado, 400);
+  r = await pedir(RUTAS_API.ventas.reservas, {
+    metodo: 'POST',
+    cuerpo: { viaje_id: '00000000-0000-4000-8000-000000000000', orden_origen: 1, orden_destino: 2, pasajeros: [], acepta_condiciones: false },
+  });
+  revisar('reserva sin aceptar los términos -> 400', r.estado, 400);
 
   for (const ruta of [RUTAS_API.buses.base, RUTAS_API.encomiendas.base, RUTAS_API.panel.indicadores, RUTAS_API.panel.prediccion]) {
     r = await pedir(ruta);
-    revisar(`${ruta} sin sesion -> 401`, r.estado, 401);
+    revisar(`${ruta} sin sesión -> 401`, r.estado, 401);
   }
   r = await pedir(RUTAS_API.taquilla.ventas, { metodo: 'POST', cuerpo: {} });
-  revisar('taquilla sin sesion -> 401', r.estado, 401);
+  revisar('taquilla sin sesión -> 401', r.estado, 401);
 
   const ana = await token('ana.quispe@panamericana.test');
   const luis = await token('luis.rojas@panamericana.test');
   if (ana && luis) {
     r = await pedir(RUTAS_API.sesion.actual, { token: ana });
-    revisar('sesion de la administradora', r.estado, 200);
+    revisar('sesión de la administradora', r.estado, 200);
     r = await pedir(RUTAS_API.panel.indicadores, { token: ana });
     revisar('panel de indicadores', r.estado, 200);
     r = await pedir(RUTAS_API.panel.prediccionDe(7), { token: ana });
     const modelo = (r.datos as { modelo?: { metricas?: { r2?: number } } }).modelo;
-    revisar('prediccion de demanda (7 dias)', r.estado, 200, `R² ${modelo?.metricas?.r2 ?? '?'}`);
+    revisar('predicción de demanda (7 días)', r.estado, 200, `R² ${modelo?.metricas?.r2 ?? '?'}`);
     r = await pedir(RUTAS_API.panel.indicadores, { token: luis });
     revisar('vendedor en el panel -> 403', r.estado, 403);
   } else {
-    filas.push({ prueba: 'pruebas con sesion', resultado: 'omitidas (falta CLAVE_DEMO)', ok: true });
+    filas.push({ prueba: 'pruebas con sesión', resultado: 'omitidas (falta CLAVE_DEMO)', ok: true });
   }
 
   console.log(`Prueba de humo contra ${API}`);

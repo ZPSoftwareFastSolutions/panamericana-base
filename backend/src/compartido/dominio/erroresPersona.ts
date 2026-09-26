@@ -19,7 +19,7 @@ export class DocumentoInvalidoError extends ErrorDeDominio {
   readonly estadoHttp = 400;
 
   constructor(numero: string) {
-    super(`El numero de documento "${numero}" no tiene un formato valido`);
+    super(`El número de documento "${numero}" no tiene un formato válido`);
   }
 }
 
@@ -28,7 +28,7 @@ export class TelefonoInvalidoError extends ErrorDeDominio {
   readonly estadoHttp = 400;
 
   constructor(telefono: string) {
-    super(`El celular "${telefono}" debe tener 8 digitos y empezar con 6 o 7`);
+    super(`El celular "${telefono}" debe tener 8 dígitos y empezar con 6 o 7`);
   }
 }
 
@@ -37,7 +37,7 @@ export class CorreoInvalidoError extends ErrorDeDominio {
   readonly estadoHttp = 400;
 
   constructor(correo: string) {
-    super(`El correo "${correo}" no tiene un formato valido`);
+    super(`El correo "${correo}" no tiene un formato válido`);
   }
 }
 

@@ -56,7 +56,7 @@ export function crearRuta(datos: { nombre: string; paradas: ParadaEntrada[] }): 
     const actual = paradas[i]!;
     if (!Number.isInteger(actual.minutos_desde_origen) || actual.minutos_desde_origen <= anterior.minutos_desde_origen) {
       throw new RutaInvalidaError(
-        `La parada ${actual.orden} debe llegar despues que la parada ${anterior.orden} (minutos crecientes)`,
+        `La parada ${actual.orden} debe llegar después que la parada ${anterior.orden} (minutos crecientes)`,
       );
     }
     if (

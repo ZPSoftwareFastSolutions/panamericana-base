@@ -15,7 +15,7 @@ export class ViajeNoDisponibleError extends ErrorDeDominio {
   readonly codigo = 'viaje_no_disponible';
   readonly estadoHttp = 409;
 
-  constructor(motivo = 'Este viaje ya no esta a la venta') {
+  constructor(motivo = 'Este viaje ya no está a la venta') {
     super(motivo);
   }
 }

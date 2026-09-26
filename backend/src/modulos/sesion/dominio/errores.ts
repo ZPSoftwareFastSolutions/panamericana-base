@@ -4,7 +4,7 @@ export class NoAutenticadoError extends ErrorDeDominio {
   readonly codigo = 'no_autenticado';
   readonly estadoHttp = 401;
 
-  constructor(motivo = 'Inicia sesion para continuar') {
+  constructor(motivo = 'Inicia sesión para continuar') {
     super(motivo);
   }
 }
@@ -14,6 +14,6 @@ export class SinPermisoError extends ErrorDeDominio {
   readonly estadoHttp = 403;
 
   constructor() {
-    super('Tu rol no tiene permiso para esta accion');
+    super('Tu rol no tiene permiso para esta acción');
   }
 }

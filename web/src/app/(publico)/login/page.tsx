@@ -1,4 +1,10 @@
+import type { Metadata } from 'next';
 import { FormularioLogin } from '@/modulos/sesion/componentes/FormularioLogin';
+
+export const metadata: Metadata = {
+  title: 'Acceso del personal',
+  robots: { index: false, follow: false },
+};
 
 /** PAGINA /login: acceso del personal. "volver" es la pagina del panel a la que se regresa */
 export default async function PaginaLogin({ searchParams }: { searchParams: Promise<{ volver?: string }> }) {

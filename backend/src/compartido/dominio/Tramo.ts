@@ -6,7 +6,8 @@ import { TramoInvalidoError, ViajeNoDisponibleError } from './erroresViaje';
  * Reglas que usan la busqueda, la disponibilidad y la venta:
  *  - el tramo va de una parada de la ruta a otra POSTERIOR;
  *  - la hora de paso por una parada = salida del viaje + minutos desde el origen;
- *  - el precio del tramo es proporcional al tiempo y se redondea a Bs 0,50.
+ *  - el precio del tramo es proporcional al tiempo y se redondea a Bs 0,50;
+ *  - las tarifas diferenciadas de la ley descuentan un porcentaje de ese precio.
  */
 
 export type ParadaDelViaje = {
@@ -50,7 +51,7 @@ export function exigirTramoALaVenta(
   ahora: Date,
 ): void {
   if (estado_viaje !== 'programado') {
-    throw new ViajeNoDisponibleError(`El viaje esta ${estado_viaje.replace('_', ' ')} y ya no se vende`);
+    throw new ViajeNoDisponibleError(`El viaje está ${estado_viaje.replace('_', ' ')} y ya no se vende`);
   }
   if (horaDePaso(fecha_salida, origen.minutos_desde_origen) <= ahora) {
     throw new ViajeNoDisponibleError('El bus ya paso por la parada de subida');
@@ -69,4 +70,22 @@ export function precioDeTramo(precioCompleto: number, minutosTramo: number, dura
   // el pequeno ajuste evita errores de redondeo con decimales (por ejemplo 47.4999999)
   const redondeado = Math.round(proporcional * 2 + 1e-9) / 2;
   return Math.min(precioCompleto, Math.max(0.5, redondeado));
+}
+
+/** una tarifa diferenciada del catalogo tipos_pasajero (general, adulto_mayor, discapacidad, menor) */
+export type TipoDePasajero = { codigo: string; descuento_porcentaje: number };
+
+/**
+ * Precio con el descuento de una tarifa diferenciada. Se redondea HACIA ABAJO a Bs 0,50 para que el
+ * pasajero nunca reciba menos descuento del que le corresponde (nunca menos de Bs 0,50).
+ */
+export function precioConDescuento(precio: number, descuento_porcentaje: number): number {
+  if (descuento_porcentaje <= 0) return precio;
+  const conDescuento = (precio * (100 - descuento_porcentaje)) / 100;
+  return Math.max(0.5, Math.floor(conDescuento * 2 + 1e-9) / 2);
+}
+
+/** el precio de un asiento con cada tarifa: { general: 47.5, adulto_mayor: 38, ... } */
+export function preciosPorTarifa(precio: number, tipos: TipoDePasajero[]): Record<string, number> {
+  return Object.fromEntries(tipos.map((tipo) => [tipo.codigo, precioConDescuento(precio, tipo.descuento_porcentaje)]));
 }

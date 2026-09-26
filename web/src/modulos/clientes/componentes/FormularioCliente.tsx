@@ -1,14 +1,15 @@
 'use client';
 
 import { useState } from 'react';
+import Link from 'next/link';
 import type { RegistrarClienteEntrada, TipoDocumento } from '@panamericana/shared';
 import { Boton } from '@/compartido/componentes/Boton';
-import { Campo, CampoSeleccion } from '@/compartido/componentes/Campo';
-import { hoyEnBolivia } from '@/compartido/utilidades/fechas';
+import { Campo, CampoCasilla, CampoSeleccion } from '@/compartido/componentes/Campo';
 import { useTiposDocumento } from '@/modulos/catalogos/hooks/useCatalogos';
 import { useRegistrarCliente } from '../hooks/useRegistrarCliente';
 
-// en el formulario todo es texto; al enviar, los campos opcionales vacios se mandan como null
+// en el formulario todo es texto; al enviar, los campos opcionales vacios se mandan como null.
+// Solo se piden los datos que usa el sistema (la fecha de nacimiento no se pide: ningun proceso la usa)
 const VALORES_INICIALES = {
   tipo_documento: 'ci',
   numero_documento: '',
@@ -16,7 +17,6 @@ const VALORES_INICIALES = {
   apellidos: '',
   telefono: '',
   correo: '',
-  fecha_nacimiento: '',
 };
 
 type ValoresFormulario = typeof VALORES_INICIALES;
@@ -29,7 +29,6 @@ function aEntrada(valores: ValoresFormulario): RegistrarClienteEntrada {
     apellidos: valores.apellidos,
     telefono: valores.telefono || null,
     correo: valores.correo || null,
-    fecha_nacimiento: valores.fecha_nacimiento || null,
   };
 }
 
@@ -37,9 +36,11 @@ function aEntrada(valores: ValoresFormulario): RegistrarClienteEntrada {
  * formulario para registrar un cliente.
  * Las reglas (CI boliviano, celular de 8 digitos, documento repetido) las valida la API:
  * si algo esta mal, aqui se muestra su mensaje.
+ * Antes de guardar, el vendedor confirma que informo al cliente de la Politica de Privacidad.
  */
 export function FormularioCliente() {
   const [valores, setValores] = useState(VALORES_INICIALES);
+  const [informado, setInformado] = useState(false);
   const tiposDocumento = useTiposDocumento();
   const registrar = useRegistrarCliente();
 
@@ -50,7 +51,10 @@ export function FormularioCliente() {
   function alEnviar(evento: React.FormEvent<HTMLFormElement>) {
     evento.preventDefault();
     registrar.mutate(aEntrada(valores), {
-      onSuccess: () => setValores(VALORES_INICIALES),
+      onSuccess: () => {
+        setValores(VALORES_INICIALES);
+        setInformado(false);
+      },
     });
   }
 
@@ -72,20 +76,23 @@ export function FormularioCliente() {
         required
       />
       <Campo
-        etiqueta="Numero de documento"
+        etiqueta="Número de documento"
         placeholder="Ej. 4827351 o 4827351-1A"
+        autoComplete="off"
         value={valores.numero_documento}
         onChange={(e) => cambiar('numero_documento', e.target.value)}
         required
       />
       <Campo
         etiqueta="Nombres"
+        autoComplete="off"
         value={valores.nombres}
         onChange={(e) => cambiar('nombres', e.target.value)}
         required
       />
       <Campo
         etiqueta="Apellidos"
+        autoComplete="off"
         value={valores.apellidos}
         onChange={(e) => cambiar('apellidos', e.target.value)}
         required
@@ -93,25 +100,27 @@ export function FormularioCliente() {
       <Campo
         etiqueta="Celular (opcional)"
         placeholder="Ej. 71234567"
+        type="tel"
         inputMode="numeric"
+        autoComplete="off"
         value={valores.telefono}
         onChange={(e) => cambiar('telefono', e.target.value)}
       />
       <Campo
         etiqueta="Correo (opcional)"
         type="email"
+        autoComplete="off"
         value={valores.correo}
         onChange={(e) => cambiar('correo', e.target.value)}
       />
-      <Campo
-        etiqueta="Fecha de nacimiento (opcional)"
-        type="date"
-        max={hoyEnBolivia()}
-        // la pagina se genera por adelantado: el "hoy" del navegador puede ser otro dia
-        suppressHydrationWarning
-        value={valores.fecha_nacimiento}
-        onChange={(e) => cambiar('fecha_nacimiento', e.target.value)}
-      />
+      <CampoCasilla checked={informado} onChange={(e) => setInformado(e.target.checked)} required>
+        El cliente fue informado de la{' '}
+        <Link href="/privacidad" target="_blank" rel="noopener" className="text-blue-700 underline">
+          Política de Privacidad
+          <span className="sr-only"> (se abre en otra pestaña)</span>
+        </Link>{' '}
+        y autorizó el registro de sus datos.
+      </CampoCasilla>
 
       <Boton type="submit" cargando={registrar.isPending}>
         Registrar

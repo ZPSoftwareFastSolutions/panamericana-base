@@ -1,6 +1,6 @@
 # Guía de Trabajo — Proyecto Panamericana (Web)
 
-> **Versión:** 1.0 · **Para:** todo el equipo de desarrollo
+> **Versión:** 1.1 (26/09: accesibilidad, textos legales y tarifas de ley) · **Para:** todo el equipo de desarrollo
 > **Qué es:** el manual del día a día. Cómo levantar el proyecto, dónde va cada archivo y cómo se conecta la pantalla con la base de datos.
 > Todo lo que aparece aquí **existe en el repositorio**: el módulo `buses` está implementado de punta a punta como ejemplo.
 
@@ -123,6 +123,7 @@ panamericana/
 │       ├── endpoints.ts      ← direcciones de la API (el único lugar donde se escriben)
 │       ├── tipos/bus.ts      ← forma de los datos que viajan entre back y front
 │       ├── tipos/comunes.ts  ← forma de los errores
+│       ├── negocio.ts        ← razón social, NIT y contacto de la empresa (el único lugar donde se escriben)
 │       └── index.ts          lo que el paquete expone
 │
 ├── backend/                  API REST
@@ -146,7 +147,7 @@ panamericana/
 │       │   │   ├── erroresComunes.ts       DatoObligatorioError
 │       │   │   ├── Persona.ts              reglas bolivianas de una persona (CI, celular, correo)
 │       │   │   ├── erroresPersona.ts       errores de los datos personales
-│       │   │   ├── Tramo.ts                tramo de un viaje: paradas, hora de paso, precio (Bs 0,50)
+│       │   │   ├── Tramo.ts                tramo de un viaje: paradas, hora de paso, precio (Bs 0,50) y tarifas de ley
 │       │   │   ├── erroresViaje.ts         viaje inexistente, no disponible, tramo inválido
 │       │   │   └── Codigo.ts               códigos V-/P- y documentos ocultos
 │       │   └── adaptadores/
@@ -165,20 +166,25 @@ panamericana/
 ├── web/                      Next.js
 │   └── src/
 │       ├── app/                              RUTAS: lo que el usuario ve en la URL
-│       │   ├── layout.tsx                    envoltura general
+│       │   ├── layout.tsx                    envoltura general: idioma, títulos, "Saltar al contenido"
 │       │   ├── proveedores.tsx               cache de datos (TanStack Query)
-│       │   ├── (publico)/                    portal: "/", login, viajes, viajes/[id], compra/[codigo]
+│       │   ├── robots.ts · sitemap.ts        buscadores (cerrados hasta tener dominio oficial)
+│       │   ├── (publico)/                    portal: "/", login, viajes, viajes/[id], compra/[codigo], boleto, seguimiento,
+│       │   │                                 terminos, privacidad, reembolsos, cookies
 │       │   └── (backoffice)/
 │       │       ├── layout.tsx                PanelConSesion: exige sesión y arma el menú por rol
 │       │       └── admin/                    page.tsx (inicio) y {buses,terminales,clientes,rutas,viajes}/page.tsx
 │       ├── modulos/
-│       │   └── buses/                        ← MÓDULO DE EJEMPLO (copiar esta forma)
-│       │       ├── componentes/              lo que se ve (tabla, formulario)
-│       │       ├── hooks/                    lógica: cuándo pedir, cargando, error
-│       │       └── servicios/                llamadas a la API
+│       │   ├── buses/                        ← MÓDULO DE EJEMPLO (copiar esta forma)
+│       │   │   ├── componentes/              lo que se ve (tabla, formulario)
+│       │   │   ├── hooks/                    lógica: cuándo pedir, cargando, error
+│       │   │   └── servicios/                llamadas a la API
+│       │   └── legal/                        documentos legales (solo componentes: no llaman a la API)
 │       └── compartido/
 │           ├── servicios/clienteHttp.ts      único lugar con fetch
-│           ├── componentes/                  Boton, Campo, CampoSeleccion, MenuLateral, PlanoAsientos, CuentaRegresiva, CodigoQR, ConsultaPorCodigo
+│           ├── sitio.ts                      dominio oficial (NEXT_PUBLIC_SITIO_URL)
+│           ├── componentes/                  Boton, Campo, CampoSeleccion, CampoCasilla, DatoDelNegocio, MenuLateral, PlanoAsientos,
+│           │                                 GraficoBarras, CuentaRegresiva, CodigoQR, ConsultaPorCodigo
 │           └── utilidades/                   fechas.ts (hora de La Paz) · dinero.ts (formatearBs)
 │
 ├── supabase/
@@ -494,9 +500,22 @@ npx supabase db push
 ### 9.6 Una regla, un lugar (desde el Sprint 3)
 
 - **Un canal nuevo reutiliza los casos de uso existentes.** La taquilla (`VenderEnTaquilla`) compone `ReservarAsientos` y `PagarVenta`: así la web y la taquilla comparten el inventario y las defensas contra la doble venta.
-- **La web no copia reglas del backend.** Si la pantalla necesita saber qué se puede hacer, la API lo informa (por ejemplo `encomienda.siguientes`) o lo lee de un catálogo (`/v1/catalogos/tipos-asiento`).
+- **La web no copia reglas del backend.** Si la pantalla necesita saber qué se puede hacer, la API lo informa (por ejemplo `encomienda.siguientes`, o `precios_por_tarifa` en la disponibilidad para mostrar el total con descuento) o lo lee de un catálogo (`/v1/catalogos/tipos-asiento`).
 - **Todo movimiento de dinero queda en `pagos`** (`aprobado` al cobrar, `reembolsado` al devolver), en la misma transacción que el cambio de estado.
 - **Orden de bloqueos:** cuando una transacción bloquea varias filas, lo hace siempre en el mismo orden (venta → pasajes; bus → viajes) para no trabarse con otra.
+
+### 9.8 Accesibilidad, datos personales y textos legales (desde el incremento de calidad)
+
+- **Formularios:** siempre con `Campo`, `CampoSeleccion` o `CampoCasilla` (etiqueta visible, ayuda y error enlazados). Nunca un `<input>` suelto con solo `placeholder`.
+- **Textos visibles en español correcto** (con tildes); los identificadores y comentarios siguen sin tildes.
+- **Contraste:** texto con `slate-500` o más oscuro sobre blanco (`slate-400` no alcanza 4,5:1); gráficos y bordes de campos 3:1. El foco lo dibuja `globals.css`: no usar `focus:outline-none`.
+- **Íconos y flechas decorativas** con `aria-hidden`; si dicen algo, un texto `sr-only` al lado. Un `sr-only` dentro de una tabla con desplazamiento necesita un contenedor `relative`.
+- **Celular:** grillas con `grid-cols-1` y columnas `minmax(0,1fr)`; tablas dentro de `relative overflow-x-auto`. Áreas táctiles de 44 px (`min-h-11`).
+- **Datos personales:** pedir solo lo que el sistema usa; si un formulario recoge datos de personas, lleva la casilla de aceptación o de información (Términos y Privacidad). Las reservas exigen `acepta_condiciones: true`.
+- **Sin analíticas ni scripts de terceros** sin consentimiento previo y sin actualizar la Política de Cookies (`npm run prueba:seguridad` lo revisa).
+- **Datos de la empresa** solo en `shared/src/negocio.ts` y se muestran con `DatoDelNegocio`.
+- **Página nueva:** `metadata` con `title`; si muestra datos personales, `robots: { index: false, follow: false }`.
+- **Imágenes:** propias o con licencia verificada (el favicon de la plantilla de Next.js era el logo de un tercero y se reemplazó).
 
 ---
 
@@ -518,6 +537,8 @@ npx supabase db push
 | Decide cuándo pedir datos, o maneja "cargando" | `web/src/modulos/<modulo>/hooks/` |
 | Se ve en pantalla | `web/src/modulos/<modulo>/componentes/` |
 | Es una URL que el usuario escribe | `web/src/app/.../page.tsx` |
+| Es un dato de la empresa (razón social, NIT, contacto) | `shared/src/negocio.ts` |
+| Es un texto legal | `web/src/modulos/legal/componentes/` y su página en `web/src/app/(publico)/` |
 
 ---
 
@@ -566,6 +587,8 @@ npx supabase db push
 - [ ] SQL en minúsculas y nombres de campos sin cambios
 - [ ] No hay archivos `.env` ni claves en el cambio
 - [ ] La pantalla maneja cargando, error y lista vacía
+- [ ] Campos con `Campo`/`CampoSeleccion`/`CampoCasilla`, textos con tildes y sin desplazamiento horizontal a 375 px
+- [ ] Si pide datos personales: solo los necesarios y con la casilla de aceptación
 
 ---
 

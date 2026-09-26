@@ -28,7 +28,6 @@ export const RUTAS_API = {
     porBus: '/v1/buses/:id/asientos',
     /** POST generar el croquis estandar de un bus sin asientos (formato para Express) */
     generar: '/v1/buses/:id/asientos/generar',
-    /** formato para la web */
     /** PUT cambiar el tipo de un asiento (formato para Express) */
     asiento: '/v1/buses/:id/asientos/:asientoId',
     /** formato para la web */
@@ -46,6 +45,8 @@ export const RUTAS_API = {
     roles: '/v1/catalogos/roles',
     /** GET listar los tipos de asiento: normal, semicama, cama */
     tiposAsiento: '/v1/catalogos/tipos-asiento',
+    /** GET listar las tarifas diferenciadas que exige la ley (adulto mayor, discapacidad, menor) */
+    tiposPasajero: '/v1/catalogos/tipos-pasajero',
   },
 
   terminales: {

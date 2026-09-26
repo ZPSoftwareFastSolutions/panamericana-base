@@ -7,9 +7,9 @@ import { useRutas } from '../hooks/useRutas';
 export function TablaRutas() {
   const { data: rutas, isPending, error } = useRutas();
 
-  if (isPending) return <p className="text-slate-500">Cargando rutas...</p>;
+  if (isPending) return <p className="text-slate-600">Cargando rutas...</p>;
   if (error) return <p className="text-red-600">No se pudo cargar la lista: {error.message}</p>;
-  if (rutas.length === 0) return <p className="text-slate-500">Todavia no hay rutas registradas.</p>;
+  if (rutas.length === 0) return <p className="text-slate-600">Todavía no hay rutas registradas.</p>;
 
   return (
     <ul className="flex flex-col gap-4">
@@ -25,10 +25,10 @@ export function TablaRutas() {
           <ol className="mt-2 flex flex-wrap items-center gap-x-2 gap-y-1 text-sm">
             {ruta.paradas.map((parada, i) => (
               <li key={parada.orden} className="flex items-center gap-2">
-                {i > 0 && <span aria-hidden="true" className="text-slate-400">→</span>}
+                {i > 0 && <span aria-hidden="true" className="text-slate-500">→</span>}
                 <span>
                   <strong>{parada.orden}.</strong> {parada.terminal.ciudad}
-                  <span className="text-slate-500"> (+{formatearDuracion(parada.minutos_desde_origen)})</span>
+                  <span className="text-slate-600"> (+{formatearDuracion(parada.minutos_desde_origen)})</span>
                 </span>
               </li>
             ))}

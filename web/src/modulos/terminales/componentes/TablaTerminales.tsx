@@ -6,20 +6,20 @@ import { useTerminales } from '../hooks/useTerminales';
 export function TablaTerminales() {
   const { data: terminales, isPending, error } = useTerminales();
 
-  if (isPending) return <p className="text-slate-500">Cargando terminales...</p>;
+  if (isPending) return <p className="text-slate-600">Cargando terminales...</p>;
   if (error) return <p className="text-red-600">No se pudo cargar la lista: {error.message}</p>;
   if (terminales.length === 0) {
-    return <p className="text-slate-500">Todavia no hay terminales registradas.</p>;
+    return <p className="text-slate-600">Todavía no hay terminales registradas.</p>;
   }
 
   return (
-    <div className="overflow-x-auto">
+    <div className="relative overflow-x-auto">
       <table className="w-full border-collapse text-sm">
         <thead>
           <tr className="border-b border-slate-300 text-left">
             <th className="py-2 pr-4">Nombre</th>
             <th className="py-2 pr-4">Ciudad</th>
-            <th className="py-2 pr-4">Direccion</th>
+            <th className="py-2 pr-4">Dirección</th>
             <th className="py-2">Estado</th>
           </tr>
         </thead>

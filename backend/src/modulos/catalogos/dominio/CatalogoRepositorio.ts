@@ -1,4 +1,4 @@
-import type { Ciudad, ElementoCatalogo } from './Catalogo';
+import type { Ciudad, ElementoCatalogo, TipoPasajero } from './Catalogo';
 
 /** lo que el modulo necesita leer; la implementacion con SQL esta en adaptadores/ */
 export interface CatalogoRepositorio {
@@ -6,4 +6,5 @@ export interface CatalogoRepositorio {
   listarTiposDocumento(): Promise<ElementoCatalogo[]>;
   listarRoles(): Promise<ElementoCatalogo[]>;
   listarTiposAsiento(): Promise<ElementoCatalogo[]>;
+  listarTiposPasajero(): Promise<TipoPasajero[]>;
 }

@@ -10,7 +10,7 @@ async function main(): Promise<void> {
 
   try {
     const version = await pool.query<{ version: string }>('select version()');
-    console.log('Conexion correcta:', version.rows[0]?.version?.split(',')[0]);
+    console.log('Conexión correcta:', version.rows[0]?.version?.split(',')[0]);
 
     const objetos = await pool.query<{ nombre: string; tipo: string }>(
       `select table_name as nombre, table_type as tipo

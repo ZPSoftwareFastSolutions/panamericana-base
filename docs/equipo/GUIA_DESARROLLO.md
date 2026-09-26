@@ -1,6 +1,6 @@
 # Guía de Desarrollo — Panamericana
 
-> **Para:** todo el equipo · **Versión:** 1.5 · **Fecha:** 24/09/2026 (cierre del MVP: panel, predicción, PWA y pruebas)
+> **Para:** todo el equipo · **Versión:** 1.6 · **Fecha:** 26/09/2026 (accesibilidad, datos personales, documentos legales y tarifas de ley)
 > **Objetivo:** que cualquier integrante pueda agregar endpoints, pantallas y módulos **sin romper la arquitectura**, por su cuenta o con ayuda de un asistente de IA.
 > **Ejemplo que se usa en toda la guía:** el módulo **`choferes`** completo (listar con filtro, ver detalle, registrar y actualizar). Todo el código de esta guía **compila y funciona** con el proyecto actual.
 
@@ -69,6 +69,7 @@ LIMITE_RESERVAS_POR_HORA=30
 NEXT_PUBLIC_API_URL=http://localhost:4000
 NEXT_PUBLIC_SUPABASE_URL=https://tvyhpwpyxmbdfxogopnl.supabase.co
 NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=sb_publishable_pekXdkyDZys5MbAEw4KJWA_pVnIHBMi
+NEXT_PUBLIC_SITIO_URL=
 ```
 
 Si en `DATABASE_URL` ves `<CONTRASEÑA_DE_LA_BASE>`, pídele la contraseña a Ángel por privado.
@@ -83,6 +84,7 @@ Si en `DATABASE_URL` ves `<CONTRASEÑA_DE_LA_BASE>`, pídele la contraseña a Á
 | `LIMITE_RESERVAS_POR_HORA` | Reservas del portal que puede hacer una misma conexión por hora (evita que alguien acapare asientos). Para pruebas locales intensivas puedes subirlo |
 | `NEXT_PUBLIC_API_URL` | Dirección de la API que usa la web |
 | `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` | Inicio de sesión del panel. La clave *publicable* está hecha para el navegador: no es secreta |
+| `NEXT_PUBLIC_SITIO_URL` | Dominio oficial del sitio. **Déjalo vacío**: solo se llena en el despliegue oficial. Vacío, los buscadores no indexan nada; lleno, la web no se construye si faltan los datos de la empresa |
 
 > 🧪 **La base de datos es compartida por todo el equipo.** Puedes crear datos de prueba, pero **borra lo que crees** al terminar y no hagas cargas masivas.
 
@@ -209,19 +211,21 @@ Antes de escribir algo "genérico", revisa si ya está aquí:
 | `guardarPersona(conexion, persona)` | `backend/src/compartido/adaptadores/pg/personasSql.ts` | Guarda la persona (o reutiliza la que ya existe con ese documento) y devuelve su `id` |
 | `CODIGOS_PG`, `codigoPg(error)` | `backend/src/compartido/adaptadores/pg/erroresPg.ts` | Reconocer errores de la base: valor repetido (23505), referencia inexistente (23503) |
 | `Autorizacion`, `ROLES_INTERNOS`, `SOLO_ADMINISTRADOR`, `ROLES_VENTA`, `ROLES_ENCOMIENDAS`, `usuarioEnSesion(res)` | `backend/src/compartido/adaptadores/http/autorizacion.ts` | Proteger un endpoint por rol y saber quién hizo la petición |
-| `resolverTramo`, `horaDePaso`, `precioDeTramo` | `backend/src/compartido/dominio/Tramo.ts` | Reglas del tramo de un viaje: paradas válidas, hora de paso y precio proporcional redondeado a Bs 0,50 |
+| `resolverTramo`, `horaDePaso`, `precioDeTramo`, `precioConDescuento`, `preciosPorTarifa` | `backend/src/compartido/dominio/Tramo.ts` | Reglas del tramo de un viaje: paradas válidas, hora de paso, precio proporcional redondeado a Bs 0,50 y descuentos de las tarifas de ley |
 | `generarCodigo`, `enmascararDocumento` | `backend/src/compartido/dominio/Codigo.ts` | Códigos legibles de venta y pasaje (`V-…`, `P-…`) y documentos ocultos (`****351`) |
 | `PASAJE_ACTIVO`, `liberarReservasVencidas` | `backend/src/compartido/adaptadores/pg/reservasSql.ts` | Qué pasaje ocupa un asiento y liberar las reservas vencidas |
 | `sumarDias`, `diasEntre` | `backend/src/compartido/dominio/Fechas.ts` | Cuentas con fechas AAAA-MM-DD (dias de La Paz) sin horas |
 | `guardarCliente(conexion, persona)` | `backend/src/compartido/adaptadores/pg/personasSql.ts` | Guarda la persona y la deja como cliente (pasajero, remitente o destinatario); devuelve el id del cliente |
-| `Boton` | `web/src/compartido/componentes/Boton.tsx` | Botón con estado "Guardando..." |
-| `Campo`, `CampoSeleccion` | `web/src/compartido/componentes/Campo.tsx` | Campos de formulario con etiqueta y mensaje de error |
+| `NEGOCIO`, `datosDelNegocioPendientes` | `shared/src/negocio.ts` | Razón social, NIT y contacto de la empresa: el único lugar donde se escriben |
+| `Boton` | `web/src/compartido/componentes/Boton.tsx` | Botón de 44 px con estado "Procesando..." (o el texto de `textoCargando`) |
+| `Campo`, `CampoSeleccion`, `CampoCasilla` | `web/src/compartido/componentes/Campo.tsx` | Campos con etiqueta, texto de `ayuda` y mensaje de error enlazados para lectores de pantalla; `CampoCasilla` para aceptar términos |
+| `DatoDelNegocio` | `web/src/compartido/componentes/DatoDelNegocio.tsx` | Muestra un dato de la empresa (o `[por completar]` si falta) |
 | `MenuLateral` | `web/src/compartido/componentes/MenuLateral.tsx` | Menú del panel; muestra solo las opciones de los roles del usuario y resalta la pantalla actual |
 | `PlanoAsientos`, `CuentaRegresiva` | `web/src/compartido/componentes/` | Croquis de asientos por piso y reloj de la reserva |
 | `GraficoBarras` | `web/src/compartido/componentes/GraficoBarras.tsx` | Grafico de barras agrupadas en SVG, sin librerias |
 | `CodigoQR`, `ConsultaPorCodigo` | `web/src/compartido/componentes/` | QR de un codigo y formulario "escribe tu codigo" (boleto, encomienda) |
 | `SeleccionDeAsientos` | `web/src/modulos/ventas/componentes/SeleccionDeAsientos.tsx` | Elegir asientos y pasajeros de un tramo (lo usan el portal y la taquilla) |
-| `useTiposAsiento` | `web/src/modulos/catalogos/hooks/useCatalogos.ts` | Tipos de asiento del catalogo (normal, semicama, cama) |
+| `useTiposAsiento`, `useTiposPasajero` | `web/src/modulos/catalogos/hooks/useCatalogos.ts` | Tipos de asiento (normal, semicama, cama) y tarifas de ley (general, adulto mayor, discapacidad, menor) |
 | `hoyEnBolivia`, `formatearFecha`, `horaEnBolivia`, `fechaHoraEnBolivia`, `aIsoBolivia`, `formatearDuracion` | `web/src/compartido/utilidades/fechas.ts` | Fechas y horas siempre en hora de La Paz |
 | `formatearBs` | `web/src/compartido/utilidades/dinero.ts` | Montos como `Bs 47,50` |
 | `useSesion` | `web/src/modulos/sesion/hooks/useSesion.ts` | El usuario conectado y sus roles |
@@ -384,7 +388,7 @@ export class ChoferDuplicadoError extends ErrorDeDominio {
   readonly estadoHttp = 409;
 
   constructor() {
-    super('Ya existe un chofer con ese documento o numero de licencia');
+    super('Ya existe un chofer con ese documento o número de licencia');
   }
 }
 
@@ -669,7 +673,7 @@ function crearCaso() {
 }
 
 describe('RegistrarChofer', () => {
-  it('registra un chofer con CI valido y lo deja activo', async () => {
+  it('registra un chofer con CI válido y lo deja activo', async () => {
     const { repositorio, registrarChofer } = crearCaso();
 
     const chofer = await registrarChofer.ejecutar(datosValidos);
@@ -1136,6 +1140,7 @@ export function InsigniaEstado({ activo }: Props) {
 
 import Link from 'next/link';
 import { useState } from 'react';
+import { CampoSeleccion } from '@/compartido/componentes/Campo';
 import { InsigniaEstado } from '@/compartido/componentes/InsigniaEstado';
 import { useChoferes } from '../hooks/useChoferes';
 
@@ -1148,15 +1153,18 @@ export function TablaChoferes() {
 
   return (
     <div className="flex flex-col gap-3">
-      <select
-        className="w-48 rounded border border-slate-300 px-3 py-2 text-sm"
-        value={filtro}
-        onChange={(e) => setFiltro(e.target.value as Filtro)}
-      >
-        <option value="activos">Solo activos</option>
-        <option value="inactivos">Solo inactivos</option>
-        <option value="todos">Todos</option>
-      </select>
+      <div className="w-48">
+        <CampoSeleccion
+          etiqueta="Mostrar"
+          opciones={[
+            { valor: 'activos', texto: 'Solo activos' },
+            { valor: 'inactivos', texto: 'Solo inactivos' },
+            { valor: 'todos', texto: 'Todos' },
+          ]}
+          value={filtro}
+          onChange={(e) => setFiltro(e.target.value as Filtro)}
+        />
+      </div>
 
       {isPending && <p className="text-slate-500">Cargando choferes...</p>}
 
@@ -1167,36 +1175,39 @@ export function TablaChoferes() {
       )}
 
       {choferes && choferes.length > 0 && (
-        <table className="w-full border-collapse text-sm">
-          <thead>
-            <tr className="border-b border-slate-300 text-left">
-              <th className="py-2">Nombre</th>
-              <th className="py-2">Documento</th>
-              <th className="py-2">Licencia</th>
-              <th className="py-2">Estado</th>
-            </tr>
-          </thead>
-          <tbody>
-            {choferes.map((chofer) => (
-              <tr key={chofer.id} className="border-b border-slate-200">
-                <td className="py-2">
-                  <Link href={`/admin/choferes/${chofer.id}`} className="text-blue-700 hover:underline">
-                    {chofer.apellidos}, {chofer.nombres}
-                  </Link>
-                </td>
-                <td className="py-2">
-                  {chofer.tipo_documento.toUpperCase()} {chofer.numero_documento}
-                </td>
-                <td className="py-2">
-                  {chofer.categoria_licencia} · vence {chofer.fecha_vencimiento_licencia}
-                </td>
-                <td className="py-2">
-                  <InsigniaEstado activo={chofer.activo} />
-                </td>
+        // relative + overflow-x-auto: en el celular la tabla se desplaza sin ensanchar la página
+        <div className="relative overflow-x-auto">
+          <table className="w-full border-collapse text-sm">
+            <thead>
+              <tr className="border-b border-slate-300 text-left">
+                <th className="py-2">Nombre</th>
+                <th className="py-2">Documento</th>
+                <th className="py-2">Licencia</th>
+                <th className="py-2">Estado</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              {choferes.map((chofer) => (
+                <tr key={chofer.id} className="border-b border-slate-200">
+                  <td className="py-2">
+                    <Link href={`/admin/choferes/${chofer.id}`} className="text-blue-700 hover:underline">
+                      {chofer.apellidos}, {chofer.nombres}
+                    </Link>
+                  </td>
+                  <td className="py-2">
+                    {chofer.tipo_documento.toUpperCase()} {chofer.numero_documento}
+                  </td>
+                  <td className="py-2">
+                    {chofer.categoria_licencia} · vence {chofer.fecha_vencimiento_licencia}
+                  </td>
+                  <td className="py-2">
+                    <InsigniaEstado activo={chofer.activo} />
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
       )}
     </div>
   );
@@ -1262,7 +1273,7 @@ export function FormularioChofer() {
         onChange={(e) => setValores({ ...valores, tipo_documento: e.target.value as TipoDocumento })}
       />
       <Campo
-        etiqueta="Numero de documento"
+        etiqueta="Número de documento"
         placeholder="Ej. 5120478"
         value={valores.numero_documento}
         onChange={(e) => setValores({ ...valores, numero_documento: e.target.value })}
@@ -1281,13 +1292,13 @@ export function FormularioChofer() {
         required
       />
       <Campo
-        etiqueta="Numero de licencia"
+        etiqueta="Número de licencia"
         value={valores.numero_licencia}
         onChange={(e) => setValores({ ...valores, numero_licencia: e.target.value })}
         required
       />
       <Campo
-        etiqueta="Categoria de licencia"
+        etiqueta="Categoría de licencia"
         placeholder="Ej. c"
         value={valores.categoria_licencia}
         onChange={(e) => setValores({ ...valores, categoria_licencia: e.target.value })}
@@ -1302,6 +1313,8 @@ export function FormularioChofer() {
       />
       <Campo
         etiqueta="Celular (opcional)"
+        type="tel"
+        inputMode="numeric"
         placeholder="Ej. 70011223"
         value={valores.telefono ?? ''}
         onChange={(e) => setValores({ ...valores, telefono: e.target.value })}
@@ -1328,6 +1341,7 @@ export function FormularioChofer() {
 'use client';
 
 import Link from 'next/link';
+import { Boton } from '@/compartido/componentes/Boton';
 import { InsigniaEstado } from '@/compartido/componentes/InsigniaEstado';
 import { ErrorDeApi } from '@/compartido/servicios/clienteHttp';
 import { useActualizarChofer } from '../hooks/useActualizarChofer';
@@ -1380,14 +1394,14 @@ export function DetalleChofer({ id }: { id: string }) {
         <dd>{chofer.telefono ?? 'Sin registrar'}</dd>
       </dl>
 
-      <button
+      <Boton
         type="button"
-        disabled={actualizar.isPending}
+        className="w-fit"
+        cargando={actualizar.isPending}
         onClick={() => actualizar.mutate({ activo: !chofer.activo })}
-        className="w-fit rounded bg-slate-900 px-4 py-2 text-white disabled:opacity-50"
       >
         {chofer.activo ? 'Desactivar chofer' : 'Activar chofer'}
-      </button>
+      </Boton>
 
       {actualizar.error && (
         <p role="alert" className="text-red-600">
@@ -1547,7 +1561,7 @@ export function MiComponente() {
 ### 5.7 Componentes reutilizables
 
 - Si lo usa **un solo módulo** → `web/src/modulos/<modulo>/componentes/`.
-- Si lo usan **varios** → `web/src/compartido/componentes/` (como `Boton`, `Campo`, `MenuLateral` o `InsigniaEstado`).
+- Si lo usan **varios** → `web/src/compartido/componentes/` (como `Boton`, `Campo`, `CampoCasilla`, `MenuLateral` o `InsigniaEstado`).
 - Reciben datos por *props* y **no** llaman a la API.
 
 ### 5.8 Si tu tarjeta necesita cambiar la base de datos
@@ -1572,6 +1586,8 @@ export function MiComponente() {
 - [ ] Los componentes **no** usan `fetch`: servicio → hook → componente
 - [ ] La pantalla maneja **cargando, vacío y error**
 - [ ] Datos de ejemplo **bolivianos** (CI, placas `1234ABC`, celulares de 8 dígitos, Bs)
+- [ ] Campos con `Campo`, `CampoSeleccion` o `CampoCasilla`, textos visibles **con tildes** y sin desplazamiento horizontal a 375 px (sección 6.3)
+- [ ] Si el formulario pide datos personales: solo los necesarios y con la casilla de aceptación
 - [ ] No hay `.env` ni contraseñas en el cambio
 
 ### 6.2 Errores comunes
@@ -1588,6 +1604,21 @@ export function MiComponente() {
 | Borrar líneas de otros en `endpoints.ts`, `index.ts`, `contenedor.ts`, `rutas.ts` o el menú | Rompe el trabajo de tus compañeros | Solo **agregar** tus líneas; PR pequeño y rápido |
 | `npm install` dentro de `backend/` o `web/` | Rompe la instalación del proyecto | `npm install` en la raíz |
 | Pegar la contraseña de la base en el código o en un chat | La base queda expuesta | Solo en `backend/.env` |
+| `<input placeholder="Nombre">` sin etiqueta | El lector de pantalla no sabe qué pide el campo y el ejemplo desaparece al escribir | `<Campo etiqueta="Nombre" ... />` |
+| `focus:outline-none` o texto `text-slate-400` | Quien usa teclado no ve dónde está; el gris claro no se lee | Dejar el foco de `globals.css`; texto `slate-500` o más oscuro |
+| Agregar una herramienta de analítica o un script de otro sitio | Exige aviso de cookies y consentimiento; `npm run prueba:seguridad` lo marca | Consultarlo antes con el equipo |
+| Escribir el NIT o el teléfono de la empresa en una pantalla | Queda desactualizado en varios lugares | `<DatoDelNegocio dato="nit" />` |
+
+### 6.3 Accesibilidad, textos y datos personales
+
+- **Cada campo con su etiqueta visible** (`Campo`, `CampoSeleccion`, `CampoCasilla`). El `placeholder` es solo un ejemplo. Para explicar algo, usa la propiedad `ayuda`.
+- **Textos que ve el usuario en español correcto, con tildes** ("Número", "Código", "sesión"). Los nombres de variables y campos siguen sin tildes (`numero_documento`).
+- **Contraste:** texto `text-slate-500` o más oscuro sobre blanco; nunca `text-slate-400` para texto. No quites el borde de foco.
+- **Íconos, flechas y cuadritos de leyenda decorativos** llevan `aria-hidden="true"`; si transmiten algo, agrega un texto `sr-only` (por ejemplo `<span className="sr-only">a</span>` junto a una flecha).
+- **Celular:** las grillas empiezan con `grid-cols-1` y usan `minmax(0,1fr)` en vez de `1fr`; las tablas van dentro de `<div className="relative overflow-x-auto">`. Botones y enlaces de acción de al menos 44 px (`Boton` ya lo cumple).
+- **Datos personales:** pide solo lo que el sistema usa. Si una pantalla registra datos de personas, agrega la casilla "fue informado de la Política de Privacidad" (`CampoCasilla`). Las reservas y ventas exigen `acepta_condiciones: true`.
+- **Página nueva:** exporta `metadata` con `title`. Si muestra datos personales (compras, boletos, encomiendas), agrega `robots: { index: false, follow: false }`.
+- **Imágenes:** solo propias o con licencia comprobada.
 
 ---
 

@@ -21,7 +21,7 @@ export class EditarTarifas {
     if (!viaje) throw new ViajeNoEncontradoError(viaje_id);
 
     if (viaje.estado !== 'programado' || viaje.fecha_salida <= this.ahora()) {
-      throw new ViajeNoDisponibleError('Solo se cambian los precios de un viaje programado que todavia no salio');
+      throw new ViajeNoDisponibleError('Solo se cambian los precios de un viaje programado que todavía no salió');
     }
     validarTarifas(tarifas, { placa: viaje.placa, tipos_asiento: viaje.tipos_asiento });
 

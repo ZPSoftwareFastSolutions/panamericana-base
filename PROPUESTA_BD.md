@@ -9,12 +9,12 @@
 | Dato | Valor |
 |---|---|
 | Proyecto Supabase | `panamericana` (ref `tvyhpwpyxmbdfxogopnl`) |
-| Tablas creadas | **26**, todas con RLS activado y sin políticas públicas |
+| Tablas creadas | **27**, todas con RLS activado y sin políticas públicas (la 27.ª, `tipos_pasajero`, desde el 26/09) |
 | Vistas | **4** (`rutas_resumen`, `viajes_horarios`, `ventas_totales`, `encomiendas_estado_actual`), con `security_invoker` y sin acceso para `anon` |
 | Datos de prueba | `supabase/seed.sql`: 5 personas, 2 usuarios con rol, 2 clientes, 1 chofer, 3 terminales, 2 buses con croquis completo (`2045KLP`: 2 cama + 34 semicama en 2 pisos; `3187HTR`: 40 semicama), 1 ruta con 3 paradas, 1 viaje, 2 tarifas (una por tipo de asiento del bus), 1 venta con pasaje y pago |
 | Datos de demostración | `supabase/demo.sql` (`npm run db:demo`): viajes de hoy a 6 días con tarifas; idempotente y sin cruces de horario |
 | Cuentas de acceso | Supabase Auth: Ana (administradora) y Luis (vendedor), con el **mismo id** que en `usuarios`. La contraseña no se versiona |
-| Migraciones | `supabase/migrations/` (11 archivos, aplicados) |
+| Migraciones | `supabase/migrations/` (12 archivos, aplicados) |
 | Contexto | **Bolivia (La Paz):** documentos `ci`, `ce` y `pasaporte`; placas `1234ABC`; montos en bolivianos (Bs); fechas en hora de La Paz (UTC−4) |
 
 **Pruebas ejecutadas contra la base real (22/09):**
@@ -99,6 +99,7 @@ erDiagram
     asientos ||--o{ pasajes : "se asigna en"
     rutas_paradas ||--o{ pasajes : "sube / baja"
     clientes ||--o{ pasajes : "viaja"
+    tipos_pasajero ||--o{ pasajes : "tarifa de ley"
     ventas ||--|{ pasajes : "agrupa"
     ventas ||--o{ encomiendas : "agrupa"
     ventas ||--|{ pagos : "se cobra con"
@@ -113,11 +114,11 @@ erDiagram
     usuarios ||--o{ historial_encomiendas : "actualiza"
 ```
 
-**26 tablas en 6 áreas**
+**27 tablas en 6 áreas**
 
 | Área | Tablas |
 |---|---|
-| 📚 Catálogos | `departamentos`, `ciudades`, `tipos_documento`, `tipos_asiento`, `categorias_licencia`, `canales_venta`, `metodos_pago`, `roles` |
+| 📚 Catálogos | `departamentos`, `ciudades`, `tipos_documento`, `tipos_asiento`, `categorias_licencia`, `canales_venta`, `metodos_pago`, `roles`, `tipos_pasajero` |
 | 🔐 Personas y acceso | `personas`, `usuarios`, `usuarios_roles`, `clientes` |
 | 🚌 Flota y tripulación | `buses`, `asientos`, `choferes` |
 | 🗺️ Rutas y viajes | `terminales`, `rutas`, `rutas_paradas`, `viajes`, `viajes_choferes`, `tarifas` |
@@ -144,6 +145,7 @@ Todos tienen `codigo` (clave primaria), `nombre*`, `activo*` y `creado_en*`.
 | `canales_venta` | `web`, `movil`, `taquilla` | |
 | `metodos_pago` | `efectivo`, `tarjeta`, `transferencia`, `billetera_digital` | |
 | `roles` | `administrador`, `vendedor`, `encomiendas`, `cliente` | `descripcion` |
+| `tipos_pasajero` | `general` (0 %), `adulto_mayor` (20 %), `discapacidad` (50 %), `menor` (50 %) | `descuento_porcentaje*` (de 0 a menos de 100), `requisito` (documento que se presenta al subir), `base_legal`, `orden*`. Tarifas diferenciadas de la normativa boliviana (migración 12) |
 
 > Agregar un rol, un método de pago o una ciudad es **insertar una fila**, no una migración.
 
@@ -322,7 +324,8 @@ Una operación de compra: agrupa pasajes y/o encomiendas y se cobra junta. **El 
 | `asiento_id`* | uuid | → `asientos.id`, del bus del viaje |
 | `cliente_id`* | uuid | → `clientes.id` (el pasajero) |
 | `orden_origen`* · `orden_destino`* | smallint | Paradas donde sube y baja, dentro de `ruta_id` |
-| `precio`* | numeric(10,2) | Precio cobrado (histórico: no se recalcula) |
+| `precio`* | numeric(10,2) | Precio cobrado, **ya con el descuento de su tarifa** (histórico: no se recalcula) |
+| `tipo_pasajero`* | text | → `tipos_pasajero.codigo`; por defecto `'general'`. Con qué tarifa se vendió (el boleto dice qué documento presentar) |
 | `estado`* | text | `'reservado'`, `'pagado'`, `'anulado'`, `'expirado'` |
 | `reservado_hasta` | timestamptz | Hasta cuándo se retiene el asiento |
 | `creado_en`* · `actualizado_en`* | timestamptz | |
@@ -463,5 +466,6 @@ Las decisiones marcadas ✅ están en `PRODUCT_BACKLOG.md` §2 y **no requieren 
 | `20260922143814_derivados_y_vistas.sql` | quita las 7 columnas calculadas y crea las 4 vistas |
 | `20260922143903_integridad_y_claves.sql` | claves naturales, catálogos como FK y la integridad del tramo |
 | `20260924022028_rutas_nombre_unico.sql` | índice único `lower(nombre)` en `rutas`: dos registros simultáneos con el mismo nombre no pasan (Sprint 2, PAN-13) |
+| `20260926034529_tarifas_diferenciadas.sql` | catálogo `tipos_pasajero` (adulto mayor, Ley 1886; discapacidad, Ley 223 y DS 1893; menor de 3 a 12 años, reglamento de la ATT, art. 81) y columna `pasajes.tipo_pasajero` con valor por defecto `general` (incremento de calidad y legal, PAN-44) |
 
 Todas las tablas (salvo las puente y las de historial) tienen `creado_en` y `actualizado_en`; un *trigger* mantiene `actualizado_en` al día.

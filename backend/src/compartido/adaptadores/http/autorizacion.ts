@@ -38,7 +38,7 @@ export const ROLES_ENCOMIENDAS = ['administrador', 'encomiendas'];
 export function usuarioEnSesion(res: Response): UsuarioEnSesion {
   const usuario = res.locals.usuario as UsuarioEnSesion | undefined;
   if (!usuario) {
-    throw new Error('Esta ruta no tiene el middleware de autorizacion');
+    throw new Error('Esta ruta no tiene el middleware de autorización');
   }
   return usuario;
 }

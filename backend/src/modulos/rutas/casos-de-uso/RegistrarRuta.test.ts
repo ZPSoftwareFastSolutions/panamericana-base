@@ -53,7 +53,7 @@ const valida = {
 };
 
 describe('RegistrarRuta', () => {
-  it('numera las paradas en orden y calcula la duracion con la ultima', async () => {
+  it('numera las paradas en orden y calcula la duración con la última', async () => {
     const ruta = await new RegistrarRuta(new RutasEnMemoria()).ejecutar(valida);
 
     expect(ruta.paradas.map((p) => p.orden)).toEqual([1, 2, 3]);

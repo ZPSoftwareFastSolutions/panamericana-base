@@ -29,7 +29,7 @@ export const UMBRAL_REFUERZO = 0.9;
 export function exigirModeloCompatible(modelo: ModeloDemanda): void {
   const esperado = NOMBRES_CARACTERISTICAS.join(',');
   if (modelo.caracteristicas.join(',') !== esperado || modelo.coeficientes.length !== NOMBRES_CARACTERISTICAS.length) {
-    throw new ModeloInvalidoError('las caracteristicas del modelo no coinciden: vuelve a entrenarlo');
+    throw new ModeloInvalidoError('las características del modelo no coinciden: vuelve a entrenarlo');
   }
 }
 

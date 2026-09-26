@@ -52,7 +52,7 @@ describe('EditarTarifas', () => {
     );
   });
 
-  it('no cambia precios de un viaje que ya salio o no esta programado; 404 si no existe', async () => {
+  it('no cambia precios de un viaje que ya salió o no está programado; 404 si no existe', async () => {
     const { editar, repositorio } = crear();
 
     repositorio.viaje = { ...repositorio.viaje, fecha_salida: new Date('2026-09-30T11:00:00Z') };

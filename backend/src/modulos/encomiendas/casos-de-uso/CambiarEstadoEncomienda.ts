@@ -32,7 +32,7 @@ export class CambiarEstadoEncomienda {
     const viaje_id = entrada.viaje_id ?? null;
     if (viaje_id) {
       if (!admiteViaje(entrada.estado)) {
-        throw new EncomiendaInvalidaError('El viaje se indica solo al despachar la encomienda (en transito)');
+        throw new EncomiendaInvalidaError('El viaje se indica solo al despachar la encomienda (en tránsito)');
       }
       const sirve = await this.encomiendas.viajeSirve(
         viaje_id,
@@ -44,7 +44,7 @@ export class CambiarEstadoEncomienda {
 
     const observacion = entrada.observacion?.trim() || null;
     if (observacion && observacion.length > 200) {
-      throw new EncomiendaInvalidaError('La observacion tiene 200 caracteres como maximo');
+      throw new EncomiendaInvalidaError('La observación tiene 200 caracteres como máximo');
     }
 
     const guardado = await this.encomiendas.registrarCambio({

@@ -1,5 +1,5 @@
 import { ViajeNoEncontradoError } from '../../../compartido/dominio/erroresViaje';
-import { reservarAsientos } from '../dominio/Venta';
+import { exigirConsentimiento, reservarAsientos } from '../dominio/Venta';
 import type { Canal, DatosPasajero } from '../dominio/Venta';
 import type { VentaDetalle, VentaRepositorio } from '../dominio/VentaRepositorio';
 import { ocultarDocumentos } from '../dominio/privacidad';
@@ -9,6 +9,8 @@ export type EntradaReserva = {
   orden_origen: number;
   orden_destino: number;
   pasajeros: DatosPasajero[];
+  /** el comprador acepto los Terminos y Condiciones y la Politica de Privacidad */
+  acepta_condiciones: boolean;
 };
 
 /**
@@ -33,6 +35,9 @@ export class ReservarAsientos {
       usuario_id: null,
     },
   ): Promise<VentaDetalle> {
+    // primero lo que no necesita la base: sin consentimiento no se consulta nada
+    exigirConsentimiento(entrada.acepta_condiciones);
+
     const contexto = await this.ventas.contextoDeReserva(
       entrada.viaje_id,
       entrada.orden_origen,
@@ -47,6 +52,8 @@ export class ReservarAsientos {
         orden_origen: entrada.orden_origen,
         orden_destino: entrada.orden_destino,
         pasajeros: entrada.pasajeros,
+        tiposPasajero: contexto.tiposPasajero,
+        acepta_condiciones: entrada.acepta_condiciones,
         canal: opciones.canal,
         usuario_id: opciones.usuario_id,
       },
@@ -57,7 +64,7 @@ export class ReservarAsientos {
     await this.ventas.guardarReserva(venta);
 
     const guardada = await this.ventas.buscarPorCodigo(venta.codigo);
-    if (!guardada) throw new Error('La venta no se encontro despues de guardarla');
+    if (!guardada) throw new Error('La venta no se encontró después de guardarla');
     return opciones.mostrarDocumentos ? guardada : ocultarDocumentos(guardada);
   }
 }

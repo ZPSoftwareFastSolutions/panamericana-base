@@ -1,4 +1,10 @@
+import type { Metadata } from 'next';
 import { Boleto } from '@/modulos/ventas/componentes/Boleto';
+
+export const metadata: Metadata = {
+  title: 'Boleto',
+  robots: { index: false, follow: false },
+};
 
 /** PAGINA /boleto/[codigo]: boleto electronico con QR, listo para imprimir */
 export default async function PaginaBoleto({ params }: { params: Promise<{ codigo: string }> }) {

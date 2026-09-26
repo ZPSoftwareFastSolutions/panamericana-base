@@ -1,10 +1,49 @@
 @import 'tailwindcss';
 
+/*
+ * COLORES DEL SISTEMA (tokens). Los componentes usan la paleta slate de Tailwind; estos valores
+ * son los que se repiten fuera de las clases (fondo, texto, foco y graficos). "static" los publica
+ * siempre como variables CSS, aunque ninguna clase los use.
+ * Todos cumplen el contraste minimo de accesibilidad: texto 4.5:1 y graficos o bordes 3:1.
+ */
+@theme static {
+  --color-fondo: #f8fafc; /* slate-50 */
+  --color-texto: #0f172a; /* slate-900 */
+  --color-foco: #2563eb; /* blue-600: 5.2:1 sobre blanco y 3.5:1 sobre la cabecera oscura */
+  --color-grafico-principal: #0f172a; /* slate-900 */
+  --color-grafico-secundario: #64748b; /* slate-500: 4.5:1 sobre el fondo del grafico */
+  --color-grafico-alerta: #dc2626; /* red-600 */
+}
+
 :root {
   color-scheme: light;
 }
 
 body {
-  background-color: #f8fafc;
-  color: #0f172a;
+  background-color: var(--color-fondo);
+  color: var(--color-texto);
+}
+
+/* borde de foco visible y parejo en todo el sistema (solo al navegar con teclado en botones y enlaces) */
+:where(a, button, input, select, textarea, summary, [tabindex]:not([tabindex='-1'])):focus-visible {
+  outline: 2px solid var(--color-foco);
+  outline-offset: 2px;
+}
+
+/* el texto de ejemplo de los campos tambien debe leerse (slate-500, 4.8:1 sobre blanco) */
+::placeholder {
+  color: #64748b;
+  opacity: 1;
+}
+
+/* quien pidio menos movimiento en su dispositivo no ve animaciones ni transiciones */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
 }

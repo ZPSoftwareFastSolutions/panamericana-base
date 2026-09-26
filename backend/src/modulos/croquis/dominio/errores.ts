@@ -14,7 +14,7 @@ export class CroquisExistenteError extends ErrorDeDominio {
   readonly estadoHttp = 409;
 
   constructor() {
-    super('El bus ya tiene asientos: el croquis estandar solo se genera para un bus sin asientos');
+    super('El bus ya tiene asientos: el croquis estándar solo se genera para un bus sin asientos');
   }
 }
 
@@ -31,7 +31,7 @@ export class AsientoDuplicadoError extends ErrorDeDominio {
   readonly codigo = 'asiento_duplicado';
   readonly estadoHttp = 409;
 
-  constructor(motivo = 'Ya existe un asiento con ese numero o en esa posicion') {
+  constructor(motivo = 'Ya existe un asiento con ese número o en esa posición') {
     super(motivo);
   }
 }

@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { exigirTramoALaVenta, horaDePaso, precioDeTramo, resolverTramo } from './Tramo';
+import { exigirTramoALaVenta, horaDePaso, precioConDescuento, precioDeTramo, preciosPorTarifa, resolverTramo } from './Tramo';
 import { TramoInvalidoError, ViajeNoDisponibleError } from './erroresViaje';
 
 const PARADAS = [
@@ -30,6 +30,26 @@ describe('precioDeTramo', () => {
   });
 });
 
+describe('tarifas diferenciadas', () => {
+  it('el descuento se redondea hacia abajo a Bs 0,50 y nunca deja el pasaje en menos de Bs 0,50', () => {
+    expect(precioConDescuento(47.5, 0)).toBe(47.5);
+    expect(precioConDescuento(47.5, 20)).toBe(38);
+    expect(precioConDescuento(47.5, 50)).toBe(23.5);
+    expect(precioConDescuento(95, 50)).toBe(47.5);
+    expect(precioConDescuento(0.5, 50)).toBe(0.5);
+  });
+
+  it('da el precio de un asiento con cada tarifa del catalogo', () => {
+    const tipos = [
+      { codigo: 'general', descuento_porcentaje: 0 },
+      { codigo: 'adulto_mayor', descuento_porcentaje: 20 },
+      { codigo: 'menor', descuento_porcentaje: 50 },
+    ];
+    expect(preciosPorTarifa(60, tipos)).toEqual({ general: 60, adulto_mayor: 48, menor: 30 });
+    expect(preciosPorTarifa(60, [])).toEqual({});
+  });
+});
+
 describe('resolverTramo', () => {
   it('devuelve las paradas del tramo y cuanto dura', () => {
     const tramo = resolverTramo(PARADAS, 2, 3);
@@ -53,7 +73,7 @@ describe('exigirTramoALaVenta', () => {
     expect(horaDePaso(salida, 210).toISOString()).toBe('2026-10-01T15:30:00.000Z');
   });
 
-  it('no vende si el bus ya paso o si el viaje no esta programado', () => {
+  it('no vende si el bus ya paso o si el viaje no está programado', () => {
     const ahora = new Date('2026-10-01T13:00:00Z');
     expect(() => exigirTramoALaVenta('programado', salida, PARADAS[0]!, ahora)).toThrow(
       ViajeNoDisponibleError,

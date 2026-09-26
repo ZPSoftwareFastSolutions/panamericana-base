@@ -11,3 +11,14 @@ export type ElementoCatalogo = {
   codigo: string;
   nombre: string;
 };
+
+/**
+ * una tarifa diferenciada que exige la normativa boliviana (catalogo tipos_pasajero).
+ * El requisito es el documento que el pasajero presenta al subir al bus.
+ */
+export type TipoPasajero = {
+  codigo: string;
+  nombre: string;
+  descuento_porcentaje: number;
+  requisito: string | null;
+};

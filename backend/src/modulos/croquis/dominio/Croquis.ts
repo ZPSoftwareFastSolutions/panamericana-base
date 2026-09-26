@@ -46,7 +46,7 @@ export function validarAsiento(
 ): void {
   const enteros = [asiento.numero, asiento.piso, asiento.fila, asiento.columna];
   if (enteros.some((valor) => !Number.isInteger(valor) || valor < 1)) {
-    throw new AsientoInvalidoError('Numero, piso, fila y columna deben ser enteros mayores que 0');
+    throw new AsientoInvalidoError('Número, piso, fila y columna deben ser enteros mayores que 0');
   }
   if (asiento.piso > bus.numero_pisos) {
     throw new AsientoInvalidoError(`El bus ${bus.placa} solo tiene ${bus.numero_pisos} piso(s)`);
@@ -102,13 +102,13 @@ export function generarCroquisEstandar(
 /** un asiento nuevo no puede repetir el numero ni la posicion de otro del mismo bus */
 export function chocaConOtro(nuevo: DatosAsiento, existentes: DatosAsiento[]): string | null {
   if (existentes.some((a) => a.numero === nuevo.numero)) {
-    return `Ya existe el asiento numero ${nuevo.numero}`;
+    return `Ya existe el asiento número ${nuevo.numero}`;
   }
   const mismaPosicion = existentes.find(
     (a) => a.piso === nuevo.piso && a.fila === nuevo.fila && a.columna === nuevo.columna,
   );
   if (mismaPosicion) {
-    return `Esa posicion ya la ocupa el asiento ${mismaPosicion.numero}`;
+    return `Esa posición ya la ocupa el asiento ${mismaPosicion.numero}`;
   }
   return null;
 }

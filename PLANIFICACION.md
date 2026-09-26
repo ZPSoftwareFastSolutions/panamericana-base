@@ -1,6 +1,6 @@
 # PLANIFICACIÓN — Sistema de Gestión "Panamericana"
 
-> **Versión:** 0.5 · **Fecha:** 2026-09-15 · **Estado:** Sprint 1 en curso · repositorio del equipo montado y corregido · contexto Bolivia · todo en local
+> **Versión:** 0.6 · **Fecha:** 2026-09-26 · **Estado:** Sprint 1 en curso · repositorio del equipo montado y corregido · contexto Bolivia · todo en local
 > **Entorno:** Proyecto aislado (cuarentena), sin dependencias ni contexto heredado.
 >
 > 📅 **Calendario vigente (desde v0.4):** Sprint 1 **08/09 → 19/09** · Sprint 2 **22/09 → 03/10** · Sprint 3 **06/10 → 17/10, sin confirmar por el docente**. Ya **no existe Sprint 0** ni los Sprints 4–6 de versiones anteriores.
@@ -14,6 +14,7 @@
 | 0.3 | Repositorio construido: workspaces (`shared`, `backend`, `web`), módulo de ejemplo `buses` de punta a punta, Next.js 16. Móvil aplazado para priorizar la web. Modelo de datos v0.9 con tripulación, tramos, tarifas y ventas. |
 | 0.4 | **Calendario comprimido a 3 sprints** (el docente fijó Sprint 1 del 08/09 al 19/09 y Sprint 2 del 22/09 al 03/10; el Sprint 3 está sin confirmar). Desaparece el Sprint 0: su guía pasa a ser la del Sprint 1. **Product Backlog del MVP** con épicas E0–E11 e historias de usuario. Despliegue en **Vercel + Supabase** (ADR-002, propuesta). Canal móvil como **PWA**. Nueva sección de **tecnologías emergentes**. |
 | 0.5 | **Contexto Bolivia** (documentos `ci`/`ce`/`pasaporte`, placas, Bs). **Despliegue en la nube movido a la fase final**: todo corre en local hasta entonces. Tokens de Supabase firmados con **ECC P-256** (validación por JWKS). El repositorio del equipo lo administra **AngelParedesH20**. |
+| 0.6 | (26/09) **Calidad y cumplimiento legal:** tarifas diferenciadas de ley, consentimiento al vender, documentos legales, accesibilidad WCAG 2.2 AA en la *Definition of Done* y riesgos legales nuevos (§10). Informe: `docs/calidad/INFORME_CALIDAD_LEGAL.md`. |
 
 ### Documentos del proyecto
 
@@ -279,6 +280,8 @@ La guía completa, con ejemplos, está en **`ARQUITECTURA_CLEAN.md`**. Resumen:
 - [ ] SQL en minúsculas y nombres idénticos al modelo aprobado (R1–R6)
 - [ ] PR aprobado por el revisor
 - [ ] Criterios de aceptación validados en local (en staging desde la fase final)
+- [ ] Pantallas accesibles: campos con etiqueta, textos con tildes, contraste y sin desplazamiento horizontal a 375 px (`ARQUITECTURA_CLEAN.md` §9.8)
+- [ ] Si se piden datos personales: solo los necesarios y con consentimiento
 
 ### 7.6 Convenciones Git
 
@@ -368,6 +371,10 @@ Las historias de usuario, los criterios de aceptación y las tarjetas están en 
 | SM con poco tiempo para desarrollar | Media | Medio | 40 % SM, WIP 1, módulos CRUD | Ángel |
 | Sobrecarga de un integrante | Media | Medio | Reglas 2.6 revisadas en cada Planning | Ángel |
 | Semanas de exámenes | Alta | Medio | Capacidad ≤ 80 %, ajustar el sprint afectado | Ángel |
+| Publicar sin los datos legales de la empresa (razón social, NIT, autorización de la ATT) | Media | Alto | Un solo archivo (`shared/src/negocio.ts`); el build del sitio oficial y `prueba:seguridad` en producción fallan si faltan | Product Owner |
+| Ventas sin factura del SIN | Alta | Alto | Fuera del MVP: facturar con el sistema actual de la empresa o integrar la facturación en línea (informe de calidad §7.3) | Product Owner |
+| Documentos legales sin revisión profesional | Media | Alto | Revisión de un abogado boliviano antes del despliegue oficial | Product Owner |
+| Venta en línea no autorizada por la ATT para el operador | Baja | Alto | Confirmarlo con la ATT antes de publicar | Product Owner |
 
 ---
 

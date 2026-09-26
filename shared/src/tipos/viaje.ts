@@ -67,7 +67,10 @@ export type AsientoDisponible = {
   fila: number;
   columna: number;
   tipo: string;
+  /** precio del tramo con la tarifa general */
   precio: number;
+  /** el mismo precio con cada tarifa diferenciada ({ general: 47.5, adulto_mayor: 38, ... }) */
+  precios_por_tarifa: Record<string, number>;
   disponible: boolean;
 };
 

@@ -17,6 +17,7 @@ const PASAJE: PasajeDetalle = {
   precio: 47.5,
   venta: { codigo: 'V-ABCD2345', canal: 'web' },
   asiento: { numero: 12, piso: 1, tipo: 'semicama' },
+  tipo_pasajero: { codigo: 'general', nombre: 'General', requisito: null },
   pasajero: { tipo_documento: 'ci', numero_documento: '4827351', nombres: 'Maria', apellidos: 'Flores' },
   viaje: {
     id: 'viaje-1',
@@ -55,7 +56,7 @@ describe('ObtenerPasaje', () => {
     expect(boleto.anulable_hasta).toBe('2026-10-01T13:30:00.000Z');
   });
 
-  it('codigo inexistente -> 404', async () => {
+  it('código inexistente -> 404', async () => {
     await expect(new ObtenerPasaje(new PasajesEnMemoria()).ejecutar('P-NOEXISTE')).rejects.toThrow(
       PasajeNoEncontradoError,
     );
@@ -89,7 +90,7 @@ describe('AnularPasaje', () => {
     await expect(anular.ejecutar('P-ABCD2345')).rejects.toThrow(PasajeNoAnulableError);
   });
 
-  it('si otra persona lo anulo un instante antes, responde 409 sin reembolsar dos veces', async () => {
+  it('si otra persona lo anuló un instante antes, responde 409 sin reembolsar dos veces', async () => {
     const repositorio = new PasajesEnMemoria();
     repositorio.yaAnulado = true;
 
@@ -117,7 +118,7 @@ describe('VenderEnTaquilla', () => {
     } as unknown as PagarVenta;
 
     const venta = await new VenderEnTaquilla(reservar, pagar, { expirar: async () => {} }).ejecutar(
-      { viaje_id: 'viaje-1', orden_origen: 1, orden_destino: 2, pasajeros: [] },
+      { viaje_id: 'viaje-1', orden_origen: 1, orden_destino: 2, pasajeros: [], acepta_condiciones: true },
       'vendedor-1',
     );
 
@@ -135,14 +136,14 @@ describe('VenderEnTaquilla', () => {
     } as unknown as ReservarAsientos;
     const pagar = {
       ejecutar: async () => {
-        throw new Error('se corto la conexion');
+        throw new Error('se corto la conexión');
       },
     } as unknown as PagarVenta;
     const vender = new VenderEnTaquilla(reservar, pagar, { expirar: async (id: string) => void liberadas.push(id) });
 
     await expect(
-      vender.ejecutar({ viaje_id: 'viaje-1', orden_origen: 1, orden_destino: 2, pasajeros: [] }, 'vendedor-1'),
-    ).rejects.toThrow('se corto la conexion');
+      vender.ejecutar({ viaje_id: 'viaje-1', orden_origen: 1, orden_destino: 2, pasajeros: [], acepta_condiciones: true }, 'vendedor-1'),
+    ).rejects.toThrow('se corto la conexión');
     expect(liberadas).toEqual(['venta-2']);
   });
 });

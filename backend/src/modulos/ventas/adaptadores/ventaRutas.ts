@@ -21,8 +21,10 @@ export const esquemaReserva = z.object({
       apellidos: z.string().min(1),
       telefono: z.string().nullable().optional(),
       correo: z.string().nullable().optional(),
+      tipo_pasajero: z.string().min(1).optional(),
     }),
   ),
+  acepta_condiciones: z.boolean(),
 });
 
 const esquemaCodigo = z.object({ codigo: z.string().min(3).max(20) });

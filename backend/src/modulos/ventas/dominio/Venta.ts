@@ -1,8 +1,8 @@
 import { generarCodigo } from '../../../compartido/dominio/Codigo';
 import { crearPersona } from '../../../compartido/dominio/Persona';
 import type { DatosPersona, Persona } from '../../../compartido/dominio/Persona';
-import { exigirTramoALaVenta, precioDeTramo, resolverTramo } from '../../../compartido/dominio/Tramo';
-import type { ParadaDelViaje } from '../../../compartido/dominio/Tramo';
+import { exigirTramoALaVenta, precioConDescuento, precioDeTramo, resolverTramo } from '../../../compartido/dominio/Tramo';
+import type { ParadaDelViaje, TipoDePasajero } from '../../../compartido/dominio/Tramo';
 import { AsientoNoDisponibleError, ReservaInvalidaError } from './errores';
 
 /**
@@ -10,6 +10,10 @@ import { AsientoNoDisponibleError, ReservaInvalidaError } from './errores';
  *
  * Ciclo de vida:  pendiente --pagar--> pagada        (pasajes: reservado -> pagado)
  *                 pendiente --vence--> expirada      (pasajes: reservado -> expirado, asientos libres)
+ *
+ * Tarifas diferenciadas (normativa boliviana): cada pasajero indica su tipo (general, adulto mayor,
+ * discapacidad, menor) y el descuento del catalogo se aplica sobre el precio del tramo. El documento
+ * que lo acredita se presenta al subir al bus.
  */
 
 export const MAXIMO_PASAJES_POR_VENTA = 5;
@@ -29,13 +33,18 @@ export type ViajeParaReservar = {
 
 export type AsientoParaReservar = { id: string; numero: number; tipo: string; ocupado: boolean };
 
-export type DatosPasajero = DatosPersona & { asiento_id: string };
+export type DatosPasajero = DatosPersona & { asiento_id: string; tipo_pasajero?: string };
+
+export type { TipoDePasajero };
+
+export const TIPO_PASAJERO_GENERAL = 'general';
 
 export type PasajeNuevo = {
   id: string;
   codigo: string;
   asiento_id: string;
   precio: number;
+  tipo_pasajero: string;
   pasajero: Persona;
 };
 
@@ -54,6 +63,16 @@ export type VentaNueva = {
 };
 
 /**
+ * Sin aceptar los Terminos y Condiciones y la Politica de Privacidad no se vende (web ni taquilla).
+ * El caso de uso lo revisa ANTES de ir a la base; reservarAsientos lo vuelve a exigir.
+ */
+export function exigirConsentimiento(acepta_condiciones: boolean): void {
+  if (acepta_condiciones !== true) {
+    throw new ReservaInvalidaError('Para comprar hay que aceptar los Términos y Condiciones y la Política de Privacidad');
+  }
+}
+
+/**
  * Reserva asientos de un tramo: valida todo y arma la venta pendiente con sus pasajes.
  * Aun no toca la base: el repositorio la guarda despues, dentro de una transaccion.
  */
@@ -64,6 +83,8 @@ export function reservarAsientos(
     orden_origen: number;
     orden_destino: number;
     pasajeros: DatosPasajero[];
+    tiposPasajero: TipoDePasajero[];
+    acepta_condiciones: boolean;
     canal: Canal;
     usuario_id: string | null;
   },
@@ -71,6 +92,8 @@ export function reservarAsientos(
   minutosDeReserva: number,
 ): VentaNueva {
   const { viaje, pasajeros } = datos;
+
+  exigirConsentimiento(datos.acepta_condiciones);
 
   if (pasajeros.length === 0 || pasajeros.length > MAXIMO_PASAJES_POR_VENTA) {
     throw new ReservaInvalidaError(`Una compra lleva de 1 a ${MAXIMO_PASAJES_POR_VENTA} pasajes`);
@@ -99,16 +122,26 @@ export function reservarAsientos(
   const ocupados = elegidos.filter((a) => a.ocupado).map((a) => a.numero);
   if (ocupados.length > 0) throw new AsientoNoDisponibleError(ocupados);
 
+  // cada pasajero con una tarifa del catalogo (sin indicar: general)
+  const tipos = pasajeros.map((p) => {
+    const codigo = p.tipo_pasajero ?? TIPO_PASAJERO_GENERAL;
+    const tipo = datos.tiposPasajero.find((t) => t.codigo === codigo);
+    if (!tipo) throw new ReservaInvalidaError(`La tarifa "${codigo}" no existe`);
+    return tipo;
+  });
+
   const pasajes = elegidos.map((asiento, i) => {
     const tarifa = viaje.tarifas.find((t) => t.tipo_asiento === asiento.tipo);
     if (!tarifa) {
       throw new ReservaInvalidaError(`El asiento ${asiento.numero} no tiene tarifa en este viaje`);
     }
+    const tipo = tipos[i]!;
     return {
       id: crypto.randomUUID(),
       codigo: generarCodigo('P'),
       asiento_id: asiento.id,
-      precio: precioDeTramo(tarifa.precio, tramo.minutos, viaje.duracion_ruta),
+      precio: precioConDescuento(precioDeTramo(tarifa.precio, tramo.minutos, viaje.duracion_ruta), tipo.descuento_porcentaje),
+      tipo_pasajero: tipo.codigo,
       pasajero: personas[i]!,
     };
   });

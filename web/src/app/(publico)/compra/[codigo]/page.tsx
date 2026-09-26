@@ -1,4 +1,10 @@
+import type { Metadata } from 'next';
 import { Checkout } from '@/modulos/ventas/componentes/Checkout';
+
+export const metadata: Metadata = {
+  title: 'Tu compra',
+  robots: { index: false, follow: false },
+};
 
 /** PAGINA /compra/[codigo]: pago simulado y confirmacion con los codigos de los pasajes */
 export default async function PaginaCompra({ params }: { params: Promise<{ codigo: string }> }) {

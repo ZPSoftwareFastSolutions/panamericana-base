@@ -7,7 +7,7 @@ export type FiltroIndicadores = {
   ruta_id?: string;
 };
 
-/** indicadores del panel de la administradora (HU-029) */
+/** indicadores del panel de la administradora */
 export type Indicadores = {
   desde: string;
   hasta: string;
@@ -47,7 +47,7 @@ export type DemandaDelDia = {
   alerta: AlertaDemanda | null;
 };
 
-/** prediccion de demanda de los proximos dias (HU-033) */
+/** prediccion de demanda de los proximos dias */
 export type PrediccionDemanda = {
   modelo: {
     tipo: string;

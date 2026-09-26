@@ -11,12 +11,12 @@ export function TablaViajes() {
   const { data: viajes, isPending, error } = useViajes();
   const [editando, setEditando] = useState<string | null>(null);
 
-  if (isPending) return <p className="text-slate-500">Cargando viajes...</p>;
+  if (isPending) return <p className="text-slate-600">Cargando viajes...</p>;
   if (error) return <p className="text-red-600">No se pudo cargar la lista: {error.message}</p>;
-  if (viajes.length === 0) return <p className="text-slate-500">No hay viajes programados desde hoy.</p>;
+  if (viajes.length === 0) return <p className="text-slate-600">No hay viajes programados desde hoy.</p>;
 
   return (
-    <div className="overflow-x-auto">
+    <div className="relative overflow-x-auto">
       <table className="w-full border-collapse text-sm">
         <thead>
           <tr className="border-b border-slate-300 text-left">
@@ -24,9 +24,11 @@ export function TablaViajes() {
             <th className="py-2 pr-4">Ruta</th>
             <th className="py-2 pr-4">Bus</th>
             <th className="py-2 pr-4">Tarifas</th>
-            <th className="py-2 pr-4">Ocupacion</th>
+            <th className="py-2 pr-4">Ocupación</th>
             <th className="py-2 pr-4">Estado</th>
-            <th className="py-2" />
+            <th className="py-2">
+            <span className="sr-only">Acciones</span>
+          </th>
           </tr>
         </thead>
         <tbody>
@@ -35,7 +37,7 @@ export function TablaViajes() {
             <tr className="border-b border-slate-200 align-top">
               <td className="py-2 pr-4 whitespace-nowrap">
                 {fechaHoraEnBolivia(viaje.fecha_salida)}
-                <span className="block text-xs text-slate-500">llega {fechaHoraEnBolivia(viaje.fecha_llegada_estimada)}</span>
+                <span className="block text-xs text-slate-600">llega {fechaHoraEnBolivia(viaje.fecha_llegada_estimada)}</span>
               </td>
               <td className="py-2 pr-4">{viaje.ruta.nombre}</td>
               <td className="py-2 pr-4">{viaje.bus.placa}</td>
@@ -52,8 +54,8 @@ export function TablaViajes() {
               <td className="py-2 pr-4">{viaje.estado}</td>
               <td className="py-2">
                 {viaje.estado === 'programado' && new Date(viaje.fecha_salida) > new Date() && (
-                  <button type="button" className="text-blue-700 hover:underline" onClick={() => setEditando(viaje.id)}>
-                    Precios
+                  <button type="button" className="min-h-11 text-blue-700 hover:underline" onClick={() => setEditando(viaje.id)}>
+                    Precios<span className="sr-only"> del viaje {fechaHoraEnBolivia(viaje.fecha_salida)}</span>
                   </button>
                 )}
               </td>

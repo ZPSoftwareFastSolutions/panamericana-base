@@ -37,7 +37,7 @@ export function PanelIndicadores() {
         />
       </div>
 
-      {isPending && <p className="text-slate-500">Cargando indicadores...</p>}
+      {isPending && <p className="text-slate-600">Cargando indicadores...</p>}
       {error && <p className="text-red-600">{error.message}</p>}
       {data && <ResumenIndicadores datos={data} />}
     </div>

@@ -7,6 +7,7 @@ export type PasajeDetalle = {
   precio: number;
   venta: { codigo: string; canal: string };
   asiento: { numero: number; piso: number; tipo: string };
+  tipo_pasajero: { codigo: string; nombre: string; requisito: string | null };
   pasajero: { tipo_documento: string; numero_documento: string; nombres: string; apellidos: string };
   viaje: {
     id: string;

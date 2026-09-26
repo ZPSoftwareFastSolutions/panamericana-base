@@ -9,6 +9,7 @@ export const clavesCatalogos = {
   tiposDocumento: ['catalogos', 'tipos-documento'] as const,
   roles: ['catalogos', 'roles'] as const,
   tiposAsiento: ['catalogos', 'tipos-asiento'] as const,
+  tiposPasajero: ['catalogos', 'tipos-pasajero'] as const,
 };
 
 // los catalogos casi nunca cambian: se guardan 10 minutos en cache
@@ -46,6 +47,15 @@ export function useTiposAsiento() {
   return useQuery({
     queryKey: clavesCatalogos.tiposAsiento,
     queryFn: catalogosServicio.tiposAsiento,
+    staleTime: DIEZ_MINUTOS,
+  });
+}
+
+/** HOOK: tarifas diferenciadas de la ley (general, adulto mayor, discapacidad, menor) para vender pasajes */
+export function useTiposPasajero() {
+  return useQuery({
+    queryKey: clavesCatalogos.tiposPasajero,
+    queryFn: catalogosServicio.tiposPasajero,
     staleTime: DIEZ_MINUTOS,
   });
 }

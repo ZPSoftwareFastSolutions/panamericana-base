@@ -21,14 +21,14 @@ export function PrediccionDemanda() {
       <div className="flex flex-wrap items-end justify-between gap-3">
         <div>
           <h2 className="font-semibold">Demanda estimada</h2>
-          <p className="text-sm text-slate-500">Pasajes esperados por dia frente a los asientos ya programados</p>
+          <p className="text-sm text-slate-600">Pasajes esperados por día frente a los asientos ya programados</p>
         </div>
         <div className="w-40">
           <CampoSeleccion
-            etiqueta="Proximos"
+            etiqueta="Próximos"
             opciones={[
-              { valor: '7', texto: '7 dias' },
-              { valor: '14', texto: '14 dias' },
+              { valor: '7', texto: '7 días' },
+              { valor: '14', texto: '14 días' },
             ]}
             value={String(dias)}
             onChange={(e) => setDias(Number(e.target.value))}
@@ -36,7 +36,7 @@ export function PrediccionDemanda() {
         </div>
       </div>
 
-      {isPending && <p className="text-slate-500">Calculando la demanda...</p>}
+      {isPending && <p className="text-slate-600">Calculando la demanda...</p>}
       {error && <p className="text-red-600">{error.message}</p>}
 
       {data && (
@@ -48,16 +48,16 @@ export function PrediccionDemanda() {
               <article key={ruta.id} className="flex flex-col gap-2">
                 <h3 className="text-sm font-semibold">
                   {ruta.nombre}{' '}
-                  <span className="font-normal text-slate-500">
-                    · base {pasajes_por_dia} pasajes/dia ({fuente === 'ventas_reales' ? 'ventas reales' : 'modelo'})
+                  <span className="font-normal text-slate-600">
+                    · base {pasajes_por_dia} pasajes/día ({fuente === 'ventas_reales' ? 'ventas reales' : 'modelo'})
                   </span>
                 </h3>
                 <GraficoBarras
                   titulo={`Demanda estimada de ${ruta.nombre}`}
                   categorias={delaRuta.map((d) => etiqueta(d.fecha) + (d.feriado ? ' ★' : ''))}
                   series={[
-                    { nombre: 'Pasajes estimados', color: '#0f172a', valores: delaRuta.map((d) => d.pasajes_estimados) },
-                    { nombre: 'Asientos programados', color: '#94a3b8', valores: delaRuta.map((d) => d.capacidad_programada) },
+                    { nombre: 'Pasajes estimados', color: 'var(--color-grafico-principal)', valores: delaRuta.map((d) => d.pasajes_estimados) },
+                    { nombre: 'Asientos programados', color: 'var(--color-grafico-secundario)', valores: delaRuta.map((d) => d.capacidad_programada) },
                   ]}
                   resaltadas={delaRuta.map((d) => d.alerta === 'refuerzo_sugerido')}
                 />
@@ -75,9 +75,9 @@ export function PrediccionDemanda() {
             );
           })}
 
-          <p className="border-t border-slate-200 pt-3 text-xs text-slate-500">
+          <p className="border-t border-slate-200 pt-3 text-xs text-slate-600">
             Modelo: {data.modelo.tipo} v{data.modelo.version}, entrenado el {data.modelo.entrenado_en} con datos {data.modelo.datos}. En
-            dias de prueba: error medio {data.modelo.metricas.mae} pasajes/dia (RMSE {data.modelo.metricas.rmse}), R²{' '}
+            días de prueba: error medio {data.modelo.metricas.mae} pasajes/día (RMSE {data.modelo.metricas.rmse}), R²{' '}
             {data.modelo.metricas.r2}. ★ feriado nacional.
           </p>
         </>

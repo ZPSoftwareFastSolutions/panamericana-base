@@ -31,18 +31,24 @@ export function VentaTaquilla() {
   if (vendida) {
     return (
       <section className="flex flex-col gap-3 rounded-xl border border-emerald-300 bg-emerald-50 p-4">
-        <h3 className="text-lg font-semibold text-emerald-900">
+        <h2 className="text-lg font-semibold text-emerald-900">
           Venta {vendida.codigo} cobrada: {formatearBs(vendida.total)} en efectivo
-        </h3>
+        </h2>
         <ul className="flex flex-col gap-1 text-sm">
           {vendida.pasajes.map((p) => (
             <li key={p.codigo} className="flex flex-wrap items-center gap-2">
               <span className="font-mono">{p.codigo}</span>
               <span>
                 asiento {p.asiento.numero} · {p.pasajero.nombres} {p.pasajero.apellidos} ({p.pasajero.numero_documento})
+                {p.tipo_pasajero.requisito && (
+                  <strong>
+                    {' '}
+                    · tarifa {p.tipo_pasajero.nombre}: verificar {p.tipo_pasajero.requisito.toLowerCase()}
+                  </strong>
+                )}
               </span>
-              <Link href={`/boleto/${p.codigo}`} target="_blank" className="text-blue-700 underline">
-                Imprimir boleto
+              <Link href={`/boleto/${p.codigo}`} target="_blank" rel="noopener" className="text-blue-700 underline">
+                Imprimir boleto<span className="sr-only"> {p.codigo} (se abre en otra pestaña)</span>
               </Link>
             </li>
           ))}
@@ -78,12 +84,14 @@ export function VentaTaquilla() {
           hasta={tramo.destino.orden}
           textoBoton="Cobrar en efectivo"
           nota="El cobro es inmediato: los asientos quedan vendidos y los pasajes emitidos."
-          alConfirmar={async (pasajeros) => {
+          consentimiento="taquilla"
+          alConfirmar={async (pasajeros, acepta_condiciones) => {
             const venta = await vender.mutateAsync({
               viaje_id: tramo.viaje_id,
               orden_origen: tramo.origen.orden,
               orden_destino: tramo.destino.orden,
               pasajeros,
+              acepta_condiciones,
             });
             setVendida(venta);
           }}
@@ -119,8 +127,12 @@ export function VentaTaquilla() {
         />
       </div>
 
-      {origen && destino && origen === destino && <p className="text-sm text-red-600">El destino debe ser distinto al origen</p>}
-      {resultados.isFetching && <p className="text-slate-500">Buscando viajes...</p>}
+      {origen && destino && origen === destino && (
+        <p role="alert" className="text-sm text-red-600">
+          El destino debe ser distinto al origen
+        </p>
+      )}
+      {resultados.isFetching && <p className="text-slate-600">Buscando viajes...</p>}
       {resultados.error && <p className="text-red-600">{resultados.error.message}</p>}
       {resultados.data?.length === 0 && <p className="text-slate-600">No hay viajes para esa fecha.</p>}
 
@@ -131,11 +143,12 @@ export function VentaTaquilla() {
             className="flex flex-wrap items-center justify-between gap-2 rounded-lg border border-slate-200 bg-white p-3"
           >
             <span>
-              <strong>{horaEnBolivia(r.origen.hora)}</strong> → {horaEnBolivia(r.destino.hora)} · bus {r.bus.placa} · desde{' '}
+              <strong>{horaEnBolivia(r.origen.hora)}</strong> <span aria-hidden="true">→</span>
+              <span className="sr-only">llega</span> {horaEnBolivia(r.destino.hora)} · bus {r.bus.placa} · desde{' '}
               {formatearBs(r.precio_desde)} · {r.asientos_libres} libres
             </span>
             <Boton disabled={r.asientos_libres === 0} onClick={() => setTramo(r)}>
-              Vender
+              Vender<span className="sr-only"> el viaje de las {horaEnBolivia(r.origen.hora)}</span>
             </Boton>
           </li>
         ))}

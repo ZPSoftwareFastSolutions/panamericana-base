@@ -23,12 +23,12 @@ export class IdentificarUsuario {
     try {
       ({ id } = await this.verificador.verificar(token));
     } catch {
-      throw new NoAutenticadoError('La sesion no es valida o ya vencio. Vuelve a iniciar sesion');
+      throw new NoAutenticadoError('La sesión no es valida o ya venció. Vuelve a iniciar sesión');
     }
 
     const cuenta = await this.cuentas.buscarActiva(id);
     if (!cuenta) {
-      throw new NoAutenticadoError('Tu cuenta no esta registrada o fue desactivada');
+      throw new NoAutenticadoError('Tu cuenta no está registrada o fue desactivada');
     }
 
     if (!puedeAcceder(cuenta, rolesPermitidos)) {
